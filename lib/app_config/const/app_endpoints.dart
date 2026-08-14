@@ -1,7 +1,7 @@
 /// Emulador Android → máquina host: use `10.0.2.2` (não use localhost).
 /// iOS Simulator → `localhost` ou `127.0.0.1`.
 /// Celular físico na mesma rede → IP do notebook (ex.: 192.168.0.105).
-const String server = 'http://10.0.2.2:8080';
+const String server = 'http://192.168.0.105:8080';
 
 // const String server = 'http://localhost:8080';
 
