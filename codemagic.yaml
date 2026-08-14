@@ -63,23 +63,50 @@ workflows:
 
       - name: Configure Version
         script: |
+          set -euo pipefail
+
           VERSION_LINE=$(grep '^version:' pubspec.yaml | cut -d' ' -f2)
           VERSION_NAME=$(echo "$VERSION_LINE" | cut -d'+' -f1)
-          PUBSPEC_BUILD=$(echo "$VERSION_LINE" | cut -d'+' -f2)
-          CM_NUM=${CM_BUILD_NUMBER:-0}
+          PUBSPEC_BUILD=$(echo "$VERSION_LINE" | cut -d'+' -f2 | tr -cd '0-9')
+          PUBSPEC_BUILD=${PUBSPEC_BUILD:-0}
+          CM_NUM=$(echo "${CM_BUILD_NUMBER:-0}" | tr -cd '0-9')
+          CM_NUM=${CM_NUM:-0}
 
-          if [ "$CM_NUM" -gt "$PUBSPEC_BUILD" ]; then
-            BUILD_NUMBER=$CM_NUM
-          else
-            BUILD_NUMBER=$PUBSPEC_BUILD
+          digits() {
+            local v
+            v=$(printf '%s' "${1:-0}" | tr -cd '0-9')
+            printf '%s' "${v:-0}"
+          }
+
+          STORE=0
+          TESTFLIGHT=0
+          LATEST=0
+          if command -v app-store-connect >/dev/null 2>&1; then
+            STORE=$(digits "$(app-store-connect get-latest-app-store-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || true)")
+            TESTFLIGHT=$(digits "$(app-store-connect get-latest-testflight-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || true)")
+            LATEST=$(digits "$(app-store-connect get-latest-build-number "$APP_STORE_APPLE_ID" 2>/dev/null || true)")
           fi
 
-          echo "VERSION_NAME=$VERSION_NAME" >> $CM_ENV
-          echo "BUILD_NUMBER=$BUILD_NUMBER" >> $CM_ENV
+          MAX=$PUBSPEC_BUILD
+          for n in "$CM_NUM" "$STORE" "$TESTFLIGHT" "$LATEST"; do
+            if [ "$n" -gt "$MAX" ]; then
+              MAX=$n
+            fi
+          done
+
+          BUILD_NUMBER=$((MAX + 1))
+
+          echo "VERSION_NAME=$VERSION_NAME" >> "$CM_ENV"
+          echo "BUILD_NUMBER=$BUILD_NUMBER" >> "$CM_ENV"
 
           echo ""
-          echo "App Version : $VERSION_NAME"
-          echo "Build Number: $BUILD_NUMBER"
+          echo "App Version........: $VERSION_NAME"
+          echo "pubspec build......: $PUBSPEC_BUILD"
+          echo "Codemagic number...: $CM_NUM"
+          echo "App Store latest...: $STORE"
+          echo "TestFlight latest..: $TESTFLIGHT"
+          echo "ASC latest.........: $LATEST"
+          echo "Next build number..: $BUILD_NUMBER"
           echo ""
 
       - name: Install CocoaPods
