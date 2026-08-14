@@ -1,5 +1,6 @@
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
+import 'package:app_dinix/function/categoria_icone.dart';
 import 'package:app_dinix/function/form_validation.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/function/validators.dart';
@@ -9,11 +10,13 @@ import 'package:app_dinix/models/receita_model.dart';
 import 'package:app_dinix/pages/receitas/cadastro_receita/cadastro_receita_bloc.dart';
 import 'package:app_dinix/pages/receitas/cadastro_receita/cadastro_receita_event.dart';
 import 'package:app_dinix/pages/receitas/cadastro_receita/cadastro_receita_state.dart';
+import 'package:app_dinix/widgets/app_cadastro_style.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_form_field_dinix.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/app_select_sheet.dart';
+import 'package:app_dinix/widgets/banco_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muller_package/muller_package.dart'
@@ -31,11 +34,9 @@ class CadastroReceitaPage extends StatefulWidget {
 class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
   final CadastroReceitaBloc bloc = CadastroReceitaBloc();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _valorController = TextEditingController();
+  final FocusNode _valorFocus = FocusNode();
 
-  late final AppFormField _valorForm;
-  late final AppFormField _origemForm;
-  late final AppFormField _contaForm;
-  late final AppFormField _dataForm;
   late final AppFormField _descricaoForm;
   late final AppFormField _obsForm;
   late final bool _isEdit;
@@ -43,6 +44,7 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
   CadastroReceitaLookups? _lookups;
   String? _idCategoria;
   String? _idConta;
+  late DateTime _dataRecebimento;
   bool _recorrente = false;
 
   @override
@@ -52,49 +54,36 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
     _idCategoria = widget.receita?.idCategoria;
     _idConta = widget.receita?.idConta;
     _recorrente = widget.receita?.recorrente ?? false;
+    _dataRecebimento = _parseDataInicial(widget.receita?.dataRecebimento);
     _criarCampos();
     _preencher();
+    _valorFocus.addListener(_aoFocarValor);
     bloc.add(CadastroReceitaLoadEvent());
+    if (!_isEdit) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _valorFocus.requestFocus();
+      });
+    }
+  }
+
+  void _aoFocarValor() {
+    if (_valorFocus.hasFocus) return;
+    normalizarValorCampo(_valorController);
+  }
+
+  DateTime _parseDataInicial(String? iso) {
+    final parsed = iso != null && iso.length >= 10
+        ? DateTime.tryParse(iso.substring(0, 10))
+        : null;
+    if (parsed != null) return DateTime(parsed.year, parsed.month, parsed.day);
+    final agora = DateTime.now();
+    return DateTime(agora.year, agora.month, agora.day);
   }
 
   void _criarCampos() {
-    _valorForm = criarCampoDinix(
-      context: context,
-      hint: 'Valor recebido',
-      icon: Phosphor.money,
-      textInputType: TextInputType.number,
-      textInputFormatter: AppFormFormatters.valor,
-      validator: validateValor,
-    );
-    _origemForm = criarCampoDinix(
-      context: context,
-      hint: 'Como ganhou',
-      icon: Phosphor.tag,
-      showKeyboard: false,
-      onTap: _escolherOrigem,
-      suffixIcon: Icon(Phosphor.caretDown, color: AppColors.grey400),
-      validator: (v) => validateObrigatorio(v, campo: 'Origem do ganho'),
-    );
-    _contaForm = criarCampoDinix(
-      context: context,
-      hint: 'Conta de destino',
-      icon: Phosphor.wallet,
-      showKeyboard: false,
-      onTap: _escolherConta,
-      suffixIcon: Icon(Phosphor.caretDown, color: AppColors.grey400),
-      validator: (v) => validateObrigatorio(v, campo: 'Conta'),
-    );
-    _dataForm = criarCampoDinix(
-      context: context,
-      hint: 'Data do recebimento',
-      icon: Phosphor.calendarBlank,
-      textInputType: TextInputType.number,
-      textInputFormatter: AppFormFormatters.data,
-      validator: validateDataBr,
-    );
     _descricaoForm = criarCampoDinix(
       context: context,
-      hint: 'Descrição (opcional)',
+      hint: 'O que foi recebido',
       icon: Phosphor.fileText,
     );
     _obsForm = criarCampoDinix(
@@ -107,23 +96,14 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
 
   void _preencher() {
     final receita = widget.receita;
-    _dataForm.controller.text = isoParaBr(receita?.dataRecebimento ?? dataHojeIso());
-    if (receita == null) return;
-    if (receita.valor != null) {
-      _valorForm.controller.text = formataMoedaCampo(receita.valor);
+    if (receita?.valor != null) {
+      _valorController.text = formataMoedaCampo(receita!.valor);
+    } else if (!_isEdit) {
+      _valorController.text = formataMoedaCampo(kCadastroValorPadrao);
     }
+    if (receita == null) return;
     _descricaoForm.controller.text = receita.descricao ?? '';
     _obsForm.controller.text = receita.observacoes ?? '';
-  }
-
-  void _aplicarLookups(CadastroReceitaLookups lookups) {
-    _lookups = lookups;
-    final origem = lookups.origens.where((c) => c.id == _idCategoria).firstOrNull;
-    if (origem != null) _origemForm.controller.text = origem.nome ?? '';
-    final conta = lookups.contas.where((c) => c.id == _idConta).firstOrNull;
-    if (conta != null) {
-      _contaForm.controller.text = conta.nomeBanco ?? conta.nome ?? '';
-    }
   }
 
   Future<void> _escolherOrigem() async {
@@ -138,12 +118,10 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
       items: items,
       labelOf: (c) => c.nome ?? '',
       selected: items.where((c) => c.id == _idCategoria).firstOrNull,
+      leadingOf: (c) => Icon(iconeDaCategoria(c), color: DinixColors.primary),
     );
     if (selecionada == null) return;
-    setState(() {
-      _idCategoria = selecionada.id;
-      _origemForm.controller.text = selecionada.nome ?? '';
-    });
+    setState(() => _idCategoria = selecionada.id);
   }
 
   Future<void> _escolherConta() async {
@@ -156,14 +134,13 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
       context: context,
       title: 'Conta de destino',
       items: items,
-      labelOf: (c) => c.nomeBanco ?? c.nome ?? '',
+      labelOf: (c) => c.nome ?? 'Conta',
+      subtitleOf: (c) => c.nomeBanco,
       selected: items.where((c) => c.id == _idConta).firstOrNull,
+      leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
     );
     if (selecionada == null) return;
-    setState(() {
-      _idConta = selecionada.id;
-      _contaForm.controller.text = selecionada.nomeBanco ?? selecionada.nome ?? '';
-    });
+    setState(() => _idConta = selecionada.id);
   }
 
   void _salvarCadastro() {
@@ -177,22 +154,28 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
       return;
     }
 
-    final origem = _lookups?.origens.where((c) => c.id == _idCategoria).firstOrNull;
+    final origem =
+        _lookups?.origens.where((c) => c.id == _idCategoria).firstOrNull;
     final descricao = _descricaoForm.value.trim().isNotEmpty
         ? _descricaoForm.value.trim()
         : (origem?.nome ?? 'Ganho');
+
+    final valor = (parseValor(_valorController.text) ?? kCadastroValorPadrao)
+        .clamp(kCadastroValorMinimo, kCadastroValorMaximo)
+        .toDouble();
 
     bloc.add(
       CadastroReceitaSaveEvent(
         receita: ReceitaModel(
           id: widget.receita?.id,
           descricao: descricao,
-          valor: parseValor(_valorForm.value),
+          valor: valor,
           idCategoria: _idCategoria,
           idConta: _idConta,
-          dataRecebimento: brParaIso(_dataForm.value),
+          dataRecebimento: dateTimeParaIso(_dataRecebimento),
           recorrente: _recorrente,
-          observacoes: _obsForm.value.trim().isEmpty ? null : _obsForm.value.trim(),
+          observacoes:
+              _obsForm.value.trim().isEmpty ? null : _obsForm.value.trim(),
         ),
       ),
     );
@@ -204,7 +187,8 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
     final ok = await showAppConfirmDialog(
       context,
       title: 'Excluir ganho',
-      message: 'O ganho será removido e o saldo da conta será ajustado. Deseja continuar?',
+      message:
+          'O ganho será removido e o saldo da conta será ajustado. Deseja continuar?',
       confirmLabel: 'Excluir',
       destructive: true,
     );
@@ -212,9 +196,13 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
   }
 
   void _onState(CadastroReceitaState state) {
-    if (state is CadastroReceitaReadyState) _aplicarLookups(state.lookups);
+    if (state is CadastroReceitaReadyState) {
+      setState(() => _lookups = state.lookups);
+    }
     if (state is CadastroReceitaSuccessState) {
-      showToastSuccess(message: _isEdit ? 'Ganho atualizado' : 'Ganho cadastrado');
+      showToastSuccess(
+        message: _isEdit ? 'Ganho atualizado' : 'Ganho cadastrado',
+      );
       Navigator.of(context).pop(true);
     }
     if (state is CadastroReceitaDeletedState) {
@@ -228,6 +216,10 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final origem =
+        _lookups?.origens.where((c) => c.id == _idCategoria).firstOrNull;
+    final conta = _lookups?.contas.where((c) => c.id == _idConta).firstOrNull;
+
     return scaffold(
       title: _isEdit ? 'Editar ganho' : 'Novo ganho',
       centerTitle: true,
@@ -239,32 +231,64 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
         bloc: bloc,
         listener: (_, state) => _onState(state),
         builder: (context, state) {
-          if (state is CadastroReceitaLoadingState || state is CadastroReceitaInitialState) {
+          if (state is CadastroReceitaLoadingState ||
+              state is CadastroReceitaInitialState) {
             return appLoadingDinix();
           }
           return Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
               children: [
-                _valorForm.formulario,
-                _origemForm.formulario,
-                _contaForm.formulario,
-                _dataForm.formulario,
-                _descricaoForm.formulario,
-                SwitchListTile(
-                  value: _recorrente,
-                  activeThumbColor: DinixColors.primary,
-                  title: appText('Recebimento recorrente', color: DinixColors.textPrimary),
-                  subtitle: appText(
-                    'Aparece na previsão mensal',
-                    color: AppColors.grey400,
-                    fontSize: AppFontSizes.verySmall,
+                cadastroCampoValor(
+                  titulo: 'Valor',
+                  controller: _valorController,
+                  focusNode: _valorFocus,
+                  validator: validateValor,
+                  onChanged: () => setState(() {}),
+                ),
+                cadastroSecao(
+                  'O que foi recebido',
+                  _descricaoForm.formulario,
+                ),
+                cadastroCampoQuando(
+                  data: _dataRecebimento,
+                  onChanged: (d) => setState(() => _dataRecebimento = d),
+                ),
+                cadastroSecao(
+                  'Como ganhou',
+                  cadastroBotaoSeletor(
+                    tituloVazio: 'Selecionar origem',
+                    valor: origem?.nome,
+                    leading: Icon(
+                      iconeDaCategoria(origem),
+                      color: DinixColors.primary,
+                    ),
+                    onTap: _escolherOrigem,
                   ),
+                ),
+                cadastroSecao(
+                  'Conta de destino',
+                  cadastroBotaoSeletor(
+                    tituloVazio: 'Selecionar conta',
+                    valor: conta?.nome,
+                    leading: conta == null
+                        ? Icon(Phosphor.wallet, color: DinixColors.primary)
+                        : bancoIcon(
+                            banco: conta.nomeBanco ?? conta.nome,
+                            size: 28,
+                          ),
+                    onTap: _escolherConta,
+                  ),
+                ),
+                cadastroSwitch(
+                  titulo: 'Recebimento recorrente',
+                  subtitulo: 'Aparece na previsão mensal',
+                  value: _recorrente,
                   onChanged: (v) => setState(() => _recorrente = v),
                 ),
-                _obsForm.formulario,
+                cadastroSecao('Observações', _obsForm.formulario),
                 appSizedBox(height: AppSpacing.medium),
                 appElevatedButtonDinix(
                   title: _isEdit ? AppStrings.salvar : 'Cadastrar',
@@ -290,6 +314,9 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
 
   @override
   void dispose() {
+    _valorFocus.removeListener(_aoFocarValor);
+    _valorController.dispose();
+    _valorFocus.dispose();
     bloc.close();
     super.dispose();
   }

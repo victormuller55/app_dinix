@@ -69,7 +69,7 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
               key: _formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
                 children: [
                   appText(
                     'Esse nome aparece nos seus lançamentos e no perfil.',

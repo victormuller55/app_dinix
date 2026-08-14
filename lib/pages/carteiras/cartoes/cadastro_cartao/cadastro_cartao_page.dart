@@ -1,3 +1,4 @@
+import 'package:app_dinix/app_config/bancos_catalogo.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/function/form_validation.dart';
@@ -8,11 +9,14 @@ import 'package:app_dinix/models/conta_model.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cadastro_cartao/cadastro_cartao_bloc.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cadastro_cartao/cadastro_cartao_event.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cadastro_cartao/cadastro_cartao_state.dart';
+import 'package:app_dinix/widgets/app_cadastro_style.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_form_field_dinix.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/app_select_sheet.dart';
+import 'package:app_dinix/widgets/banco_icon.dart';
+import 'package:app_dinix/widgets/banco_select_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muller_package/muller_package.dart'
@@ -30,26 +34,51 @@ class CadastroCartaoPage extends StatefulWidget {
 class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
   final CadastroCartaoBloc bloc = CadastroCartaoBloc();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _limiteController = TextEditingController();
+  final FocusNode _limiteFocus = FocusNode();
 
   late final AppFormField _nomeForm;
-  late final AppFormField _bancoForm;
-  late final AppFormField _contaForm;
-  late final AppFormField _limiteForm;
-  late final AppFormField _fechamentoForm;
-  late final AppFormField _vencimentoForm;
   late final bool _isEdit;
 
   List<ContaModel> _contas = [];
   String? _idConta;
+  BancoOpcao? _banco;
+  int _diaFechamento = 1;
+  int _diaVencimento = 10;
 
   @override
   void initState() {
     super.initState();
     _isEdit = widget.cartao?.id != null && widget.cartao!.id!.isNotEmpty;
     _idConta = widget.cartao?.idConta;
+    _banco = _resolverBanco(widget.cartao?.banco);
+    _diaFechamento = widget.cartao?.diaFechamento ?? 1;
+    _diaVencimento = widget.cartao?.diaVencimento ?? 10;
+    if (_diaFechamento < 1) _diaFechamento = 1;
+    if (_diaFechamento > 31) _diaFechamento = 31;
+    if (_diaVencimento < 1) _diaVencimento = 1;
+    if (_diaVencimento > 31) _diaVencimento = 31;
     _criarCampos();
     _preencher();
+    _limiteFocus.addListener(_aoFocarLimite);
     bloc.add(CadastroCartaoLoadEvent());
+    if (!_isEdit) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _limiteFocus.requestFocus();
+      });
+    }
+  }
+
+  BancoOpcao? _resolverBanco(String? nome) {
+    final catalogo = BancosCatalogo.porNome(nome);
+    if (catalogo != null) return catalogo;
+    if (nome == null || nome.trim().isEmpty) return null;
+    return BancoOpcao(nome: nome.trim(), cor: '#FF9800');
+  }
+
+  void _aoFocarLimite() {
+    if (_limiteFocus.hasFocus) return;
+    normalizarValorCampo(_limiteController);
   }
 
   void _criarCampos() {
@@ -59,63 +88,26 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
       icon: Phosphor.creditCard,
       validator: (v) => validateObrigatorio(v, campo: 'Nome'),
     );
-    _bancoForm = criarCampoDinix(
-      context: context,
-      hint: 'Banco',
-      icon: Phosphor.bank,
-      validator: (v) => validateObrigatorio(v, campo: 'Banco'),
-    );
-    _contaForm = criarCampoDinix(
-      context: context,
-      hint: 'Conta de pagamento',
-      icon: Phosphor.wallet,
-      showKeyboard: false,
-      onTap: _escolherConta,
-      suffixIcon: Icon(Phosphor.caretDown, color: AppColors.grey400),
-      validator: (v) => validateObrigatorio(v, campo: 'Conta'),
-    );
-    _limiteForm = criarCampoDinix(
-      context: context,
-      hint: 'Limite',
-      icon: Phosphor.money,
-      textInputType: TextInputType.number,
-      textInputFormatter: AppFormFormatters.valor,
-      validator: validateValor,
-    );
-    _fechamentoForm = criarCampoDinix(
-      context: context,
-      hint: 'Dia de fechamento',
-      icon: Phosphor.calendar,
-      textInputType: TextInputType.number,
-      validator: validateDiaMes,
-    );
-    _vencimentoForm = criarCampoDinix(
-      context: context,
-      hint: 'Dia de vencimento',
-      icon: Phosphor.calendarCheck,
-      textInputType: TextInputType.number,
-      validator: validateDiaMes,
-    );
   }
 
   void _preencher() {
     final cartao = widget.cartao;
+    if (cartao?.limite != null) {
+      _limiteController.text = formataMoedaCampo(cartao!.limite);
+    } else if (!_isEdit) {
+      _limiteController.text = formataMoedaCampo(kCadastroValorPadrao);
+    }
     if (cartao == null) return;
     _nomeForm.controller.text = cartao.nome ?? '';
-    _bancoForm.controller.text = cartao.banco ?? '';
-    if (cartao.limite != null) {
-      _limiteForm.controller.text = formataMoedaCampo(cartao.limite);
-    }
-    _fechamentoForm.controller.text = '${cartao.diaFechamento ?? ''}';
-    _vencimentoForm.controller.text = '${cartao.diaVencimento ?? ''}';
   }
 
-  void _aplicarContas(List<ContaModel> contas) {
-    _contas = contas;
-    if (_idConta != null) {
-      final conta = contas.where((c) => c.id == _idConta).firstOrNull;
-      if (conta != null) _contaForm.controller.text = conta.nome ?? '';
-    }
+  Future<void> _escolherBanco() async {
+    final selecionado = await showBancoSelectSheet(
+      context: context,
+      selected: _banco,
+    );
+    if (selecionado == null) return;
+    setState(() => _banco = selecionado);
   }
 
   Future<void> _escolherConta() async {
@@ -128,31 +120,39 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
       title: 'Conta de pagamento',
       items: _contas,
       labelOf: (c) => c.nome ?? '',
+      subtitleOf: (c) => c.nomeBanco,
       selected: _contas.where((c) => c.id == _idConta).firstOrNull,
+      leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
     );
     if (selecionada == null) return;
-    setState(() {
-      _idConta = selecionada.id;
-      _contaForm.controller.text = selecionada.nome ?? '';
-    });
+    setState(() => _idConta = selecionada.id);
   }
 
   void _salvarCadastro() {
     if (!validarFormularioComFeedback(_formKey)) return;
+    if (_banco == null) {
+      showToastWarning(message: 'Selecione o banco');
+      return;
+    }
     if (_idConta == null || _idConta!.isEmpty) {
       showToastWarning(message: 'Selecione a conta de pagamento da fatura.');
       return;
     }
+
+    final limite = (parseValor(_limiteController.text) ?? kCadastroValorPadrao)
+        .clamp(kCadastroValorMinimo, kCadastroValorMaximo)
+        .toDouble();
+
     bloc.add(
       CadastroCartaoSaveEvent(
         cartao: CartaoCreditoModel(
           id: widget.cartao?.id,
           idConta: _idConta,
           nome: _nomeForm.value.trim(),
-          banco: _bancoForm.value.trim(),
-          limite: parseValor(_limiteForm.value),
-          diaFechamento: int.tryParse(_fechamentoForm.value.trim()),
-          diaVencimento: int.tryParse(_vencimentoForm.value.trim()),
+          banco: _banco!.nome,
+          limite: limite,
+          diaFechamento: _diaFechamento,
+          diaVencimento: _diaVencimento,
         ),
       ),
     );
@@ -173,10 +173,12 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
 
   void _onState(CadastroCartaoState state) {
     if (state is CadastroCartaoReadyState) {
-      _aplicarContas(state.contas);
+      setState(() => _contas = state.contas);
     }
     if (state is CadastroCartaoSuccessState) {
-      showToastSuccess(message: _isEdit ? 'Cartão atualizado' : 'Cartão cadastrado');
+      showToastSuccess(
+        message: _isEdit ? 'Cartão atualizado' : 'Cartão cadastrado',
+      );
       Navigator.of(context).pop(true);
     }
     if (state is CadastroCartaoDeletedState) {
@@ -189,18 +191,64 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
   }
 
   Widget _formulario() {
+    final conta = _contas.where((c) => c.id == _idConta).firstOrNull;
+
     return Form(
       key: _formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         children: [
-          _nomeForm.formulario,
-          _bancoForm.formulario,
-          _contaForm.formulario,
-          _limiteForm.formulario,
-          _fechamentoForm.formulario,
-          _vencimentoForm.formulario,
+          cadastroCampoValor(
+            titulo: 'Limite',
+            controller: _limiteController,
+            focusNode: _limiteFocus,
+            validator: validateValor,
+            onChanged: () => setState(() {}),
+          ),
+          cadastroSecao('Nome', _nomeForm.formulario),
+          cadastroSecao(
+            'Banco',
+            cadastroBotaoSeletor(
+              tituloVazio: 'Selecionar banco',
+              valor: _banco?.nome,
+              leading: _banco == null
+                  ? Icon(Phosphor.bank, color: DinixColors.primary)
+                  : bancoIcon(
+                      banco: _banco!.nome,
+                      size: 28,
+                      gradient: _banco!.gradiente,
+                    ),
+              onTap: _escolherBanco,
+            ),
+          ),
+          cadastroSecao(
+            'Conta de pagamento',
+            cadastroBotaoSeletor(
+              tituloVazio: 'Selecionar conta',
+              valor: conta?.nome,
+              leading: conta == null
+                  ? Icon(Phosphor.wallet, color: DinixColors.primary)
+                  : bancoIcon(banco: conta.nomeBanco ?? conta.nome, size: 28),
+              onTap: _escolherConta,
+            ),
+          ),
+          cadastroCampoInteiro(
+            titulo: 'Dia de fechamento',
+            valor: _diaFechamento,
+            min: 1,
+            max: 31,
+            onChanged: (v) => setState(() => _diaFechamento = v),
+            rotulo: (v) => 'Dia $v',
+          ),
+          cadastroCampoInteiro(
+            titulo: 'Dia de vencimento',
+            valor: _diaVencimento,
+            min: 1,
+            max: 31,
+            onChanged: (v) => setState(() => _diaVencimento = v),
+            rotulo: (v) => 'Dia $v',
+          ),
           appSizedBox(height: AppSpacing.medium),
           appElevatedButtonDinix(
             title: _isEdit ? AppStrings.salvar : 'Cadastrar',
@@ -221,27 +269,6 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
     );
   }
 
-  Widget _bodyBuilder() {
-    return BlocConsumer<CadastroCartaoBloc, CadastroCartaoState>(
-      bloc: bloc,
-      listener: (_, state) => _onState(state),
-      builder: (context, state) {
-        if (state is CadastroCartaoLoadingState || state is CadastroCartaoInitialState) {
-          return appLoadingDinix();
-        }
-        if (state is CadastroCartaoErrorState && _contas.isEmpty) {
-          return Center(
-            child: appElevatedButtonDinix(
-              title: 'Tentar novamente',
-              onTap: () => bloc.add(CadastroCartaoLoadEvent()),
-            ),
-          );
-        }
-        return _formulario();
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return scaffold(
@@ -251,12 +278,33 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
       appBarColor: DinixColors.primaryDark,
       titleColor: DinixColors.textPrimary,
       drawerColor: DinixColors.textPrimary,
-      body: _bodyBuilder(),
+      body: BlocConsumer<CadastroCartaoBloc, CadastroCartaoState>(
+        bloc: bloc,
+        listener: (_, state) => _onState(state),
+        builder: (context, state) {
+          if (state is CadastroCartaoLoadingState ||
+              state is CadastroCartaoInitialState) {
+            return appLoadingDinix();
+          }
+          if (state is CadastroCartaoErrorState && _contas.isEmpty) {
+            return Center(
+              child: appElevatedButtonDinix(
+                title: 'Tentar novamente',
+                onTap: () => bloc.add(CadastroCartaoLoadEvent()),
+              ),
+            );
+          }
+          return _formulario();
+        },
+      ),
     );
   }
 
   @override
   void dispose() {
+    _limiteFocus.removeListener(_aoFocarLimite);
+    _limiteController.dispose();
+    _limiteFocus.dispose();
     bloc.close();
     super.dispose();
   }

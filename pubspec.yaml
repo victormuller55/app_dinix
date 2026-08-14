@@ -27,6 +27,9 @@ dependencies:
   url_launcher: ^6.3.1
   cupertino_icons: ^1.0.8
   cupertino_native_better: ^1.5.4
+  local_auth: ^3.0.2
+  local_auth_android: ^2.0.8
+  local_auth_darwin: ^2.0.3
 
 dev_dependencies:
   flutter_test:
@@ -46,10 +49,12 @@ flutter_launcher_icons:
 
 flutter_native_splash:
   color: "#000000"
-  image: assets/images/logo/logo.png
+  image: assets/images/logo/splash_logo.png
   android: true
   ios: true
   web: false
+  ios_content_mode: scaleAspectFit
+  android_gravity: center
   android_12:
     color: "#000000"
     image: assets/images/logo/icon.png

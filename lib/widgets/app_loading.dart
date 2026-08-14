@@ -1,9 +1,9 @@
 import 'package:app_dinix/app_config/app_platform.dart';
+import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 /// Loading nativo: Cupertino no iOS, Material no Android.
-/// Sempre branco sobre fundo preto.
 Widget appLoadingDinix({Color? color, double? size}) {
   final dimension = size ?? 28.0;
   final Widget indicator;
@@ -26,7 +26,7 @@ Widget appLoadingDinix({Color? color, double? size}) {
   if (size != null) return indicator;
 
   return ColoredBox(
-    color: Colors.black,
+    color: color ?? DinixColors.background,
     child: Center(child: indicator),
   );
 }

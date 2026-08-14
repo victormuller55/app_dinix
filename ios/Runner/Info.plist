@@ -41,6 +41,8 @@
 		<string>O Dinix pode salvar imagens na sua galeria quando necessário.</string>
 		<key>NSCameraUsageDescription</key>
 		<string>O Dinix precisa da câmera para fotografar comprovantes e notas.</string>
+		<key>NSFaceIDUsageDescription</key>
+		<string>O Dinix usa o Face ID para proteger o acesso à sua conta neste aparelho.</string>
 		<key>UIApplicationSceneManifest</key>
 		<dict>
 			<key>UIApplicationSupportsMultipleScenes</key>

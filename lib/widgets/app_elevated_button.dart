@@ -19,7 +19,7 @@ Widget appElevatedButtonDinix({
   var hover = false;
   final borderRadius = radius ?? (isIOSPlatform ? 12.0 : AppRadius.input);
   final buttonHeight = height ?? (isIOSPlatform ? 50.0 : 48.0);
-  final label = isIOSPlatform ? title : title.toUpperCase();
+  final label = title.toUpperCase();
   final textSize = fontSize ?? (isIOSPlatform ? 17.0 : AppFontSizes.verySmall);
 
   return StatefulBuilder(

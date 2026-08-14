@@ -51,69 +51,71 @@ class CadastroFluxoShell extends StatelessWidget {
           ),
           centerTitle: true,
         ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(999),
-                child: LinearProgressIndicator(
-                  value: passo.progresso,
-                  minHeight: 4,
-                  color: DinixColors.primary,
-                  backgroundColor: AppColors.grey800,
+        body: SafeArea(
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(999),
+                  child: LinearProgressIndicator(
+                    value: passo.progresso,
+                    minHeight: 4,
+                    color: DinixColors.primary,
+                    backgroundColor: AppColors.grey800,
+                  ),
                 ),
               ),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-                physics: const BouncingScrollPhysics(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      appText(
+                        passo.titulo,
+                        bold: true,
+                        color: DinixColors.textPrimary,
+                        fontSize: AppFontSizes.medium,
+                      ),
+                      appSizedBox(height: AppSpacing.small),
+                      appText(
+                        passo.subtitulo,
+                        color: AppColors.grey400,
+                        fontSize: AppFontSizes.verySmall,
+                      ),
+                      appSizedBox(height: AppSpacing.big),
+                      child,
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    appText(
-                      passo.titulo,
-                      bold: true,
-                      color: DinixColors.textPrimary,
-                      fontSize: AppFontSizes.medium,
-                    ),
-                    appSizedBox(height: AppSpacing.small),
-                    appText(
-                      passo.subtitulo,
-                      color: AppColors.grey400,
-                      fontSize: AppFontSizes.verySmall,
-                    ),
-                    appSizedBox(height: AppSpacing.big),
-                    child,
+                    if (onPular != null) ...[
+                      appTextButton(
+                        text: 'Pular por agora',
+                        color: AppColors.grey400,
+                        onTap: () => onPular!(),
+                      ),
+                      appSizedBox(height: AppSpacing.small),
+                    ],
+                    carregando
+                        ? Center(child: appLoadingDinix(size: 22))
+                        : appElevatedButtonDinix(
+                            title: botaoTitulo,
+                            onTap: onContinuar,
+                            height: 52,
+                          ),
                   ],
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  if (onPular != null) ...[
-                    appTextButton(
-                      text: 'Pular por agora',
-                      color: AppColors.grey400,
-                      onTap: () => onPular!(),
-                    ),
-                    appSizedBox(height: AppSpacing.small),
-                  ],
-                  carregando
-                      ? Center(child: appLoadingDinix(size: 22))
-                      : appElevatedButtonDinix(
-                          title: botaoTitulo,
-                          onTap: onContinuar,
-                          height: 52,
-                        ),
-                ],
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

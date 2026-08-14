@@ -9,11 +9,10 @@ import 'package:app_dinix/models/conta_model.dart';
 import 'package:app_dinix/pages/carteiras/cadastro_conta/cadastro_conta_bloc.dart';
 import 'package:app_dinix/pages/carteiras/cadastro_conta/cadastro_conta_event.dart';
 import 'package:app_dinix/pages/carteiras/cadastro_conta/cadastro_conta_state.dart';
+import 'package:app_dinix/widgets/app_cadastro_style.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
-import 'package:app_dinix/widgets/app_form_field_dinix.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
-import 'package:app_dinix/widgets/app_select_sheet.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
 import 'package:app_dinix/widgets/banco_select_sheet.dart';
 import 'package:flutter/material.dart';
@@ -33,11 +32,9 @@ class CadastroContaPage extends StatefulWidget {
 class _CadastroContaPageState extends State<CadastroContaPage> {
   final CadastroContaBloc bloc = CadastroContaBloc();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _saldoController = TextEditingController();
+  final FocusNode _saldoFocus = FocusNode();
 
-  late final TextEditingController _bancoController;
-  late final FocusNode _bancoFocus;
-  late final AppFormField _tipoForm;
-  late final AppFormField _saldoForm;
   late final bool _isEdit;
   String _tipoConta = TipoConta.contaCorrente;
   BancoOpcao? _banco;
@@ -48,10 +45,8 @@ class _CadastroContaPageState extends State<CadastroContaPage> {
     _isEdit = widget.conta?.id != null && widget.conta!.id!.isNotEmpty;
     _tipoConta = widget.conta?.tipoConta ?? TipoConta.contaCorrente;
     _banco = _resolverBanco(widget.conta?.nomeBanco);
-    _bancoController = TextEditingController();
-    _bancoFocus = FocusNode()..canRequestFocus = false;
-    _criarCampos();
     _preencher();
+    _saldoFocus.addListener(_aoFocarSaldo);
   }
 
   BancoOpcao? _resolverBanco(String? nome) {
@@ -64,48 +59,23 @@ class _CadastroContaPageState extends State<CadastroContaPage> {
     );
   }
 
-  Widget _prefixoBanco() {
-    if (_banco == null) {
-      return Icon(Phosphor.bank, size: 22, color: DinixColors.primary);
-    }
-    return Padding(
-      padding: const EdgeInsets.all(10),
-      child: bancoIcon(
-        banco: _banco!.nome,
-        size: 28,
-        gradient: _banco!.gradiente,
-      ),
-    );
-  }
-
-  void _criarCampos() {
-    _tipoForm = criarCampoDinix(
-      context: context,
-      hint: 'Tipo de conta',
-      icon: Phosphor.tag,
-      showKeyboard: false,
-      onTap: _escolherTipo,
-      suffixIcon: Icon(Phosphor.caretDown, color: AppColors.grey400),
-    );
-    _saldoForm = criarCampoDinix(
-      context: context,
-      hint: 'Saldo atual',
-      icon: Phosphor.money,
-      textInputType: TextInputType.number,
-      textInputFormatter: AppFormFormatters.valor,
-      validator: validateValorOpcional,
+  void _aoFocarSaldo() {
+    if (_saldoFocus.hasFocus) return;
+    normalizarValorCampo(
+      _saldoController,
+      min: 0,
+      fallback: 0,
     );
   }
 
   void _preencher() {
     final conta = widget.conta;
-    _bancoController.text = _banco?.nome ?? '';
-    _tipoForm.controller.text = TipoConta.rotulo(_tipoConta);
-    if (conta == null) return;
-    final saldo = conta.saldoAtual ?? conta.saldoInicial;
-    if (saldo != null) {
-      _saldoForm.controller.text = formataMoedaCampo(saldo);
+    if (conta == null) {
+      _saldoController.text = formataMoedaCampo(0);
+      return;
     }
+    final saldo = conta.saldoAtual ?? conta.saldoInicial;
+    _saldoController.text = formataMoedaCampo(saldo ?? 0);
   }
 
   Future<void> _escolherBanco() async {
@@ -114,41 +84,7 @@ class _CadastroContaPageState extends State<CadastroContaPage> {
       selected: _banco,
     );
     if (selecionado == null) return;
-    setState(() {
-      _banco = selecionado;
-      _bancoController.text = selecionado.nome;
-    });
-  }
-
-  Widget _campoBanco() {
-    return CampoPrefixoDinix(
-      controller: _bancoController,
-      focusNode: _bancoFocus,
-      hint: 'Banco',
-      prefixIcon: _prefixoBanco(),
-      onTap: _escolherBanco,
-      suffixIcon: Icon(Phosphor.caretDown, color: AppColors.grey400),
-    );
-  }
-
-  Future<void> _escolherTipo() async {
-    final selecionado = await showAppSelectSheet<String>(
-      context: context,
-      title: 'Tipo de conta',
-      items: TipoConta.valores,
-      labelOf: TipoConta.rotulo,
-      selected: _tipoConta,
-    );
-    if (selecionado == null) return;
-    setState(() {
-      _tipoConta = selecionado;
-      _tipoForm.controller.text = TipoConta.rotulo(selecionado);
-    });
-  }
-
-  String? _validarBanco(String? _) {
-    if (_banco == null) return 'Selecione o banco';
-    return null;
+    setState(() => _banco = selecionado);
   }
 
   void _salvarCadastro() {
@@ -157,7 +93,7 @@ class _CadastroContaPageState extends State<CadastroContaPage> {
       return;
     }
     if (!validarFormularioComFeedback(_formKey)) return;
-    final saldo = parseValor(_saldoForm.value) ?? 0;
+    final saldo = parseValor(_saldoController.text) ?? 0;
     bloc.add(
       CadastroContaSaveEvent(
         conta: ContaModel(
@@ -208,30 +144,46 @@ class _CadastroContaPageState extends State<CadastroContaPage> {
       key: _formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         children: [
-          FormField<String>(
-            validator: _validarBanco,
-            builder: (state) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _campoBanco(),
-                  if (state.hasError)
-                    Padding(
-                      padding: const EdgeInsets.only(left: 12, top: 6),
-                      child: appText(
-                        state.errorText ?? '',
-                        color: AppColors.red,
-                        fontSize: AppFontSizes.verySmall,
-                      ),
+          cadastroSecao(
+            'Banco',
+            cadastroBotaoSeletor(
+              tituloVazio: 'Selecionar banco',
+              valor: _banco?.nome,
+              leading: _banco == null
+                  ? Icon(Phosphor.bank, color: DinixColors.primary)
+                  : bancoIcon(
+                      banco: _banco!.nome,
+                      size: 28,
+                      gradient: _banco!.gradiente,
                     ),
-                ],
-              );
-            },
+              onTap: _escolherBanco,
+            ),
           ),
-          _tipoForm.formulario,
-          _saldoForm.formulario,
+          cadastroSecao(
+            'Tipo de conta',
+            cadastroGradeChips(
+              [
+                for (final tipo in TipoConta.valores)
+                  cadastroChip(
+                    label: TipoConta.rotulo(tipo),
+                    selecionado: _tipoConta == tipo,
+                    onTap: () => setState(() => _tipoConta = tipo),
+                  ),
+              ],
+              colunas: 2,
+            ),
+          ),
+          cadastroCampoValor(
+            titulo: 'Saldo atual',
+            controller: _saldoController,
+            focusNode: _saldoFocus,
+            min: 0,
+            padrao: 0,
+            validator: validateValorOpcional,
+            onChanged: () => setState(() {}),
+          ),
           appSizedBox(height: AppSpacing.medium),
           appElevatedButtonDinix(
             title: _isEdit ? AppStrings.salvar : 'Cadastrar',
@@ -252,17 +204,6 @@ class _CadastroContaPageState extends State<CadastroContaPage> {
     );
   }
 
-  Widget _bodyBuilder() {
-    return BlocConsumer<CadastroContaBloc, CadastroContaState>(
-      bloc: bloc,
-      listener: (_, state) => _onState(state),
-      builder: (context, state) {
-        if (state is CadastroContaLoadingState) return appLoadingDinix();
-        return _formulario();
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return scaffold(
@@ -272,14 +213,22 @@ class _CadastroContaPageState extends State<CadastroContaPage> {
       appBarColor: DinixColors.primaryDark,
       titleColor: DinixColors.textPrimary,
       drawerColor: DinixColors.textPrimary,
-      body: _bodyBuilder(),
+      body: BlocConsumer<CadastroContaBloc, CadastroContaState>(
+        bloc: bloc,
+        listener: (_, state) => _onState(state),
+        builder: (context, state) {
+          if (state is CadastroContaLoadingState) return appLoadingDinix();
+          return _formulario();
+        },
+      ),
     );
   }
 
   @override
   void dispose() {
-    _bancoController.dispose();
-    _bancoFocus.dispose();
+    _saldoFocus.removeListener(_aoFocarSaldo);
+    _saldoController.dispose();
+    _saldoFocus.dispose();
     bloc.close();
     super.dispose();
   }

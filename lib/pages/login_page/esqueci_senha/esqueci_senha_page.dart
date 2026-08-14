@@ -4,6 +4,7 @@ import 'package:app_dinix/function/form_validation.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/function/validators.dart';
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/steps/passo_codigo_conteudo.dart';
+import 'package:app_dinix/pages/login_page/cadastro_fluxo/verificacao_email_service.dart';
 import 'package:app_dinix/pages/login_page/esqueci_senha/esqueci_senha_service.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
@@ -25,7 +26,6 @@ class EsqueciSenhaPage extends StatefulWidget {
 class _EsqueciSenhaPageState extends State<EsqueciSenhaPage> {
   _PassoEsqueciSenha _passo = _PassoEsqueciSenha.email;
   bool _carregando = false;
-  bool _reenviando = false;
   String _email = '';
   String _codigo = '';
 
@@ -97,29 +97,28 @@ class _EsqueciSenhaPageState extends State<EsqueciSenhaPage> {
   Future<void> _enviarCodigo({bool reenvio = false}) async {
     if (!reenvio && !validarFormularioComFeedback(_formEmail)) return;
     final email = reenvio ? _email : _emailForm.value.trim();
-    setState(() {
-      if (reenvio) {
-        _reenviando = true;
-      } else {
-        _carregando = true;
-      }
-    });
+    if (!reenvio) {
+      setState(() => _carregando = true);
+    }
     try {
       await enviarCodigoEsqueciSenha(email: email);
       if (!mounted) return;
-      showToastSuccess(message: 'Se o e-mail existir, enviamos um código.');
+      showToastSuccess(
+        message: reenvio
+            ? 'Novo código enviado'
+            : 'Se o e-mail existir, enviamos um código. Verifique também o spam.',
+      );
       setState(() {
         _email = email;
         _passo = _PassoEsqueciSenha.codigo;
+        if (reenvio) _codigo = '';
       });
     } catch (e) {
       showAppErrorFromException(e);
+      if (reenvio) rethrow;
     } finally {
-      if (mounted) {
-        setState(() {
-          _carregando = false;
-          _reenviando = false;
-        });
+      if (mounted && !reenvio) {
+        setState(() => _carregando = false);
       }
     }
   }
@@ -129,7 +128,20 @@ class _EsqueciSenhaPageState extends State<EsqueciSenhaPage> {
       showToastError(message: 'Informe o código de 6 dígitos');
       return;
     }
-    setState(() => _passo = _PassoEsqueciSenha.novaSenha);
+    setState(() => _carregando = true);
+    try {
+      final ok = await verificarCodigoEmail(email: _email, codigo: _codigo);
+      if (!mounted) return;
+      if (!ok) {
+        showToastError(message: 'Código inválido');
+        return;
+      }
+      setState(() => _passo = _PassoEsqueciSenha.novaSenha);
+    } catch (e) {
+      showAppErrorFromException(e);
+    } finally {
+      if (mounted) setState(() => _carregando = false);
+    }
   }
 
   Future<void> _redefinir() async {
@@ -174,7 +186,6 @@ class _EsqueciSenhaPageState extends State<EsqueciSenhaPage> {
           valorInicial: _codigo,
           onChanged: (value) => _codigo = value,
           onReenviar: () => _enviarCodigo(reenvio: true),
-          reenviando: _reenviando,
         ),
       _PassoEsqueciSenha.novaSenha => Form(
           key: _formSenha,
@@ -213,30 +224,46 @@ class _EsqueciSenhaPageState extends State<EsqueciSenhaPage> {
         body: SafeArea(
           child: _carregando
               ? appLoadingDinix()
-              : ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
-                  children: [
-                    appText(
-                      _titulo,
-                      bold: true,
-                      color: DinixColors.textPrimary,
-                      fontSize: AppFontSizes.medium,
-                    ),
-                    appSizedBox(height: AppSpacing.small),
-                    appText(
-                      _subtitulo,
-                      color: AppColors.grey400,
-                      fontSize: AppFontSizes.verySmall,
-                    ),
-                    appSizedBox(height: AppSpacing.medium),
-                    _conteudo(),
-                    appSizedBox(height: AppSpacing.medium),
-                    appElevatedButtonDinix(
-                      title: _botao,
-                      onTap: _continuar,
-                      height: 52,
-                    ),
-                  ],
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 40),
+                      physics: const BouncingScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight - 48,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            appText(
+                              _titulo,
+                              bold: true,
+                              color: DinixColors.textPrimary,
+                              fontSize: AppFontSizes.medium,
+                              textAlign: TextAlign.center,
+                            ),
+                            appSizedBox(height: AppSpacing.small),
+                            appText(
+                              _subtitulo,
+                              color: AppColors.grey400,
+                              fontSize: AppFontSizes.verySmall,
+                              textAlign: TextAlign.center,
+                            ),
+                            appSizedBox(height: AppSpacing.medium),
+                            _conteudo(),
+                            appSizedBox(height: AppSpacing.medium),
+                            appElevatedButtonDinix(
+                              title: _botao,
+                              onTap: _continuar,
+                              height: 52,
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
         ),
       ),

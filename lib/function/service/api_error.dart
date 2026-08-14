@@ -79,7 +79,10 @@ ErrorModel _normalizeKnownErrors(int statusCode, ErrorModel model) {
   }
   if (statusCode == 500 || erro.contains('erro_interno')) {
     return ErrorModel(
-      mensagem: 'Tente novamente em instantes.',
+      mensagem: model.mensagem?.trim().isNotEmpty == true &&
+              model.mensagem != 'Erro inesperado'
+          ? model.mensagem
+          : 'Tente novamente em instantes.',
       erro: model.erro ?? 'erro_interno',
       tipo: model.tipo ?? '$statusCode',
     );

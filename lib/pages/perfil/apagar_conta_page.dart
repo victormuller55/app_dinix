@@ -78,7 +78,7 @@ class _ApagarContaPageState extends State<ApagarContaPage> {
               key: _formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
                 children: [
                   Container(
                     padding: const EdgeInsets.all(16),

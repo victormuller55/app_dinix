@@ -1,6 +1,7 @@
 import 'package:app_dinix/app_config/app_enums.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
+import 'package:app_dinix/function/categoria_icone.dart';
 import 'package:app_dinix/function/form_validation.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/function/validators.dart';
@@ -11,11 +12,13 @@ import 'package:app_dinix/models/conta_model.dart';
 import 'package:app_dinix/pages/assinaturas/cadastro_assinatura/cadastro_assinatura_bloc.dart';
 import 'package:app_dinix/pages/assinaturas/cadastro_assinatura/cadastro_assinatura_event.dart';
 import 'package:app_dinix/pages/assinaturas/cadastro_assinatura/cadastro_assinatura_state.dart';
+import 'package:app_dinix/widgets/app_cadastro_style.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_form_field_dinix.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/app_select_sheet.dart';
+import 'package:app_dinix/widgets/banco_icon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muller_package/muller_package.dart'
@@ -33,15 +36,10 @@ class CadastroAssinaturaPage extends StatefulWidget {
 class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
   final CadastroAssinaturaBloc bloc = CadastroAssinaturaBloc();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _valorController = TextEditingController();
+  final FocusNode _valorFocus = FocusNode();
 
   late final AppFormField _nomeForm;
-  late final AppFormField _valorForm;
-  late final AppFormField _categoriaForm;
-  late final AppFormField _pagamentoForm;
-  late final AppFormField _contaForm;
-  late final AppFormField _diaForm;
-  late final AppFormField _inicioForm;
-  late final AppFormField _recorrenciaForm;
   late final bool _isEdit;
 
   CadastroAssinaturaLookups? _lookups;
@@ -50,114 +48,79 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
   String? _idConta;
   String? _idCartao;
   String _recorrencia = Recorrencia.mensal;
+  late DateTime _dataInicio;
+  int _diaCobranca = 1;
   bool _pagamentoHoje = false;
 
   @override
   void initState() {
     super.initState();
-    _isEdit = widget.assinatura?.id != null && widget.assinatura!.id!.isNotEmpty;
+    _isEdit =
+        widget.assinatura?.id != null && widget.assinatura!.id!.isNotEmpty;
     _idCategoria = widget.assinatura?.idCategoria;
-    _formaPagamento = widget.assinatura?.formaPagamento ?? FormaPagamento.cartaoCredito;
+    _formaPagamento =
+        widget.assinatura?.formaPagamento ?? FormaPagamento.cartaoCredito;
     _idConta = widget.assinatura?.idConta;
     _idCartao = widget.assinatura?.idCartaoCredito;
     _recorrencia = widget.assinatura?.recorrencia ?? Recorrencia.mensal;
+    _diaCobranca = widget.assinatura?.diaCobranca ?? DateTime.now().day;
+    if (_diaCobranca < 1) _diaCobranca = 1;
+    if (_diaCobranca > 31) _diaCobranca = 31;
+    _dataInicio = _parseDataInicial(widget.assinatura?.dataInicio);
     _criarCampos();
     _preencher();
+    _valorFocus.addListener(_aoFocarValor);
     bloc.add(CadastroAssinaturaLoadEvent());
+    if (!_isEdit) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _valorFocus.requestFocus();
+      });
+    }
+  }
+
+  void _aoFocarValor() {
+    if (_valorFocus.hasFocus) return;
+    normalizarValorCampo(_valorController);
+  }
+
+  DateTime _parseDataInicial(String? iso) {
+    final parsed = iso != null && iso.length >= 10
+        ? DateTime.tryParse(iso.substring(0, 10))
+        : null;
+    if (parsed != null) return DateTime(parsed.year, parsed.month, parsed.day);
+    final agora = DateTime.now();
+    return DateTime(agora.year, agora.month, agora.day);
   }
 
   void _criarCampos() {
     _nomeForm = criarCampoDinix(
       context: context,
-      hint: 'Nome',
+      hint: 'Nome da assinatura',
       icon: PhosphorFill.stack,
       validator: (v) => validateObrigatorio(v, campo: 'Nome'),
-    );
-    _valorForm = criarCampoDinix(
-      context: context,
-      hint: 'Valor',
-      icon: Phosphor.money,
-      textInputType: TextInputType.number,
-      textInputFormatter: AppFormFormatters.valor,
-      validator: validateValor,
-    );
-    _categoriaForm = criarCampoDinix(
-      context: context,
-      hint: 'Categoria',
-      icon: Phosphor.tag,
-      showKeyboard: false,
-      onTap: _escolherCategoria,
-      suffixIcon: Icon(Phosphor.caretDown, color: AppColors.grey400),
-      validator: (v) => validateObrigatorio(v, campo: 'Categoria'),
-    );
-    _pagamentoForm = criarCampoDinix(
-      context: context,
-      hint: 'Forma de pagamento',
-      icon: Phosphor.wallet,
-      showKeyboard: false,
-      onTap: _escolherPagamento,
-      suffixIcon: Icon(Phosphor.caretDown, color: AppColors.grey400),
-    );
-    _contaForm = criarCampoDinix(
-      context: context,
-      hint: FormaPagamento.usaCartao(_formaPagamento) ? 'Cartão' : 'Conta',
-      icon: Phosphor.wallet,
-      showKeyboard: false,
-      onTap: _escolherDestinoPagamento,
-      suffixIcon: Icon(Phosphor.caretDown, color: AppColors.grey400),
-      validator: (v) => validateObrigatorio(v, campo: 'Pagamento'),
-    );
-    _diaForm = criarCampoDinix(
-      context: context,
-      hint: 'Dia da cobrança',
-      icon: Phosphor.calendar,
-      textInputType: TextInputType.number,
-      validator: validateDiaMes,
-    );
-    _inicioForm = criarCampoDinix(
-      context: context,
-      hint: 'Data de início',
-      icon: Phosphor.calendarBlank,
-      textInputFormatter: AppFormFormatters.data,
-      textInputType: TextInputType.number,
-      validator: validateDataBr,
-    );
-    _recorrenciaForm = criarCampoDinix(
-      context: context,
-      hint: 'Recorrência',
-      icon: Phosphor.arrowsClockwise,
-      showKeyboard: false,
-      onTap: _escolherRecorrencia,
-      suffixIcon: Icon(Phosphor.caretDown, color: AppColors.grey400),
     );
   }
 
   void _preencher() {
     final item = widget.assinatura;
-    _pagamentoForm.controller.text = FormaPagamento.rotulo(_formaPagamento);
-    _recorrenciaForm.controller.text = Recorrencia.rotulo(_recorrencia);
-    _inicioForm.controller.text = isoParaBr(item?.dataInicio ?? dataHojeIso());
+    if (item?.valor != null) {
+      _valorController.text = formataMoedaCampo(item!.valor);
+    } else if (!_isEdit) {
+      _valorController.text = formataMoedaCampo(kCadastroValorPadrao);
+    }
     if (item == null) return;
     _nomeForm.controller.text = item.nome ?? '';
-    if (item.valor != null) _valorForm.controller.text = formataMoedaCampo(item.valor);
-    _diaForm.controller.text = '${item.diaCobranca ?? ''}';
   }
 
-  void _aplicarLookups(CadastroAssinaturaLookups lookups) {
-    _lookups = lookups;
-    final categoria = lookups.categorias.where((c) => c.id == _idCategoria).firstOrNull;
-    if (categoria != null) _categoriaForm.controller.text = categoria.nome ?? '';
-    _atualizarDestinoLabel();
-  }
-
-  void _atualizarDestinoLabel() {
-    if (FormaPagamento.usaCartao(_formaPagamento)) {
-      final cartao = _lookups?.cartoes.where((c) => c.id == _idCartao).firstOrNull;
-      _contaForm.controller.text = cartao?.nome ?? '';
-    } else {
-      final conta = _lookups?.contas.where((c) => c.id == _idConta).firstOrNull;
-      _contaForm.controller.text = conta?.nome ?? '';
-    }
+  void _selecionarPagamento(String forma) {
+    setState(() {
+      _formaPagamento = forma;
+      if (FormaPagamento.usaCartao(forma)) {
+        _idConta = null;
+      } else {
+        _idCartao = null;
+      }
+    });
   }
 
   Future<void> _escolherCategoria() async {
@@ -169,33 +132,10 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
       items: items,
       labelOf: (c) => c.nome ?? '',
       selected: items.where((c) => c.id == _idCategoria).firstOrNull,
+      leadingOf: (c) => Icon(iconeDaCategoria(c), color: DinixColors.primary),
     );
     if (selecionada == null) return;
-    setState(() {
-      _idCategoria = selecionada.id;
-      _categoriaForm.controller.text = selecionada.nome ?? '';
-    });
-  }
-
-  Future<void> _escolherPagamento() async {
-    final selecionada = await showAppSelectSheet<String>(
-      context: context,
-      title: 'Forma de pagamento',
-      items: FormaPagamento.valores,
-      labelOf: FormaPagamento.rotulo,
-      selected: _formaPagamento,
-    );
-    if (selecionada == null) return;
-    setState(() {
-      _formaPagamento = selecionada;
-      _pagamentoForm.controller.text = FormaPagamento.rotulo(selecionada);
-      if (FormaPagamento.usaCartao(selecionada)) {
-        _idConta = null;
-      } else {
-        _idCartao = null;
-      }
-      _atualizarDestinoLabel();
-    });
+    setState(() => _idCategoria = selecionada.id);
   }
 
   Future<void> _escolherDestinoPagamento() async {
@@ -210,13 +150,12 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
         title: 'Cartão',
         items: items,
         labelOf: (c) => c.nome ?? '',
+        subtitleOf: (c) => c.banco,
         selected: items.where((c) => c.id == _idCartao).firstOrNull,
+        leadingOf: (c) => bancoIcon(banco: c.banco ?? c.nome, size: 32),
       );
       if (selecionado == null) return;
-      setState(() {
-        _idCartao = selecionado.id;
-        _contaForm.controller.text = selecionado.nome ?? '';
-      });
+      setState(() => _idCartao = selecionado.id);
       return;
     }
 
@@ -230,45 +169,78 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
       title: 'Conta',
       items: items,
       labelOf: (c) => c.nome ?? '',
+      subtitleOf: (c) => c.nomeBanco,
       selected: items.where((c) => c.id == _idConta).firstOrNull,
+      leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
     );
     if (selecionada == null) return;
-    setState(() {
-      _idConta = selecionada.id;
-      _contaForm.controller.text = selecionada.nome ?? '';
-    });
+    setState(() => _idConta = selecionada.id);
   }
 
-  Future<void> _escolherRecorrencia() async {
-    final selecionada = await showAppSelectSheet<String>(
-      context: context,
-      title: 'Recorrência',
-      items: Recorrencia.valores,
-      labelOf: Recorrencia.rotulo,
-      selected: _recorrencia,
+  Widget _campoDestino() {
+    final credito = FormaPagamento.usaCartao(_formaPagamento);
+    if (credito) {
+      final cartao =
+          _lookups?.cartoes.where((c) => c.id == _idCartao).firstOrNull;
+      return cadastroSecao(
+        'Cartão',
+        cadastroBotaoSeletor(
+          tituloVazio: 'Selecionar cartão',
+          valor: cartao?.nome,
+          leading: cartao == null
+              ? Icon(Phosphor.creditCard, color: DinixColors.primary)
+              : bancoIcon(banco: cartao.banco ?? cartao.nome, size: 28),
+          onTap: _escolherDestinoPagamento,
+        ),
+      );
+    }
+
+    final conta = _lookups?.contas.where((c) => c.id == _idConta).firstOrNull;
+    return cadastroSecao(
+      'Conta',
+      cadastroBotaoSeletor(
+        tituloVazio: 'Selecionar conta',
+        valor: conta?.nome,
+        leading: conta == null
+            ? Icon(Phosphor.wallet, color: DinixColors.primary)
+            : bancoIcon(banco: conta.nomeBanco ?? conta.nome, size: 28),
+        onTap: _escolherDestinoPagamento,
+      ),
     );
-    if (selecionada == null) return;
-    setState(() {
-      _recorrencia = selecionada;
-      _recorrenciaForm.controller.text = Recorrencia.rotulo(selecionada);
-    });
   }
 
   void _salvarCadastro() {
     if (!validarFormularioComFeedback(_formKey)) return;
+    if (_idCategoria == null || _idCategoria!.isEmpty) {
+      showToastWarning(message: 'Selecione uma categoria');
+      return;
+    }
     final credito = FormaPagamento.usaCartao(_formaPagamento);
+    if (credito && (_idCartao == null || _idCartao!.isEmpty)) {
+      showToastWarning(message: 'Selecione um cartão');
+      return;
+    }
+    if (!credito && (_idConta == null || _idConta!.isEmpty)) {
+      showToastWarning(message: 'Selecione uma conta');
+      return;
+    }
+
+    final valor = (parseValor(_valorController.text) ?? kCadastroValorPadrao)
+        .clamp(kCadastroValorMinimo, kCadastroValorMaximo)
+        .toDouble();
+
     bloc.add(
       CadastroAssinaturaSaveEvent(
         assinatura: AssinaturaModel(
           id: widget.assinatura?.id,
           nome: _nomeForm.value.trim(),
-          valor: parseValor(_valorForm.value),
+          valor: valor,
           idCategoria: _idCategoria,
           formaPagamento: _formaPagamento,
           idConta: credito ? null : _idConta,
           idCartaoCredito: credito ? _idCartao : null,
-          diaCobranca: int.tryParse(_diaForm.value.trim()),
-          dataInicio: brParaIso(_inicioForm.value),
+          diaCobranca: _diaCobranca,
+          dataInicio: dateTimeParaIso(_dataInicio),
           recorrencia: _recorrencia,
           pagamentoHoje: !_isEdit && _pagamentoHoje,
         ),
@@ -290,9 +262,13 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
   }
 
   void _onState(CadastroAssinaturaState state) {
-    if (state is CadastroAssinaturaReadyState) _aplicarLookups(state.lookups);
+    if (state is CadastroAssinaturaReadyState) {
+      setState(() => _lookups = state.lookups);
+    }
     if (state is CadastroAssinaturaSuccessState) {
-      showToastSuccess(message: _isEdit ? 'Assinatura atualizada' : 'Assinatura cadastrada');
+      showToastSuccess(
+        message: _isEdit ? 'Assinatura atualizada' : 'Assinatura cadastrada',
+      );
       Navigator.of(context).pop(true);
     }
     if (state is CadastroAssinaturaDeletedState) {
@@ -306,6 +282,9 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final categoria =
+        _lookups?.categorias.where((c) => c.id == _idCategoria).firstOrNull;
+
     return scaffold(
       title: _isEdit ? 'Editar assinatura' : 'Nova assinatura',
       centerTitle: true,
@@ -317,43 +296,93 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
         bloc: bloc,
         listener: (_, state) => _onState(state),
         builder: (context, state) {
-          if (state is CadastroAssinaturaLoadingState || state is CadastroAssinaturaInitialState) {
+          if (state is CadastroAssinaturaLoadingState ||
+              state is CadastroAssinaturaInitialState) {
             return appLoadingDinix();
           }
           return Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
               children: [
-                _nomeForm.formulario,
-                _valorForm.formulario,
-                _categoriaForm.formulario,
-                _pagamentoForm.formulario,
-                _contaForm.formulario,
-                _diaForm.formulario,
-                _inicioForm.formulario,
+                cadastroCampoValor(
+                  titulo: 'Valor',
+                  controller: _valorController,
+                  focusNode: _valorFocus,
+                  validator: validateValor,
+                  onChanged: () => setState(() {}),
+                ),
+                cadastroSecao('Nome', _nomeForm.formulario),
+                cadastroSecao(
+                  'Categoria',
+                  cadastroBotaoSeletor(
+                    tituloVazio: 'Selecionar categoria',
+                    valor: categoria?.nome,
+                    leading: Icon(
+                      iconeDaCategoria(categoria),
+                      color: DinixColors.primary,
+                    ),
+                    onTap: _escolherCategoria,
+                  ),
+                ),
+                cadastroSecao(
+                  'Pagamento',
+                  cadastroGradeChips(
+                    [
+                      for (final forma in FormaPagamento.valores)
+                        cadastroChip(
+                          label: FormaPagamento.rotulo(forma),
+                          selecionado: _formaPagamento == forma,
+                          onTap: () => _selecionarPagamento(forma),
+                        ),
+                    ],
+                    colunas: 2,
+                  ),
+                ),
+                _campoDestino(),
+                cadastroCampoInteiro(
+                  titulo: 'Dia da cobrança',
+                  valor: _diaCobranca,
+                  min: 1,
+                  max: 31,
+                  onChanged: (v) => setState(() => _diaCobranca = v),
+                  rotulo: (v) => 'Dia $v',
+                ),
+                cadastroCampoQuando(
+                  titulo: 'Início',
+                  data: _dataInicio,
+                  onChanged: (d) => setState(() => _dataInicio = d),
+                ),
                 if (!_isEdit)
-                  SwitchListTile(
+                  cadastroSwitch(
+                    titulo: 'Pagamento foi hoje',
+                    subtitulo:
+                        'Cobra agora na conta ou cartão selecionado. Se desmarcado, a cobrança ocorre na data de cobrança.',
                     value: _pagamentoHoje,
-                    activeThumbColor: DinixColors.primary,
-                    title: appText(
-                      'Pagamento foi hoje',
-                      color: DinixColors.textPrimary,
-                    ),
-                    subtitle: appText(
-                      'Cobra agora na conta ou cartão selecionado. Se desmarcado, a cobrança ocorre na data de cobrança.',
-                      color: AppColors.grey400,
-                      fontSize: AppFontSizes.verySmall,
-                    ),
                     onChanged: (v) => setState(() {
                       _pagamentoHoje = v;
                       if (v) {
-                        _inicioForm.controller.text = isoParaBr(dataHojeIso());
+                        final agora = DateTime.now();
+                        _dataInicio =
+                            DateTime(agora.year, agora.month, agora.day);
                       }
                     }),
                   ),
-                _recorrenciaForm.formulario,
+                cadastroSecao(
+                  'Recorrência',
+                  cadastroGradeChips(
+                    [
+                      for (final item in Recorrencia.valores)
+                        cadastroChip(
+                          label: Recorrencia.rotulo(item),
+                          selecionado: _recorrencia == item,
+                          onTap: () => setState(() => _recorrencia = item),
+                        ),
+                    ],
+                    colunas: 2,
+                  ),
+                ),
                 appSizedBox(height: AppSpacing.medium),
                 appElevatedButtonDinix(
                   title: _isEdit ? AppStrings.salvar : 'Cadastrar',
@@ -379,6 +408,9 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
 
   @override
   void dispose() {
+    _valorFocus.removeListener(_aoFocarValor);
+    _valorController.dispose();
+    _valorFocus.dispose();
     bloc.close();
     super.dispose();
   }

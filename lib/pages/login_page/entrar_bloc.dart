@@ -3,7 +3,7 @@ import 'package:muller_package/muller_package.dart';
 import 'package:app_dinix/app_config/app_auth.dart';
 import 'package:app_dinix/cache/reference_data_prefetch.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
-import 'package:app_dinix/pages/home_shell.dart';
+import 'package:app_dinix/pages/login_page/biometria_permissao_page.dart';
 import 'package:app_dinix/pages/login_page/entrar_event.dart';
 import 'package:app_dinix/pages/login_page/entrar_service.dart';
 import 'package:app_dinix/pages/login_page/entrar_state.dart';
@@ -27,7 +27,7 @@ class EntrarBloc extends Bloc<EntrarEvent, EntrarState> {
       showToastSuccess(message: AppStrings.loginEfetuadoComSucesso);
       emit(EntrarSuccessState(usuarioModel: usuarioModel));
       ReferenceDataPrefetch.agendarDownloadPosLogin();
-      open(screen: const HomeShell(), closePrevious: true);
+      await navegarAposAutenticacao();
     } catch (e) {
       showAppErrorFromException(e);
       emit(EntrarInitialState());

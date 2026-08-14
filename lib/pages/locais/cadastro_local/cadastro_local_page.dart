@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/function/categoria_icone.dart';
 import 'package:app_dinix/function/form_validation.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/function/validators.dart';
@@ -7,6 +8,7 @@ import 'package:app_dinix/models/local_model.dart';
 import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_bloc.dart';
 import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_event.dart';
 import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_state.dart';
+import 'package:app_dinix/widgets/app_cadastro_style.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_form_field_dinix.dart';
@@ -32,7 +34,6 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
 
   late final AppFormField _nomeForm;
   late final AppFormField _descricaoForm;
-  late final AppFormField _categoriaForm;
   late final bool _isEdit;
 
   CadastroLocalLookups? _lookups;
@@ -60,15 +61,6 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
       hint: 'Descrição (opcional)',
       icon: Phosphor.note,
     );
-    _categoriaForm = criarCampoDinix(
-      context: context,
-      hint: 'Categoria do estabelecimento',
-      icon: Phosphor.tag,
-      showKeyboard: false,
-      onTap: _escolherCategoria,
-      suffixIcon: Icon(Phosphor.caretDown, color: AppColors.grey400),
-      validator: (v) => validateObrigatorio(v, campo: 'Categoria'),
-    );
   }
 
   void _preencher() {
@@ -76,13 +68,6 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
     if (local == null) return;
     _nomeForm.controller.text = local.nome ?? '';
     _descricaoForm.controller.text = local.descricao ?? '';
-    _categoriaForm.controller.text = local.nomeCategoria ?? '';
-  }
-
-  void _aplicarLookups(CadastroLocalLookups lookups) {
-    _lookups = lookups;
-    final categoria = lookups.categorias.where((c) => c.id == _idCategoria).firstOrNull;
-    if (categoria != null) _categoriaForm.controller.text = categoria.nome ?? '';
   }
 
   String? _opcional(String value) {
@@ -99,16 +84,20 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
       items: items,
       labelOf: (c) => c.nome ?? '',
       selected: items.where((c) => c.id == _idCategoria).firstOrNull,
+      leadingOf: (c) => Icon(iconeDaCategoria(c), color: DinixColors.primary),
     );
     if (selecionada == null) return;
-    setState(() {
-      _idCategoria = selecionada.id;
-      _categoriaForm.controller.text = selecionada.nome ?? '';
-    });
+    setState(() => _idCategoria = selecionada.id);
   }
 
   void _salvarCadastro() {
     if (!validarFormularioComFeedback(_formKey)) return;
+    if (_idCategoria == null || _idCategoria!.isEmpty) {
+      showToastWarning(message: 'Selecione uma categoria');
+      return;
+    }
+    final categoria =
+        _lookups?.categorias.where((c) => c.id == _idCategoria).firstOrNull;
     bloc.add(
       CadastroLocalSaveEvent(
         local: LocalModel(
@@ -116,7 +105,7 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
           nome: _nomeForm.value.trim(),
           descricao: _opcional(_descricaoForm.value),
           idCategoria: _idCategoria,
-          nomeCategoria: _categoriaForm.value.trim(),
+          nomeCategoria: categoria?.nome,
         ),
       ),
     );
@@ -136,9 +125,15 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
   }
 
   void _onState(CadastroLocalState state) {
-    if (state is CadastroLocalReadyState) _aplicarLookups(state.lookups);
+    if (state is CadastroLocalReadyState) {
+      setState(() => _lookups = state.lookups);
+    }
     if (state is CadastroLocalSuccessState) {
-      showToastSuccess(message: _isEdit ? 'Estabelecimento atualizado' : 'Estabelecimento cadastrado');
+      showToastSuccess(
+        message: _isEdit
+            ? 'Estabelecimento atualizado'
+            : 'Estabelecimento cadastrado',
+      );
       Navigator.of(context).pop(true);
     }
     if (state is CadastroLocalDeletedState) {
@@ -152,6 +147,9 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
 
   @override
   Widget build(BuildContext context) {
+    final categoria =
+        _lookups?.categorias.where((c) => c.id == _idCategoria).firstOrNull;
+
     return scaffold(
       title: _isEdit ? 'Editar local' : 'Novo estabelecimento',
       centerTitle: true,
@@ -163,18 +161,30 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
         bloc: bloc,
         listener: (_, state) => _onState(state),
         builder: (context, state) {
-          if (state is CadastroLocalLoadingState || state is CadastroLocalInitialState) {
+          if (state is CadastroLocalLoadingState ||
+              state is CadastroLocalInitialState) {
             return appLoadingDinix();
           }
           return Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
               children: [
-                _nomeForm.formulario,
-                _descricaoForm.formulario,
-                _categoriaForm.formulario,
+                cadastroSecao('Nome', _nomeForm.formulario),
+                cadastroSecao('Descrição', _descricaoForm.formulario),
+                cadastroSecao(
+                  'Categoria',
+                  cadastroBotaoSeletor(
+                    tituloVazio: 'Selecionar categoria',
+                    valor: categoria?.nome,
+                    leading: Icon(
+                      iconeDaCategoria(categoria),
+                      color: DinixColors.primary,
+                    ),
+                    onTap: _escolherCategoria,
+                  ),
+                ),
                 appSizedBox(height: AppSpacing.medium),
                 appElevatedButtonDinix(
                   title: _isEdit ? AppStrings.salvar : 'Cadastrar',

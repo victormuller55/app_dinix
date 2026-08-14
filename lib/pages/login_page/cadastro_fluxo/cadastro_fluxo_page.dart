@@ -2,7 +2,7 @@ import 'package:app_dinix/app_config/app_auth.dart';
 import 'package:app_dinix/app_config/bancos_catalogo.dart';
 import 'package:app_dinix/cache/reference_data_prefetch.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
-import 'package:app_dinix/pages/home_shell.dart';
+import 'package:app_dinix/pages/login_page/biometria_permissao_page.dart';
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/cadastro_fluxo_dados.dart';
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/cadastro_fluxo_passo.dart';
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/steps/passo_cartoes_conteudo.dart';
@@ -33,7 +33,6 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
   final CadastroFluxoDados _dados = CadastroFluxoDados();
   CadastroFluxoPasso _passo = CadastroFluxoPasso.nome;
   bool _carregando = false;
-  bool _reenviandoCodigo = false;
 
   final GlobalKey<FormState> _formNome = GlobalKey<FormState>();
   final GlobalKey<FormState> _formEmail = GlobalKey<FormState>();
@@ -153,7 +152,6 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
   }
 
   Future<void> _reenviarCodigoEmail() async {
-    setState(() => _reenviandoCodigo = true);
     try {
       await enviarCodigoVerificacaoEmail(email: _dados.email);
       _dados.codigo = '';
@@ -162,8 +160,7 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
       showToastSuccess(message: 'Novo código enviado');
     } catch (e) {
       showAppErrorFromException(e);
-    } finally {
-      if (mounted) setState(() => _reenviandoCodigo = false);
+      rethrow;
     }
   }
 
@@ -190,7 +187,7 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
       showToastSuccess(message: AppStrings.sucessoAoCriarConta);
       ReferenceDataPrefetch.agendarDownloadPosLogin();
       if (!mounted) return;
-      open(screen: const HomeShell(), closePrevious: true);
+      await navegarAposAutenticacao();
     } catch (e) {
       showAppErrorFromException(e);
     } finally {
@@ -269,7 +266,6 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
           valorInicial: _dados.codigo,
           onChanged: (v) => setState(() => _dados.codigo = v),
           onReenviar: _reenviarCodigoEmail,
-          reenviando: _reenviandoCodigo,
         );
       case CadastroFluxoPasso.senha:
         return PassoSenhaConteudo(key: _senhaKey, formKey: _formSenha);

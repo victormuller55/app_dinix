@@ -8,6 +8,7 @@ import 'package:app_dinix/pages/perfil/perfil_service.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_form_field_dinix.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
+import 'package:app_dinix/widgets/reenviar_codigo_botao.dart';
 import 'package:flutter/material.dart';
 import 'package:muller_package/muller_package.dart'
     hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters;
@@ -26,7 +27,6 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
   late final AppFormField _emailForm;
   bool _aguardandoCodigo = false;
   bool _carregando = false;
-  bool _reenviando = false;
   String _codigo = '';
 
   @override
@@ -70,16 +70,14 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
   }
 
   Future<void> _reenviar() async {
-    setState(() => _reenviando = true);
     try {
       await enviarCodigoNovoEmail(_email);
       if (!mounted) return;
       showToastSuccess(message: 'Novo código enviado');
     } catch (e) {
-      if (await tratarSessaoExpirada(e)) return;
+      if (await tratarSessaoExpirada(e)) rethrow;
       showAppErrorFromException(e);
-    } finally {
-      if (mounted) setState(() => _reenviando = false);
+      rethrow;
     }
   }
 
@@ -107,7 +105,7 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
       key: _formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
         children: [
           appText(
             'Atual: ${widget.emailAtual}',
@@ -116,7 +114,7 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
           ),
           appSizedBox(height: AppSpacing.small),
           appText(
-            'Enviaremos um código para confirmar o novo endereço.',
+            'Enviaremos um código para confirmar o novo endereço. Se o e-mail já estiver cadastrado, não será possível usá-lo.',
             color: AppColors.grey400,
             fontSize: AppFontSizes.verySmall,
           ),
@@ -133,45 +131,51 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
   }
 
   Widget _passoCodigo() {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
-      children: [
-        appText(
-          _email,
-          color: DinixColors.primary,
-          fontSize: AppFontSizes.small,
-          textAlign: TextAlign.center,
-        ),
-        appSizedBox(height: AppSpacing.medium),
-        CodigoOtpField(onChanged: (value) => _codigo = value),
-        appSizedBox(height: AppSpacing.medium),
-        appText(
-          'O código expira em 3 horas. Verifique também a caixa de spam.',
-          color: AppColors.grey400,
-          fontSize: AppFontSizes.verySmall,
-          textAlign: TextAlign.center,
-        ),
-        appSizedBox(height: AppSpacing.normal),
-        _reenviando
-            ? Center(child: appLoadingDinix(size: 22))
-            : appTextButton(
-                text: 'Reenviar código',
-                color: DinixColors.primary,
-                onTap: _reenviar,
-              ),
-        appSizedBox(height: AppSpacing.medium),
-        appElevatedButtonDinix(
-          title: 'Confirmar e-mail',
-          onTap: _confirmar,
-          height: 52,
-        ),
-        appSizedBox(height: AppSpacing.normal),
-        appTextButton(
-          text: 'Usar outro e-mail',
-          color: AppColors.grey400,
-          onTap: () => setState(() => _aguardandoCodigo = false),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+          physics: const BouncingScrollPhysics(),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight - 40),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                appText(
+                  _email,
+                  color: DinixColors.primary,
+                  fontSize: AppFontSizes.small,
+                  textAlign: TextAlign.center,
+                ),
+                appSizedBox(height: AppSpacing.medium),
+                CodigoOtpField(onChanged: (value) => _codigo = value),
+                appSizedBox(height: AppSpacing.medium),
+                appText(
+                  'O código expira em 3 horas. Você pode pedir um novo a cada 5 minutos. Verifique também a caixa de spam.',
+                  color: AppColors.grey400,
+                  fontSize: AppFontSizes.verySmall,
+                  textAlign: TextAlign.center,
+                ),
+                appSizedBox(height: AppSpacing.normal),
+                ReenviarCodigoBotao(onReenviar: _reenviar),
+                appSizedBox(height: AppSpacing.medium),
+                appElevatedButtonDinix(
+                  title: 'Confirmar e-mail',
+                  onTap: _confirmar,
+                  height: 52,
+                ),
+                appSizedBox(height: AppSpacing.normal),
+                appTextButton(
+                  text: 'Usar outro e-mail',
+                  color: AppColors.grey400,
+                  onTap: () => setState(() => _aguardandoCodigo = false),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 

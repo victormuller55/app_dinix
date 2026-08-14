@@ -96,15 +96,13 @@ class _LoginPageState extends State<LoginPage> {
           appSizedBox(height: AppSpacing.normal),
           _loginForm.formulario,
           _passwordForm.formulario,
-          Align(
-            alignment: Alignment.centerRight,
-            child: appTextButton(
-              text: 'Esqueci minha senha',
-              color: DinixColors.primary,
-              onTap: _abrirEsqueciSenha,
-            ),
+          appSizedBox(height: AppSpacing.normal),
+          appTextButton(
+            text: 'Esqueci minha senha',
+            color: DinixColors.primary,
+            onTap: _abrirEsqueciSenha,
           ),
-          appSizedBox(height: AppSpacing.medium),
+          appSizedBox(height: AppSpacing.normal),
           appElevatedButtonDinix(title: AppStrings.entrar, onTap: _salvarLogin, height: 52),
           appSizedBox(height: AppSpacing.normal),
           appElevatedButtonDinix(
@@ -142,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
         child: LayoutBuilder(
           builder: (context, constraints) {
             return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
               physics: const BouncingScrollPhysics(),
               child: ConstrainedBox(
                 constraints: BoxConstraints(minHeight: constraints.maxHeight - 48),

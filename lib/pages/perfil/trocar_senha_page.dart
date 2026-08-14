@@ -85,7 +85,7 @@ class _TrocarSenhaPageState extends State<TrocarSenhaPage> {
               key: _formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
                 children: [
                   appText(
                     'Use no mínimo 8 caracteres. Você continua conectado depois de trocar.',
