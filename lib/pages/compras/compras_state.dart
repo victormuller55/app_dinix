@@ -30,15 +30,30 @@ class FiltroCompras {
   }
 
   factory FiltroCompras.hoje() {
-    final agora = DateTime.now();
-    final dia =
-        '${agora.year}-${agora.month.toString().padLeft(2, '0')}-${agora.day.toString().padLeft(2, '0')}';
+    return FiltroCompras.dia(DateTime.now());
+  }
+
+  factory FiltroCompras.dia(DateTime data) {
+    final dia = DateTime(data.year, data.month, data.day);
+    final iso =
+        '${dia.year}-${dia.month.toString().padLeft(2, '0')}-${dia.day.toString().padLeft(2, '0')}';
     return FiltroCompras(
-      mes: agora.month,
-      ano: agora.year,
+      mes: dia.month,
+      ano: dia.year,
       mesInteiro: false,
-      diasIso: [dia],
+      diasIso: [iso],
     );
+  }
+
+  DateTime get dataSelecionada {
+    if (!mesInteiro && diasIso.isNotEmpty) {
+      final parsed = DateTime.tryParse(diasIso.first.substring(0, 10));
+      if (parsed != null) {
+        return DateTime(parsed.year, parsed.month, parsed.day);
+      }
+    }
+    final agora = DateTime.now();
+    return DateTime(agora.year, agora.month, agora.day);
   }
 
   bool get soHoje {
@@ -88,7 +103,11 @@ abstract class ComprasState {}
 
 class ComprasInitialState extends ComprasState {}
 
-class ComprasLoadingState extends ComprasState {}
+class ComprasLoadingState extends ComprasState {
+  final FiltroCompras? filtro;
+
+  ComprasLoadingState({this.filtro});
+}
 
 class ComprasSuccessState extends ComprasState {
   final List<CompraModel> compras;

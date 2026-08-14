@@ -20,6 +20,7 @@ import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
+import 'package:app_dinix/widgets/native_ios_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -83,48 +84,64 @@ class _PerfilPageState extends State<PerfilPage> {
 
   Future<void> _escolherFoto(UsuarioModel usuario) async {
     if (_enviandoFoto) return;
-    final acao = await showModalBottomSheet<String>(
-      context: context,
-      backgroundColor: DinixColors.surfaceElevated,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.card)),
-      ),
-      builder: (ctx) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                child: appText(
-                  'Foto de perfil',
-                  bold: true,
-                  color: DinixColors.textPrimary,
-                  fontSize: AppFontSizes.normal,
+
+    final String? acao;
+    if (isIOSPlatform) {
+      final actions = <NativeIosAction>[
+        const NativeIosAction(id: 'camera', title: 'Câmera'),
+        const NativeIosAction(id: 'galeria', title: 'Galeria'),
+        if (_urlFoto(usuario) != null)
+          const NativeIosAction(id: 'remover', title: 'Remover foto', destructive: true),
+      ];
+      acao = await showNativeIosActionSheet(
+        title: 'Foto de perfil',
+        actions: actions,
+      );
+    } else {
+      acao = await showModalBottomSheet<String>(
+        context: context,
+        backgroundColor: DinixColors.surfaceElevated,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.card)),
+        ),
+        builder: (ctx) {
+          return SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                  child: appText(
+                    'Foto de perfil',
+                    bold: true,
+                    color: DinixColors.textPrimary,
+                    fontSize: AppFontSizes.normal,
+                  ),
                 ),
-              ),
-              ListTile(
-                leading: Icon(Phosphor.camera, color: DinixColors.primary),
-                title: appText('Câmera', color: DinixColors.textPrimary, bold: true),
-                onTap: () => Navigator.pop(ctx, 'camera'),
-              ),
-              ListTile(
-                leading: Icon(Phosphor.image, color: DinixColors.primary),
-                title: appText('Galeria', color: DinixColors.textPrimary, bold: true),
-                onTap: () => Navigator.pop(ctx, 'galeria'),
-              ),
-              if (_urlFoto(usuario) != null)
                 ListTile(
-                  leading: Icon(Phosphor.trash, color: AppColors.red),
-                  title: appText('Remover foto', color: AppColors.red, bold: true),
-                  onTap: () => Navigator.pop(ctx, 'remover'),
+                  leading: Icon(Phosphor.camera, color: DinixColors.primary),
+                  title: appText('Câmera', color: DinixColors.textPrimary, bold: true),
+                  onTap: () => Navigator.pop(ctx, 'camera'),
                 ),
-              appSizedBox(height: AppSpacing.small),
-            ],
-          ),
-        );
-      },
-    );
+                ListTile(
+                  leading: Icon(Phosphor.image, color: DinixColors.primary),
+                  title: appText('Galeria', color: DinixColors.textPrimary, bold: true),
+                  onTap: () => Navigator.pop(ctx, 'galeria'),
+                ),
+                if (_urlFoto(usuario) != null)
+                  ListTile(
+                    leading: Icon(Phosphor.trash, color: AppColors.red),
+                    title: appText('Remover foto', color: AppColors.red, bold: true),
+                    onTap: () => Navigator.pop(ctx, 'remover'),
+                  ),
+                appSizedBox(height: AppSpacing.small),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
     if (acao == null || !mounted) return;
     if (acao == 'remover') {
       await _removerFoto();

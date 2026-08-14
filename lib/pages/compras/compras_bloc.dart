@@ -8,7 +8,7 @@ import 'package:app_dinix/pages/compras/compras_service.dart';
 import 'package:app_dinix/pages/compras/compras_state.dart';
 
 class ComprasBloc extends Bloc<ComprasEvent, ComprasState> {
-  FiltroCompras _filtro = FiltroCompras.mesAtual();
+  FiltroCompras _filtro = FiltroCompras.hoje();
 
   ComprasBloc() : super(ComprasInitialState()) {
     on<ComprasLoadEvent>(_carregar);
@@ -21,10 +21,7 @@ class ComprasBloc extends Bloc<ComprasEvent, ComprasState> {
     Emitter<ComprasState> emit,
   ) async {
     _filtro = event.filtro;
-    final atual = state;
-    if (atual is ComprasSuccessState) {
-      emit(atual.copyWith(filtro: _filtro));
-    }
+    emit(ComprasLoadingState(filtro: _filtro));
     await _carregar(ComprasLoadEvent(forceRefresh: true), emit);
   }
 
@@ -45,7 +42,7 @@ class ComprasBloc extends Bloc<ComprasEvent, ComprasState> {
       forceRefresh: event.forceRefresh,
       hasVisibleData: temLista,
     )) {
-      emit(ComprasLoadingState());
+      emit(ComprasLoadingState(filtro: _filtro));
     }
 
     try {

@@ -86,7 +86,8 @@ class _CadastroCompraPageState extends State<CadastroCompraPage> {
       context: context,
       hint: 'Valor total',
       icon: Phosphor.money,
-      textInputType: const TextInputType.numberWithOptions(decimal: true),
+      textInputType: TextInputType.number,
+      textInputFormatter: AppFormFormatters.valor,
       validator: _isEdit ? null : validateValor,
     );
     _categoriaForm = criarCampoDinix(
@@ -145,7 +146,7 @@ class _CadastroCompraPageState extends State<CadastroCompraPage> {
     if (compra == null) return;
     _descricaoForm.controller.text = compra.descricao ?? '';
     if (compra.valorTotal != null) {
-      _valorForm.controller.text = compra.valorTotal!.toStringAsFixed(2);
+      _valorForm.controller.text = formataMoedaCampo(compra.valorTotal);
     }
     _obsForm.controller.text = compra.observacoes ?? '';
   }

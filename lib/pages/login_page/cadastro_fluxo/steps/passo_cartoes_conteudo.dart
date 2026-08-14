@@ -184,7 +184,7 @@ class _CartaoCamposState extends State<_CartaoCampos> {
           TextFormField(
             controller: _limiteController,
             keyboardType: TextInputType.number,
-            inputFormatters: [MoedaInputFormatter()],
+            inputFormatters: [AppFormFormatters.valor],
             style: const TextStyle(color: DinixColors.textPrimary),
             decoration: _decoration('0,00').copyWith(prefixText: 'R\$ '),
             onChanged: (v) => widget.onChanged(

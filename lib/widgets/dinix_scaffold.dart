@@ -24,7 +24,7 @@ Widget dinixMenuScaffold({
         icon: const Icon(Phosphor.plus, color: DinixColors.primary, size: 26),
       ),
     if ((actions == null || actions.isEmpty) && onAdd == null)
-      const SizedBox(width: 48),
+      const SizedBox(width: 72),
   ];
 
   return Scaffold(
@@ -38,15 +38,14 @@ Widget dinixMenuScaffold({
       foregroundColor: DinixColors.textPrimary,
       centerTitle: true,
       automaticallyImplyLeading: false,
-      leadingWidth: 56,
+      leadingWidth: 72,
       leading: Padding(
-        padding: const EdgeInsets.only(left: 10),
+        padding: const EdgeInsets.only(left: 12),
         child: Align(
           alignment: Alignment.centerLeft,
           child: Image.asset(
-            kIconAsset,
-            height: 28,
-            width: 28,
+            kLogoAsset,
+            height: 26,
             fit: BoxFit.contain,
             filterQuality: FilterQuality.high,
           ),

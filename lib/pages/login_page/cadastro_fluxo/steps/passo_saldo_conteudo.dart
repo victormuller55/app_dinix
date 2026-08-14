@@ -110,7 +110,7 @@ class _SaldoContaCampoState extends State<_SaldoContaCampo> {
                   TextFormField(
                     controller: _controller,
                     keyboardType: TextInputType.number,
-                    inputFormatters: [MoedaInputFormatter()],
+                    inputFormatters: [AppFormFormatters.valor],
                     style: const TextStyle(color: DinixColors.textPrimary),
                     decoration: InputDecoration(
                       hintText: '0,00',

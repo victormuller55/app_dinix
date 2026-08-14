@@ -20,22 +20,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muller_package/muller_package.dart'
     hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters;
 
-const _meses = [
-  '',
-  'Janeiro',
-  'Fevereiro',
-  'Março',
-  'Abril',
-  'Maio',
-  'Junho',
-  'Julho',
-  'Agosto',
-  'Setembro',
-  'Outubro',
-  'Novembro',
-  'Dezembro',
-];
-
 class ComprasPage extends StatefulWidget {
   const ComprasPage({super.key});
 
@@ -46,6 +30,7 @@ class ComprasPage extends StatefulWidget {
 class _ComprasPageState extends State<ComprasPage> {
   final ComprasBloc bloc = ComprasBloc();
   final ScrollController _scrollController = ScrollController();
+  int _direcaoDia = 0;
 
   @override
   void initState() {
@@ -67,139 +52,74 @@ class _ComprasPageState extends State<ComprasPage> {
     }
   }
 
-  void _irMes(FiltroCompras atual, int delta) {
-    final competencia = DateTime(atual.ano, atual.mes + delta);
-    bloc.add(
-      ComprasAlterarFiltroEvent(FiltroCompras(mes: competencia.month, ano: competencia.year)),
-    );
+  void _irDia(FiltroCompras atual, int delta) {
+    setState(() => _direcaoDia = delta);
+    final alvo = atual.dataSelecionada.add(Duration(days: delta));
+    bloc.add(ComprasAlterarFiltroEvent(FiltroCompras.dia(alvo)));
   }
 
-  Future<void> _escolherDias(FiltroCompras atual) async {
-    final escolhidos = await showModalBottomSheet<List<String>>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: DinixColors.surfaceElevated,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.card)),
-      ),
-      builder: (ctx) => _CalendarioDiasSheet(
-        mes: atual.mes,
-        ano: atual.ano,
-        selecionados: atual.mesInteiro ? const [] : atual.diasIso,
-      ),
-    );
-    if (escolhidos == null || !mounted) return;
-    if (escolhidos.isEmpty) {
-      bloc.add(ComprasAlterarFiltroEvent(FiltroCompras(mes: atual.mes, ano: atual.ano)));
-      return;
-    }
-    bloc.add(
-      ComprasAlterarFiltroEvent(
-        FiltroCompras(mes: atual.mes, ano: atual.ano, mesInteiro: false, diasIso: escolhidos),
-      ),
-    );
-  }
-
-  Widget _chip({required String label, required bool selecionado, required VoidCallback onTap}) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: selecionado ? DinixColors.primary : DinixColors.surfaceElevated,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: selecionado ? DinixColors.primary : AppColors.grey800),
-        ),
+  Widget _rotuloDiaAnimado(String rotulo) {
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 280),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      layoutBuilder: (currentChild, previousChildren) {
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            ...previousChildren,
+            ?currentChild,
+          ],
+        );
+      },
+      transitionBuilder: (child, animation) {
+        final entrando = child.key == ValueKey(rotulo);
+        final inicio = Offset(
+          entrando ? _direcaoDia * 0.45 : -_direcaoDia * 0.45,
+          0,
+        );
+        final deslize = Tween<Offset>(begin: inicio, end: Offset.zero).animate(animation);
+        return ClipRect(
+          child: SlideTransition(
+            position: deslize,
+            child: FadeTransition(
+              opacity: animation,
+              child: child,
+            ),
+          ),
+        );
+      },
+      child: SizedBox(
+        key: ValueKey(rotulo),
+        width: double.infinity,
         child: appText(
-          label,
-          bold: selecionado,
-          color: selecionado ? Colors.black : DinixColors.textPrimary,
-          fontSize: AppFontSizes.verySmall,
+          rotulo,
+          bold: true,
+          color: DinixColors.textPrimary,
+          fontSize: AppFontSizes.normal,
+          textAlign: TextAlign.center,
         ),
       ),
     );
   }
 
   Widget _filtro(FiltroCompras filtro) {
+    final rotulo = rotuloDiaNavegacao(filtro.dataSelecionada);
     return Padding(
       padding: const EdgeInsets.only(bottom: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Row(
-            children: [
-              IconButton(
-                onPressed: () => _irMes(filtro, -1),
-                icon: Icon(Phosphor.caretLeft, color: DinixColors.textPrimary),
-              ),
-              Expanded(
-                child: Center(
-                  child: appText(
-                    '${_meses[filtro.mes]} ${filtro.ano}',
-                    bold: true,
-                    color: DinixColors.textPrimary,
-                    fontSize: AppFontSizes.normal,
-                  ),
-                ),
-              ),
-              IconButton(
-                onPressed: () => _irMes(filtro, 1),
-                icon: Icon(Phosphor.caretRight, color: DinixColors.textPrimary),
-              ),
-            ],
+          IconButton(
+            onPressed: () => _irDia(filtro, -1),
+            icon: Icon(Phosphor.caretLeft, color: DinixColors.textPrimary),
+            tooltip: 'Dia anterior',
           ),
-          SizedBox(height: 10),
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-                _chip(
-                  label: 'Mês inteiro',
-                  selecionado: filtro.mesInteiro,
-                  onTap: () {
-                    if (filtro.mesInteiro) return;
-                    bloc.add(
-                      ComprasAlterarFiltroEvent(FiltroCompras(mes: filtro.mes, ano: filtro.ano)),
-                    );
-                  },
-                ),
-                const SizedBox(width: 8),
-                _chip(
-                  label: 'Hoje',
-                  selecionado: filtro.soHoje,
-                  onTap: () => bloc.add(ComprasAlterarFiltroEvent(FiltroCompras.hoje())),
-                ),
-                const SizedBox(width: 8),
-                _chip(
-                  label: 'Escolher dias',
-                  selecionado: !filtro.mesInteiro && !filtro.soHoje,
-                  onTap: () => _escolherDias(filtro),
-                ),
-              ],
-            ),
+          Expanded(child: _rotuloDiaAnimado(rotulo)),
+          IconButton(
+            onPressed: () => _irDia(filtro, 1),
+            icon: Icon(Phosphor.caretRight, color: DinixColors.textPrimary),
+            tooltip: 'Próximo dia',
           ),
-          if (!filtro.mesInteiro && filtro.diasIso.isNotEmpty) ...[
-            appSizedBox(height: AppSpacing.normal),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                for (final dia in filtro.diasIso)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: DinixColors.surfaceElevated,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: appText(
-                      isoParaBr(dia),
-                      color: DinixColors.textMuted,
-                      fontSize: AppFontSizes.verySmall,
-                    ),
-                  ),
-              ],
-            ),
-          ],
         ],
       ),
     );
@@ -335,6 +255,18 @@ class _ComprasPageState extends State<ComprasPage> {
         bloc: bloc,
         builder: (context, state) {
           if (state is ComprasLoadingState || state is ComprasInitialState) {
+            final filtro = state is ComprasLoadingState ? state.filtro : null;
+            if (filtro != null) {
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                    child: _filtro(filtro),
+                  ),
+                  Expanded(child: appLoadingDinix()),
+                ],
+              );
+            }
             return appLoadingDinix();
           }
           if (state is ComprasErrorState) {
@@ -362,9 +294,7 @@ class _ComprasPageState extends State<ComprasPage> {
                       onRefresh: atualizar,
                       child: emptyMessage(
                         title: 'Nenhuma compra',
-                        subtitle: state.filtro.mesInteiro
-                            ? 'Lance Pix, débito ou crédito neste mês.'
-                            : 'Não há lançamentos nos dias selecionados.',
+                        subtitle: 'Lance Pix, débito ou crédito neste dia.',
                         icon: Phosphor.shoppingBag,
                       ),
                     ),
@@ -392,149 +322,5 @@ class _ComprasPageState extends State<ComprasPage> {
     _scrollController.dispose();
     bloc.close();
     super.dispose();
-  }
-}
-
-class _CalendarioDiasSheet extends StatefulWidget {
-  final int mes;
-  final int ano;
-  final List<String> selecionados;
-
-  const _CalendarioDiasSheet({required this.mes, required this.ano, required this.selecionados});
-
-  @override
-  State<_CalendarioDiasSheet> createState() => _CalendarioDiasSheetState();
-}
-
-class _CalendarioDiasSheetState extends State<_CalendarioDiasSheet> {
-  late final Set<String> _selecionados;
-
-  @override
-  void initState() {
-    super.initState();
-    _selecionados = {...widget.selecionados};
-  }
-
-  String _iso(int dia) {
-    return '${widget.ano}-${widget.mes.toString().padLeft(2, '0')}-${dia.toString().padLeft(2, '0')}';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final primeiro = DateTime(widget.ano, widget.mes, 1);
-    final diasNoMes = DateTime(widget.ano, widget.mes + 1, 0).day;
-    final offset = primeiro.weekday % 7;
-    final hojeIso = dataHojeIso();
-    const labels = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S'];
-
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            appText(
-              'Escolher dias · ${_meses[widget.mes]}',
-              bold: true,
-              color: DinixColors.textPrimary,
-              fontSize: AppFontSizes.normal,
-            ),
-            appSizedBox(height: AppSpacing.medium),
-            Row(
-              children: [
-                for (final label in labels)
-                  Expanded(
-                    child: Center(
-                      child: appText(
-                        label,
-                        color: AppColors.grey400,
-                        fontSize: AppFontSizes.verySmall,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            appSizedBox(height: AppSpacing.small),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: offset + diasNoMes,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 7,
-                mainAxisSpacing: 6,
-                crossAxisSpacing: 6,
-              ),
-              itemBuilder: (_, index) {
-                if (index < offset) return const SizedBox.shrink();
-                final dia = index - offset + 1;
-                final iso = _iso(dia);
-                final marcado = _selecionados.contains(iso);
-                final ehHoje = iso == hojeIso;
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      if (marcado) {
-                        _selecionados.remove(iso);
-                      } else {
-                        _selecionados.add(iso);
-                      }
-                    });
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: marcado ? DinixColors.primary : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
-                      border: ehHoje && !marcado ? Border.all(color: DinixColors.primary) : null,
-                    ),
-                    alignment: Alignment.center,
-                    child: appText(
-                      '$dia',
-                      bold: marcado || ehHoje,
-                      color: marcado ? Colors.black : DinixColors.textPrimary,
-                      fontSize: AppFontSizes.small,
-                    ),
-                  ),
-                );
-              },
-            ),
-            appSizedBox(height: AppSpacing.medium),
-            Row(
-              children: [
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (_, constraints) {
-                      return appElevatedButtonDinix(
-                        title: 'Mês inteiro',
-                        invertedStyle: true,
-                        enableEffects: false,
-                        width: constraints.maxWidth,
-                        onTap: () => Navigator.of(context).pop(<String>[]),
-                        height: 48,
-                      );
-                    },
-                  ),
-                ),
-                appSizedBox(width: AppSpacing.normal),
-                Expanded(
-                  child: LayoutBuilder(
-                    builder: (_, constraints) {
-                      return appElevatedButtonDinix(
-                        title: 'Aplicar',
-                        width: constraints.maxWidth,
-                        onTap: () {
-                          final dias = _selecionados.toList()..sort();
-                          Navigator.of(context).pop(dias);
-                        },
-                        height: 48,
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

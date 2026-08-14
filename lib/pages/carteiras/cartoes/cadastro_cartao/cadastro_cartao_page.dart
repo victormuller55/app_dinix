@@ -78,7 +78,8 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
       context: context,
       hint: 'Limite',
       icon: Phosphor.money,
-      textInputType: const TextInputType.numberWithOptions(decimal: true),
+      textInputType: TextInputType.number,
+      textInputFormatter: AppFormFormatters.valor,
       validator: validateValor,
     );
     _fechamentoForm = criarCampoDinix(
@@ -103,7 +104,7 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
     _nomeForm.controller.text = cartao.nome ?? '';
     _bancoForm.controller.text = cartao.banco ?? '';
     if (cartao.limite != null) {
-      _limiteForm.controller.text = cartao.limite!.toStringAsFixed(2);
+      _limiteForm.controller.text = formataMoedaCampo(cartao.limite);
     }
     _fechamentoForm.controller.text = '${cartao.diaFechamento ?? ''}';
     _vencimentoForm.controller.text = '${cartao.diaVencimento ?? ''}';

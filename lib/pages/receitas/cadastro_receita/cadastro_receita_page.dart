@@ -62,7 +62,8 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
       context: context,
       hint: 'Valor recebido',
       icon: Phosphor.money,
-      textInputType: const TextInputType.numberWithOptions(decimal: true),
+      textInputType: TextInputType.number,
+      textInputFormatter: AppFormFormatters.valor,
       validator: validateValor,
     );
     _origemForm = criarCampoDinix(
@@ -109,7 +110,7 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
     _dataForm.controller.text = isoParaBr(receita?.dataRecebimento ?? dataHojeIso());
     if (receita == null) return;
     if (receita.valor != null) {
-      _valorForm.controller.text = receita.valor!.toStringAsFixed(2);
+      _valorForm.controller.text = formataMoedaCampo(receita.valor);
     }
     _descricaoForm.controller.text = receita.descricao ?? '';
     _obsForm.controller.text = receita.observacoes ?? '';

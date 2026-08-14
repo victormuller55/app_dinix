@@ -1,3 +1,4 @@
+import 'package:app_dinix/app_config/app_enums.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/function/categoria_icone.dart';
@@ -17,6 +18,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muller_package/muller_package.dart'
     hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters;
+
+class _TipoAssinatura {
+  final String nome;
+  final IconData icone;
+  final double valor;
+
+  const _TipoAssinatura({
+    required this.nome,
+    required this.icone,
+    required this.valor,
+  });
+}
 
 class AssinaturasPage extends StatefulWidget {
   final bool isActive;
@@ -57,6 +70,135 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
     if (salvo == true && mounted) {
       bloc.add(AssinaturasLoadEvent(forceRefresh: true));
     }
+  }
+
+  double _valorMensal(AssinaturaModel item) {
+    final valor = item.valor ?? 0;
+    switch (item.recorrencia) {
+      case Recorrencia.anual:
+        return valor / 12;
+      case Recorrencia.semanal:
+        return valor * 52 / 12;
+      default:
+        return valor;
+    }
+  }
+
+  CategoriaModel? _categoriaTipo(
+    AssinaturaModel item,
+    Map<String, CategoriaModel> categoriasPorId,
+  ) {
+    final categoria = categoriasPorId[item.idCategoria ?? ''];
+    if (categoria == null) return null;
+    final idPai = categoria.idCategoriaPai;
+    if (idPai != null && idPai.isNotEmpty) {
+      return categoriasPorId[idPai] ?? categoria;
+    }
+    return categoria;
+  }
+
+  List<_TipoAssinatura> _porTipo(
+    List<AssinaturaModel> assinaturas,
+    Map<String, CategoriaModel> categoriasPorId,
+  ) {
+    final mapa = <String, _TipoAssinatura>{};
+    for (final item in assinaturas) {
+      if (item.canceladoEm != null && item.canceladoEm!.isNotEmpty) continue;
+      final tipo = _categoriaTipo(item, categoriasPorId);
+      final nome = (tipo?.nome?.trim().isNotEmpty ?? false) ? tipo!.nome!.trim() : 'Outros';
+      final icone = iconeDaCategoria(tipo, categoriasPorId: categoriasPorId);
+      final atual = mapa[nome];
+      final valor = (atual?.valor ?? 0) + _valorMensal(item);
+      mapa[nome] = _TipoAssinatura(nome: nome, icone: icone, valor: valor);
+    }
+    final lista = mapa.values.toList()
+      ..sort((a, b) => b.valor.compareTo(a.valor));
+    return lista;
+  }
+
+  double _totalMensal(List<AssinaturaModel> assinaturas) {
+    return assinaturas
+        .where((a) => a.canceladoEm == null || a.canceladoEm!.isEmpty)
+        .fold<double>(0, (acc, item) => acc + _valorMensal(item));
+  }
+
+  Widget _resumo(
+    List<AssinaturaModel> assinaturas,
+    Map<String, CategoriaModel> categoriasPorId,
+  ) {
+    final total = _totalMensal(assinaturas);
+    final tipos = _porTipo(assinaturas, categoriasPorId);
+    final qtd = assinaturas
+        .where((a) => a.canceladoEm == null || a.canceladoEm!.isEmpty)
+        .length;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: appContainer(
+        padding: const EdgeInsets.all(16),
+        backgroundColor: DinixColors.surfaceElevated,
+        radius: BorderRadius.circular(AppRadius.card),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            appText(
+              qtd == 1 ? '1 assinatura ativa' : '$qtd assinaturas ativas',
+              color: AppColors.grey400,
+              fontSize: AppFontSizes.verySmall,
+            ),
+            appSizedBox(height: AppSpacing.small),
+            appText(
+              formataMoeda(total),
+              bold: true,
+              color: DinixColors.primary,
+              fontSize: AppFontSizes.big,
+            ),
+            appText(
+              'Total mensal',
+              color: AppColors.grey400,
+              fontSize: AppFontSizes.verySmall,
+            ),
+            if (tipos.isNotEmpty) ...[
+              appSizedBox(height: AppSpacing.normal),
+              Divider(color: AppColors.grey800, height: 1),
+              appSizedBox(height: AppSpacing.normal),
+              ...tipos.map((tipo) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 28,
+                        height: 28,
+                        decoration: BoxDecoration(
+                          color: DinixColors.primary.withValues(alpha: 0.16),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(tipo.icone, color: DinixColors.primary, size: 16),
+                      ),
+                      appSizedBox(width: AppSpacing.normal),
+                      Expanded(
+                        child: appText(
+                          tipo.nome,
+                          color: DinixColors.textPrimary,
+                          fontSize: AppFontSizes.small,
+                        ),
+                      ),
+                      appText(
+                        formataMoeda(tipo.valor),
+                        bold: true,
+                        color: DinixColors.textPrimary,
+                        fontSize: AppFontSizes.small,
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 
   Widget _item(AssinaturaModel item, Map<String, CategoriaModel> categoriasPorId) {
@@ -103,6 +245,13 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
     );
   }
 
+  List<Widget> _linhas(AssinaturasSuccessState state) {
+    return [
+      _resumo(state.assinaturas, state.categoriasPorId),
+      ...state.assinaturas.map((item) => _item(item, state.categoriasPorId)),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
     return dinixMenuScaffold(
@@ -139,12 +288,14 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
                 ),
               );
             }
+
+            final linhas = _linhas(state);
             return listaRefreshBuilder(
               onRefresh: atualizar,
               controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
-              itemCount: state.assinaturas.length,
-              itemBuilder: (_, i) => _item(state.assinaturas[i], state.categoriasPorId),
+              itemCount: linhas.length,
+              itemBuilder: (_, i) => linhas[i],
             );
           }
           return appLoadingDinix();

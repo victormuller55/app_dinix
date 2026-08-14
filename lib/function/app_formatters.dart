@@ -89,6 +89,38 @@ String rotuloDiaRelativo(String? iso) {
   return '${_diasSemana[dia.weekday - 1]} · $br';
 }
 
+const _mesesExtenso = [
+  '',
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
+];
+
+/// Rótulo da navegação diária: Hoje / Ontem / Amanhã / 12 de Agosto de 2026
+String rotuloDiaNavegacao(DateTime data) {
+  final dia = DateTime(data.year, data.month, data.day);
+  final agora = DateTime.now();
+  final hoje = DateTime(agora.year, agora.month, agora.day);
+  final diff = dia.difference(hoje).inDays;
+  if (diff == 0) return 'Hoje';
+  if (diff == -1) return 'Ontem';
+  if (diff == 1) return 'Amanhã';
+  return '${dia.day} de ${_mesesExtenso[dia.month]} de ${dia.year}';
+}
+
+String dateTimeParaIso(DateTime data) {
+  return '${data.year}-${_doisDigitos(data.month)}-${_doisDigitos(data.day)}';
+}
+
 String brParaIso(String br) {
   final digitos = br.replaceAll(RegExp(r'\D'), '');
   if (digitos.length != 8) return '';

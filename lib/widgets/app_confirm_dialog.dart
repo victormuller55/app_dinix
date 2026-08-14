@@ -1,7 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:muller_package/muller_package.dart' hide AppRadius, AppFontSizes, AppSpacing;
 import 'package:app_dinix/app_config/app_platform.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/widgets/native_ios_ui.dart';
+import 'package:flutter/material.dart';
+import 'package:muller_package/muller_package.dart'
+    hide AppRadius, AppFontSizes, AppSpacing;
 
 Future<bool?> showAppConfirmDialog(
   BuildContext context, {
@@ -11,27 +13,14 @@ Future<bool?> showAppConfirmDialog(
   String confirmLabel = 'Confirmar',
   String cancelLabel = AppStrings.cancelar,
   bool destructive = false,
-}) {
+}) async {
   if (isIOSPlatform) {
-    return showAdaptiveDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog.adaptive(
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(cancelLabel),
-          ),
-          TextButton(
-            style: destructive
-                ? TextButton.styleFrom(foregroundColor: AppColors.red)
-                : TextButton.styleFrom(foregroundColor: DinixColors.primary),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: Text(confirmLabel),
-          ),
-        ],
-      ),
+    return showNativeIosConfirm(
+      title: title,
+      message: message,
+      confirmLabel: confirmLabel,
+      cancelLabel: cancelLabel,
+      destructive: destructive,
     );
   }
 

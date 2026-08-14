@@ -92,7 +92,7 @@ class _CadastroContaPageState extends State<CadastroContaPage> {
       hint: 'Saldo atual',
       icon: Phosphor.money,
       textInputType: TextInputType.number,
-      textInputFormatter: MoedaInputFormatter(),
+      textInputFormatter: AppFormFormatters.valor,
       validator: validateValorOpcional,
     );
   }

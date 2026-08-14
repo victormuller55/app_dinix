@@ -77,7 +77,8 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
       context: context,
       hint: 'Valor',
       icon: Phosphor.money,
-      textInputType: const TextInputType.numberWithOptions(decimal: true),
+      textInputType: TextInputType.number,
+      textInputFormatter: AppFormFormatters.valor,
       validator: validateValor,
     );
     _categoriaForm = criarCampoDinix(
@@ -138,7 +139,7 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
     _inicioForm.controller.text = isoParaBr(item?.dataInicio ?? dataHojeIso());
     if (item == null) return;
     _nomeForm.controller.text = item.nome ?? '';
-    if (item.valor != null) _valorForm.controller.text = item.valor!.toStringAsFixed(2);
+    if (item.valor != null) _valorForm.controller.text = formataMoedaCampo(item.valor);
     _diaForm.controller.text = '${item.diaCobranca ?? ''}';
   }
 
