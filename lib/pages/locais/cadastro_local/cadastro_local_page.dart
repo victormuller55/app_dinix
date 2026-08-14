@@ -2,6 +2,7 @@ import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/form_validation.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/function/validators.dart';
+import 'package:app_dinix/models/categoria_model.dart';
 import 'package:app_dinix/models/local_model.dart';
 import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_bloc.dart';
 import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_event.dart';
@@ -10,6 +11,7 @@ import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_form_field_dinix.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
+import 'package:app_dinix/widgets/app_select_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muller_package/muller_package.dart'
@@ -30,17 +32,20 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
 
   late final AppFormField _nomeForm;
   late final AppFormField _descricaoForm;
-  late final AppFormField _enderecoForm;
-  late final AppFormField _cidadeForm;
-  late final AppFormField _estadoForm;
+  late final AppFormField _categoriaForm;
   late final bool _isEdit;
+
+  CadastroLocalLookups? _lookups;
+  String? _idCategoria;
 
   @override
   void initState() {
     super.initState();
     _isEdit = widget.local?.id != null && widget.local!.id!.isNotEmpty;
+    _idCategoria = widget.local?.idCategoria;
     _criarCampos();
     _preencher();
+    bloc.add(CadastroLocalLoadEvent());
   }
 
   void _criarCampos() {
@@ -55,20 +60,14 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
       hint: 'Descrição (opcional)',
       icon: Phosphor.note,
     );
-    _enderecoForm = criarCampoDinix(
+    _categoriaForm = criarCampoDinix(
       context: context,
-      hint: 'Endereço (opcional)',
-      icon: Phosphor.mapPin,
-    );
-    _cidadeForm = criarCampoDinix(
-      context: context,
-      hint: 'Cidade (opcional)',
-      icon: Phosphor.buildings,
-    );
-    _estadoForm = criarCampoDinix(
-      context: context,
-      hint: 'UF (opcional)',
-      icon: Phosphor.mapTrifold,
+      hint: 'Categoria do estabelecimento',
+      icon: Phosphor.tag,
+      showKeyboard: false,
+      onTap: _escolherCategoria,
+      suffixIcon: Icon(Phosphor.caretDown, color: AppColors.grey400),
+      validator: (v) => validateObrigatorio(v, campo: 'Categoria'),
     );
   }
 
@@ -77,14 +76,35 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
     if (local == null) return;
     _nomeForm.controller.text = local.nome ?? '';
     _descricaoForm.controller.text = local.descricao ?? '';
-    _enderecoForm.controller.text = local.endereco ?? '';
-    _cidadeForm.controller.text = local.cidade ?? '';
-    _estadoForm.controller.text = local.estado ?? '';
+    _categoriaForm.controller.text = local.nomeCategoria ?? '';
+  }
+
+  void _aplicarLookups(CadastroLocalLookups lookups) {
+    _lookups = lookups;
+    final categoria = lookups.categorias.where((c) => c.id == _idCategoria).firstOrNull;
+    if (categoria != null) _categoriaForm.controller.text = categoria.nome ?? '';
   }
 
   String? _opcional(String value) {
     final t = value.trim();
     return t.isEmpty ? null : t;
+  }
+
+  Future<void> _escolherCategoria() async {
+    final items = _lookups?.categorias ?? [];
+    if (items.isEmpty) return;
+    final selecionada = await showAppSelectSheet<CategoriaModel>(
+      context: context,
+      title: 'Categoria do estabelecimento',
+      items: items,
+      labelOf: (c) => c.nome ?? '',
+      selected: items.where((c) => c.id == _idCategoria).firstOrNull,
+    );
+    if (selecionada == null) return;
+    setState(() {
+      _idCategoria = selecionada.id;
+      _categoriaForm.controller.text = selecionada.nome ?? '';
+    });
   }
 
   void _salvarCadastro() {
@@ -95,9 +115,8 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
           id: widget.local?.id,
           nome: _nomeForm.value.trim(),
           descricao: _opcional(_descricaoForm.value),
-          endereco: _opcional(_enderecoForm.value),
-          cidade: _opcional(_cidadeForm.value),
-          estado: _opcional(_estadoForm.value),
+          idCategoria: _idCategoria,
+          nomeCategoria: _categoriaForm.value.trim(),
         ),
       ),
     );
@@ -117,6 +136,7 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
   }
 
   void _onState(CadastroLocalState state) {
+    if (state is CadastroLocalReadyState) _aplicarLookups(state.lookups);
     if (state is CadastroLocalSuccessState) {
       showToastSuccess(message: _isEdit ? 'Estabelecimento atualizado' : 'Estabelecimento cadastrado');
       Navigator.of(context).pop(true);
@@ -143,7 +163,9 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
         bloc: bloc,
         listener: (_, state) => _onState(state),
         builder: (context, state) {
-          if (state is CadastroLocalLoadingState) return appLoadingDinix();
+          if (state is CadastroLocalLoadingState || state is CadastroLocalInitialState) {
+            return appLoadingDinix();
+          }
           return Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -152,9 +174,7 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
               children: [
                 _nomeForm.formulario,
                 _descricaoForm.formulario,
-                _enderecoForm.formulario,
-                _cidadeForm.formulario,
-                _estadoForm.formulario,
+                _categoriaForm.formulario,
                 appSizedBox(height: AppSpacing.medium),
                 appElevatedButtonDinix(
                   title: _isEdit ? AppStrings.salvar : 'Cadastrar',

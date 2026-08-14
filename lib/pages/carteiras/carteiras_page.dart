@@ -71,21 +71,28 @@ class _CarteirasPageState extends State<CarteirasPage> {
   Widget _resumoTotal(double total) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 18),
-      child: Column(
-        children: [
-          appText(
-            'Total em contas',
-            color: AppColors.grey400,
-            fontSize: AppFontSizes.verySmall,
+      child: Material(
+        color: DinixColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+          child: Column(
+            children: [
+              appText(
+                'Total em contas',
+                color: AppColors.grey400,
+                fontSize: AppFontSizes.verySmall,
+              ),
+              appSizedBox(height: 6),
+              appText(
+                formataMoeda(total),
+                bold: true,
+                color: DinixColors.textPrimary,
+                fontSize: 32,
+              ),
+            ],
           ),
-          appSizedBox(height: 6),
-          appText(
-            formataMoeda(total),
-            bold: true,
-            color: DinixColors.textPrimary,
-            fontSize: 32,
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -144,6 +151,7 @@ class _CarteirasPageState extends State<CarteirasPage> {
                   formataMoeda(conta.saldoAtual ?? conta.saldoInicial),
                   bold: true,
                   color: DinixColors.textPrimary,
+                  fontSize: AppFontSizes.medium,
                 ),
               ],
             ),

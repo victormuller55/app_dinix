@@ -7,8 +7,22 @@ import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_state.dart'
 
 class CadastroLocalBloc extends Bloc<CadastroLocalEvent, CadastroLocalState> {
   CadastroLocalBloc() : super(CadastroLocalInitialState()) {
+    on<CadastroLocalLoadEvent>(_carregar);
     on<CadastroLocalSaveEvent>(_salvar);
     on<CadastroLocalDeleteEvent>(_excluir);
+  }
+
+  Future<void> _carregar(
+    CadastroLocalLoadEvent event,
+    Emitter<CadastroLocalState> emit,
+  ) async {
+    emit(CadastroLocalLoadingState());
+    try {
+      emit(CadastroLocalReadyState(lookups: await carregarLookupsLocal()));
+    } catch (e) {
+      if (await tratarSessaoExpirada(e)) return;
+      emit(CadastroLocalErrorState(errorModel: errorModelFromException(e)));
+    }
   }
 
   Future<void> _salvar(CadastroLocalSaveEvent event, Emitter<CadastroLocalState> emit) async {

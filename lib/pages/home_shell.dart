@@ -50,8 +50,8 @@ class _HomeShellState extends State<HomeShell> {
       label: 'Início',
       iconOutlined: Phosphor.squaresFour,
       iconSelected: PhosphorFill.squaresFour,
-      sfIcon: CNSymbol('square.grid.2x2', size: 18),
-      sfIconSelected: CNSymbol('square.grid.2x2.fill', size: 18),
+      sfIcon: CNSymbol('square.grid.2x2', size: 16),
+      sfIconSelected: CNSymbol('square.grid.2x2.fill', size: 16),
       page: PainelPage(),
     ),
     _HomeNavItem(
@@ -59,8 +59,8 @@ class _HomeShellState extends State<HomeShell> {
       label: 'Compras',
       iconOutlined: Phosphor.receipt,
       iconSelected: PhosphorFill.receipt,
-      sfIcon: CNSymbol('receipt', size: 18),
-      sfIconSelected: CNSymbol('receipt.fill', size: 18),
+      sfIcon: CNSymbol('receipt', size: 16),
+      sfIconSelected: CNSymbol('receipt.fill', size: 16),
       page: ComprasPage(),
     ),
     _HomeNavItem(
@@ -68,8 +68,8 @@ class _HomeShellState extends State<HomeShell> {
       label: 'Carteiras',
       iconOutlined: Phosphor.wallet,
       iconSelected: PhosphorFill.wallet,
-      sfIcon: CNSymbol('wallet.pass', size: 18),
-      sfIconSelected: CNSymbol('wallet.pass.fill', size: 18),
+      sfIcon: CNSymbol('wallet.pass', size: 16),
+      sfIconSelected: CNSymbol('wallet.pass.fill', size: 16),
       page: CarteirasPage(),
     ),
     _HomeNavItem(
@@ -77,8 +77,8 @@ class _HomeShellState extends State<HomeShell> {
       label: 'Planos',
       iconOutlined: Phosphor.stack,
       iconSelected: PhosphorFill.stack,
-      sfIcon: CNSymbol('square.stack.3d.up', size: 18),
-      sfIconSelected: CNSymbol('square.stack.3d.up.fill', size: 18),
+      sfIcon: CNSymbol('square.stack.3d.up', size: 16),
+      sfIconSelected: CNSymbol('square.stack.3d.up.fill', size: 16),
       pageBuilder: (isActive) => AssinaturasPage(isActive: isActive),
     ),
     _HomeNavItem(
@@ -86,8 +86,8 @@ class _HomeShellState extends State<HomeShell> {
       label: 'Perfil',
       iconOutlined: Phosphor.user,
       iconSelected: PhosphorFill.user,
-      sfIcon: CNSymbol('person', size: 18),
-      sfIconSelected: CNSymbol('person.fill', size: 18),
+      sfIcon: CNSymbol('person', size: 16),
+      sfIconSelected: CNSymbol('person.fill', size: 16),
       page: PerfilPage(),
     ),
   ];
@@ -159,8 +159,9 @@ class _HomeShellState extends State<HomeShell> {
       currentIndex: currentIndex,
       onTap: _selectTab,
       tint: DinixColors.primary,
-      iconSize: 18,
-      labelFontSize: 10,
+      backgroundColor: Colors.transparent,
+      iconSize: 16,
+      labelFontSize: 9,
       labelFontFamily: AppFonts.family,
     );
   }
@@ -188,12 +189,24 @@ class _HomeShellState extends State<HomeShell> {
       child: Scaffold(
         backgroundColor: DinixColors.background,
         extendBody: isIOSPlatform,
-        body: _body(),
-        bottomNavigationBar: isIOSPlatform
-            ? _iosLiquidGlassBar(
-                items: _items,
-                currentIndex: _currentIndex,
+        body: isIOSPlatform
+            ? Stack(
+                children: [
+                  _body(),
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    child: _iosLiquidGlassBar(
+                      items: _items,
+                      currentIndex: _currentIndex,
+                    ),
+                  ),
+                ],
               )
+            : _body(),
+        bottomNavigationBar: isIOSPlatform
+            ? null
             : _androidBar(
                 items: _items,
                 currentIndex: _currentIndex,

@@ -25,7 +25,7 @@ Widget dinixAddFab({
 
   if (!isIOSPlatform) return button;
   return Padding(
-    padding: const EdgeInsets.only(bottom: 88),
+    padding: const EdgeInsets.only(bottom: 96),
     child: button,
   );
 }

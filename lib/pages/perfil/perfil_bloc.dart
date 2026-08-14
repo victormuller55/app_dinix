@@ -11,13 +11,16 @@ class PerfilBloc extends Bloc<PerfilEvent, PerfilState> {
   PerfilBloc() : super(PerfilInitialState()) {
     on<PerfilLoadEvent>(_carregar);
     on<PerfilLogoutEvent>(_sair);
+    on<PerfilAtualizadoEvent>(_atualizar);
   }
 
   Future<void> _carregar(
     PerfilLoadEvent event,
     Emitter<PerfilState> emit,
   ) async {
-    emit(PerfilLoadingState());
+    if (!event.silencioso) {
+      emit(PerfilLoadingState());
+    }
     try {
       final usuario = await carregarPerfil();
       emit(PerfilLoadedState(usuario: usuario));
@@ -35,5 +38,9 @@ class PerfilBloc extends Bloc<PerfilEvent, PerfilState> {
     await sairDaConta();
     emit(PerfilLoggedOutState());
     open(screen: const LoginPage(), closePrevious: true);
+  }
+
+  void _atualizar(PerfilAtualizadoEvent event, Emitter<PerfilState> emit) {
+    emit(PerfilLoadedState(usuario: event.usuario));
   }
 }

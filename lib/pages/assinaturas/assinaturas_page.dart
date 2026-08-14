@@ -33,8 +33,7 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 120) {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 120) {
         bloc.add(AssinaturasLoadMoreEvent());
       }
     });
@@ -66,7 +65,12 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
         borderRadius: BorderRadius.circular(AppRadius.card),
         child: ListTile(
           onTap: () => _abrirCadastro(assinatura: item),
-          title: appText(item.nome ?? '', bold: true, color: DinixColors.textPrimary),
+          title: appText(
+            item.nome ?? '',
+            bold: true,
+            color: DinixColors.textPrimary,
+            fontSize: AppFontSizes.normal,
+          ),
           subtitle: appText(
             item.dataProximaCobranca != null
                 ? 'Próxima: ${isoParaBr(item.dataProximaCobranca)}'
@@ -78,6 +82,7 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
             formataMoeda(item.valor),
             bold: true,
             color: DinixColors.primary,
+            fontSize: AppFontSizes.normal,
           ),
         ),
       ),

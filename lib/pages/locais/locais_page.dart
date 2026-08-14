@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/function/categoria_icone.dart';
 import 'package:app_dinix/models/local_model.dart';
 import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_page.dart';
 import 'package:app_dinix/pages/locais/locais_bloc.dart';
@@ -48,6 +49,10 @@ class _LocaisPageState extends State<LocaisPage> {
   }
 
   Widget _item(LocalModel local) {
+    final icone = (local.nomeCategoria == null || local.nomeCategoria!.isEmpty)
+        ? Phosphor.storefront
+        : iconeCategoria(nome: local.nomeCategoria);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
@@ -55,9 +60,18 @@ class _LocaisPageState extends State<LocaisPage> {
         borderRadius: BorderRadius.circular(AppRadius.card),
         child: ListTile(
           onTap: () => _abrirCadastro(local: local),
+          leading: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: DinixColors.primary.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icone, color: DinixColors.primary, size: 22),
+          ),
           title: appText(local.nome ?? '', bold: true, color: DinixColors.textPrimary),
           subtitle: appText(
-            [local.cidade, local.estado].where((e) => e != null && e.isNotEmpty).join(' · '),
+            local.nomeCategoria ?? local.descricao ?? '',
             color: AppColors.grey400,
             fontSize: AppFontSizes.verySmall,
           ),

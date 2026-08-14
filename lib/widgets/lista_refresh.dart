@@ -58,22 +58,52 @@ Widget listaRefreshBuilder({
   );
 }
 
-/// Estado vazio com pull-to-refresh (mesmo sem itens na lista).
+/// Estado vazio com pull-to-refresh, mensagem no centro da área disponível.
 Widget listaRefreshVazia({
   required BuildContext context,
   required Future<void> Function() onRefresh,
   required Widget child,
   EdgeInsetsGeometry? padding,
 }) {
-  final altura = MediaQuery.sizeOf(context).height * 0.62;
-  return listaRefreshBuilder(
-    onRefresh: onRefresh,
-    padding: padding ?? const EdgeInsets.symmetric(horizontal: 16),
-    itemCount: 1,
-    itemBuilder: (_, _) => SizedBox(
-      height: altura,
-      child: Center(child: child),
-    ),
+  final conteudo = Padding(
+    padding: padding ?? EdgeInsets.zero,
+    child: Center(child: child),
+  );
+
+  if (isIOSPlatform) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+      slivers: [
+        CupertinoSliverRefreshControl(
+          onRefresh: onRefresh,
+          builder: _iosRefreshIndicator,
+        ),
+        SliverFillRemaining(
+          hasScrollBody: false,
+          child: conteudo,
+        ),
+      ],
+    );
+  }
+
+  return LayoutBuilder(
+    builder: (_, constraints) {
+      final minHeight = constraints.maxHeight.isFinite && constraints.maxHeight > 0
+          ? constraints.maxHeight
+          : MediaQuery.sizeOf(context).height * 0.62;
+      return RefreshIndicator(
+        color: Colors.white,
+        backgroundColor: Colors.black,
+        onRefresh: onRefresh,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: minHeight),
+            child: conteudo,
+          ),
+        ),
+      );
+    },
   );
 }
 

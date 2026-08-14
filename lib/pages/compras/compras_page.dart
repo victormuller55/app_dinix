@@ -51,8 +51,7 @@ class _ComprasPageState extends State<ComprasPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 120) {
+      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 120) {
         bloc.add(ComprasLoadMoreEvent());
       }
     });
@@ -60,9 +59,9 @@ class _ComprasPageState extends State<ComprasPage> {
   }
 
   Future<void> _abrirCadastro({CompraModel? compra}) async {
-    final salvo = await Navigator.of(context).push<bool>(
-      CupertinoPageRoute(builder: (_) => CadastroCompraPage(compra: compra)),
-    );
+    final salvo = await Navigator.of(
+      context,
+    ).push<bool>(CupertinoPageRoute(builder: (_) => CadastroCompraPage(compra: compra)));
     if (salvo == true && mounted) {
       bloc.add(ComprasLoadEvent(forceRefresh: true));
     }
@@ -71,9 +70,7 @@ class _ComprasPageState extends State<ComprasPage> {
   void _irMes(FiltroCompras atual, int delta) {
     final competencia = DateTime(atual.ano, atual.mes + delta);
     bloc.add(
-      ComprasAlterarFiltroEvent(
-        FiltroCompras(mes: competencia.month, ano: competencia.year),
-      ),
+      ComprasAlterarFiltroEvent(FiltroCompras(mes: competencia.month, ano: competencia.year)),
     );
   }
 
@@ -98,21 +95,12 @@ class _ComprasPageState extends State<ComprasPage> {
     }
     bloc.add(
       ComprasAlterarFiltroEvent(
-        FiltroCompras(
-          mes: atual.mes,
-          ano: atual.ano,
-          mesInteiro: false,
-          diasIso: escolhidos,
-        ),
+        FiltroCompras(mes: atual.mes, ano: atual.ano, mesInteiro: false, diasIso: escolhidos),
       ),
     );
   }
 
-  Widget _chip({
-    required String label,
-    required bool selecionado,
-    required VoidCallback onTap,
-  }) {
+  Widget _chip({required String label, required bool selecionado, required VoidCallback onTap}) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -120,9 +108,7 @@ class _ComprasPageState extends State<ComprasPage> {
         decoration: BoxDecoration(
           color: selecionado ? DinixColors.primary : DinixColors.surfaceElevated,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: selecionado ? DinixColors.primary : AppColors.grey800,
-          ),
+          border: Border.all(color: selecionado ? DinixColors.primary : AppColors.grey800),
         ),
         child: appText(
           label,
@@ -162,6 +148,7 @@ class _ComprasPageState extends State<ComprasPage> {
               ),
             ],
           ),
+          SizedBox(height: 10),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
@@ -172,9 +159,7 @@ class _ComprasPageState extends State<ComprasPage> {
                   onTap: () {
                     if (filtro.mesInteiro) return;
                     bloc.add(
-                      ComprasAlterarFiltroEvent(
-                        FiltroCompras(mes: filtro.mes, ano: filtro.ano),
-                      ),
+                      ComprasAlterarFiltroEvent(FiltroCompras(mes: filtro.mes, ano: filtro.ano)),
                     );
                   },
                 ),
@@ -303,16 +288,18 @@ class _ComprasPageState extends State<ComprasPage> {
             ),
             child: Icon(icone, color: DinixColors.primary, size: 22),
           ),
-          title: appText(compra.descricao ?? '', bold: true, color: DinixColors.textPrimary),
-          subtitle: appText(
-            detalhes,
-            color: AppColors.grey400,
-            fontSize: AppFontSizes.verySmall,
+          title: appText(
+            compra.descricao ?? '',
+            bold: true,
+            color: DinixColors.textPrimary,
+            fontSize: AppFontSizes.small,
           ),
+          subtitle: appText(detalhes, color: AppColors.grey400, fontSize: AppFontSizes.verySmall),
           trailing: appText(
             formataMoeda(compra.valorTotal),
             bold: true,
             color: DinixColors.textPrimary,
+            fontSize: AppFontSizes.normal,
           ),
         ),
       ),
@@ -321,21 +308,6 @@ class _ComprasPageState extends State<ComprasPage> {
 
   List<Widget> _linhas(ComprasSuccessState state) {
     final widgets = <Widget>[_filtro(state.filtro)];
-    if (state.compras.isEmpty) {
-      widgets.add(
-        Padding(
-          padding: const EdgeInsets.only(top: 48),
-          child: emptyMessage(
-            title: 'Nenhuma compra',
-            subtitle: state.filtro.mesInteiro
-                ? 'Lance Pix, débito ou crédito neste mês.'
-                : 'Não há lançamentos nos dias selecionados.',
-            icon: Phosphor.shoppingBag,
-          ),
-        ),
-      );
-      return widgets;
-    }
     for (final grupo in state.grupos) {
       widgets.add(_resumoDia(grupo));
       for (final compra in grupo.compras) {
@@ -379,11 +351,35 @@ class _ComprasPageState extends State<ComprasPage> {
             );
           }
           if (state is ComprasSuccessState) {
+            Future<void> atualizar() async {
+              bloc.add(ComprasLoadEvent(forceRefresh: true));
+            }
+            if (state.compras.isEmpty) {
+              return Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+                    child: _filtro(state.filtro),
+                  ),
+                  Expanded(
+                    child: listaRefreshVazia(
+                      context: context,
+                      onRefresh: atualizar,
+                      child: emptyMessage(
+                        title: 'Nenhuma compra',
+                        subtitle: state.filtro.mesInteiro
+                            ? 'Lance Pix, débito ou crédito neste mês.'
+                            : 'Não há lançamentos nos dias selecionados.',
+                        icon: Phosphor.shoppingBag,
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            }
             final linhas = _linhas(state);
             return listaRefreshBuilder(
-              onRefresh: () async {
-                bloc.add(ComprasLoadEvent(forceRefresh: true));
-              },
+              onRefresh: atualizar,
               controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(16, 4, 16, 88),
               itemCount: linhas.length,
@@ -409,11 +405,7 @@ class _CalendarioDiasSheet extends StatefulWidget {
   final int ano;
   final List<String> selecionados;
 
-  const _CalendarioDiasSheet({
-    required this.mes,
-    required this.ano,
-    required this.selecionados,
-  });
+  const _CalendarioDiasSheet({required this.mes, required this.ano, required this.selecionados});
 
   @override
   State<_CalendarioDiasSheet> createState() => _CalendarioDiasSheetState();
@@ -497,9 +489,7 @@ class _CalendarioDiasSheetState extends State<_CalendarioDiasSheet> {
                     decoration: BoxDecoration(
                       color: marcado ? DinixColors.primary : Colors.transparent,
                       borderRadius: BorderRadius.circular(20),
-                      border: ehHoje && !marcado
-                          ? Border.all(color: DinixColors.primary)
-                          : null,
+                      border: ehHoje && !marcado ? Border.all(color: DinixColors.primary) : null,
                     ),
                     alignment: Alignment.center,
                     child: appText(

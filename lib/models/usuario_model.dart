@@ -2,6 +2,7 @@ class UsuarioModel {
   String? id;
   String? nome;
   String? email;
+  String? urlFoto;
   bool? ativo;
   String? senha;
   String? token;
@@ -14,6 +15,7 @@ class UsuarioModel {
     this.id,
     this.nome,
     this.email,
+    this.urlFoto,
     this.ativo,
     this.senha,
     this.token,
@@ -28,6 +30,7 @@ class UsuarioModel {
       id: null,
       nome: '',
       email: '',
+      urlFoto: null,
       ativo: null,
       senha: null,
       token: null,
@@ -42,6 +45,8 @@ class UsuarioModel {
     id = (json['id_usuario'] ?? json['id'])?.toString();
     nome = json['nome']?.toString();
     email = json['email']?.toString();
+    urlFoto = (json['url_foto'] ?? json['foto'] ?? json['photo_url'])?.toString();
+    if (urlFoto != null && urlFoto!.trim().isEmpty) urlFoto = null;
     ativo = json['ativo'] is bool ? json['ativo'] as bool : null;
     senha = json['senha']?.toString();
     token = json['token']?.toString();
@@ -71,6 +76,7 @@ class UsuarioModel {
       'id': id,
       'nome': nome,
       'email': email,
+      'url_foto': urlFoto,
       'ativo': ativo,
       'token': token,
       'tipo_token': tipoToken,

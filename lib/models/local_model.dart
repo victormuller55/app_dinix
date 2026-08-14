@@ -2,6 +2,8 @@ class LocalModel {
   String? id;
   String? nome;
   String? descricao;
+  String? idCategoria;
+  String? nomeCategoria;
   String? endereco;
   String? cidade;
   String? estado;
@@ -12,6 +14,8 @@ class LocalModel {
     this.id,
     this.nome,
     this.descricao,
+    this.idCategoria,
+    this.nomeCategoria,
     this.endereco,
     this.cidade,
     this.estado,
@@ -25,6 +29,8 @@ class LocalModel {
     id = json['id']?.toString();
     nome = json['nome']?.toString();
     descricao = json['descricao']?.toString();
+    idCategoria = json['id_categoria']?.toString();
+    nomeCategoria = json['nome_categoria']?.toString();
     endereco = json['endereco']?.toString();
     cidade = json['cidade']?.toString();
     estado = json['estado']?.toString();
@@ -36,6 +42,7 @@ class LocalModel {
     return {
       'nome': nome ?? '',
       'descricao': _opcional(descricao),
+      'id_categoria': idCategoria,
       'endereco': _opcional(endereco),
       'cidade': _opcional(cidade),
       'estado': _opcional(estado),
@@ -45,7 +52,8 @@ class LocalModel {
   }
 
   Map<String, dynamic> toMap() => toJsonCadastro()
-    ..['id'] = id;
+    ..['id'] = id
+    ..['nome_categoria'] = nomeCategoria;
 
   String? _opcional(String? value) {
     final trimmed = value?.trim();

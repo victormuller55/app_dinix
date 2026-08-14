@@ -185,6 +185,58 @@ Future<void> deleteJson({
   );
 }
 
+Future<AppResponse> deleteAndReadJson({
+  required String endpoint,
+  Map<String, String>? parameters,
+}) async {
+  final headers = await _jsonHeaders();
+  final uri = Uri.parse(endpoint + _query(parameters));
+  final response = await _request(
+    method: 'DELETE',
+    uri: uri,
+    call: () => http.delete(uri, headers: headers),
+  );
+  return AppResponse(
+    statusCode: response.statusCode,
+    body: utf8.decode(response.bodyBytes),
+  );
+}
+
+Future<AppResponse> putMultipartFoto({
+  required String endpoint,
+  required XFile foto,
+}) async {
+  final headers = await getAuthHeaders();
+  final uri = Uri.parse(endpoint);
+  final bytes = await foto.readAsBytes();
+  final filename = foto.name.isNotEmpty ? foto.name : 'foto.jpg';
+
+  Future<http.Response> send() async {
+    final request = http.MultipartRequest('PUT', uri);
+    request.headers.addAll(headers);
+    request.files.add(
+      http.MultipartFile.fromBytes(
+        'foto',
+        bytes,
+        filename: filename,
+        contentType: _mediaTypeFromName(filename),
+      ),
+    );
+    return request.send().then(http.Response.fromStream);
+  }
+
+  final response = await _request(
+    method: 'PUT',
+    uri: uri,
+    body: {'foto': filename},
+    call: send,
+  );
+  return AppResponse(
+    statusCode: response.statusCode,
+    body: utf8.decode(response.bodyBytes),
+  );
+}
+
 Future<AppResponse> postMultipart({
   required String endpoint,
   required Map<String, dynamic> dados,

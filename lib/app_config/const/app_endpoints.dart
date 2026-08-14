@@ -22,6 +22,10 @@ class AppEndpoints {
   static String endpointAuthEnviarCodigoEmail = '$api/autenticacao/enviar-codigo-email';
   static String endpointAuthVerificarEmail = '$api/autenticacao/verificar-email';
   static String endpointUsuariosEu = '$api/usuarios/eu';
+  static String endpointUsuariosEuSenha = '$api/usuarios/eu/senha';
+  static String endpointUsuariosEuEmail = '$api/usuarios/eu/email';
+  static String endpointUsuariosEuExcluir = '$api/usuarios/eu/excluir';
+  static String endpointUsuariosEuFoto = '$api/usuarios/eu/foto';
 
   // Contas
   static String endpointContas = '$api/contas';

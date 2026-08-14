@@ -1,3 +1,4 @@
+import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_event.dart';
 import 'package:muller_package/muller_package.dart';
 
 abstract class CadastroLocalState {}
@@ -5,6 +6,11 @@ abstract class CadastroLocalState {}
 class CadastroLocalInitialState extends CadastroLocalState {}
 
 class CadastroLocalLoadingState extends CadastroLocalState {}
+
+class CadastroLocalReadyState extends CadastroLocalState {
+  final CadastroLocalLookups lookups;
+  CadastroLocalReadyState({required this.lookups});
+}
 
 class CadastroLocalSuccessState extends CadastroLocalState {}
 
