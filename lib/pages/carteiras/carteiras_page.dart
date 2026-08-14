@@ -11,7 +11,7 @@ import 'package:app_dinix/pages/carteiras/cartoes/cartoes_page.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
-import 'package:app_dinix/widgets/dinix_add_fab.dart';
+import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/empty.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
 import 'package:flutter/cupertino.dart';
@@ -236,14 +236,10 @@ class _CarteirasPageState extends State<CarteirasPage> {
 
   @override
   Widget build(BuildContext context) {
-    return scaffold(
+    return dinixMenuScaffold(
       title: 'Carteiras',
-      centerTitle: true,
-      hideBackIcon: true,
-      background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      onAdd: _abrirCadastro,
+      addTooltip: 'Nova conta',
       actions: [
         IconButton(
           onPressed: _abrirCartoes,
@@ -251,10 +247,6 @@ class _CarteirasPageState extends State<CarteirasPage> {
           tooltip: 'Cartões',
         ),
       ],
-      floatingActionButton: dinixAddFab(
-        label: 'Conta',
-        onTap: _abrirCadastro,
-      ),
       body: _bodyBuilder(),
     );
   }

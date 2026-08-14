@@ -49,3 +49,25 @@ Future<AppResponse> postAuthVerificarEmail({
     },
   );
 }
+
+Future<AppResponse> postAuthEsqueciSenhaEnviarCodigo({required String email}) {
+  return postJson(
+    endpoint: AppEndpoints.endpointAuthEsqueciSenhaEnviarCodigo,
+    body: {'email': email},
+  );
+}
+
+Future<AppResponse> postAuthEsqueciSenhaRedefinir({
+  required String email,
+  required String codigo,
+  required String senha,
+}) {
+  return postJson(
+    endpoint: AppEndpoints.endpointAuthEsqueciSenhaRedefinir,
+    body: {
+      'email': email,
+      'codigo': codigo,
+      'senha': senha,
+    },
+  );
+}

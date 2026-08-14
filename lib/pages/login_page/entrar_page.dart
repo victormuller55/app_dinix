@@ -6,6 +6,7 @@ import 'package:app_dinix/pages/login_page/cadastro_fluxo/cadastro_fluxo_page.da
 import 'package:app_dinix/pages/login_page/entrar_bloc.dart';
 import 'package:app_dinix/pages/login_page/entrar_event.dart';
 import 'package:app_dinix/pages/login_page/entrar_state.dart';
+import 'package:app_dinix/pages/login_page/esqueci_senha/esqueci_senha_page.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/app_logo.dart';
@@ -65,6 +66,10 @@ class _LoginPageState extends State<LoginPage> {
     open(screen: const CadastroFluxoPage());
   }
 
+  void _abrirEsqueciSenha() {
+    open(screen: const EsqueciSenhaPage());
+  }
+
   Widget _header() {
     return appLogoDinix(height: 64, showTagline: true);
   }
@@ -91,6 +96,14 @@ class _LoginPageState extends State<LoginPage> {
           appSizedBox(height: AppSpacing.normal),
           _loginForm.formulario,
           _passwordForm.formulario,
+          Align(
+            alignment: Alignment.centerRight,
+            child: appTextButton(
+              text: 'Esqueci minha senha',
+              color: DinixColors.primary,
+              onTap: _abrirEsqueciSenha,
+            ),
+          ),
           appSizedBox(height: AppSpacing.medium),
           appElevatedButtonDinix(title: AppStrings.entrar, onTap: _salvarLogin, height: 52),
           appSizedBox(height: AppSpacing.normal),

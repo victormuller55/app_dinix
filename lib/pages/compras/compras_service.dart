@@ -58,13 +58,7 @@ Future<Map<String, CartaoCreditoModel>> mapearCartoes() async {
   };
 }
 
-Future<Map<String, CategoriaModel>> mapearCategorias() async {
-  final categorias = await listarCategoriasLookup();
-  return {
-    for (final categoria in categorias)
-      if (categoria.id != null && categoria.id!.isNotEmpty) categoria.id!: categoria,
-  };
-}
+Future<Map<String, CategoriaModel>> mapearCategorias() => mapearCategoriasPorId();
 
 String bancoDaCompra({
   required CompraModel compra,

@@ -1,13 +1,15 @@
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
+import 'package:app_dinix/function/categoria_icone.dart';
 import 'package:app_dinix/models/assinatura_model.dart';
+import 'package:app_dinix/models/categoria_model.dart';
 import 'package:app_dinix/pages/assinaturas/assinaturas_bloc.dart';
 import 'package:app_dinix/pages/assinaturas/assinaturas_event.dart';
 import 'package:app_dinix/pages/assinaturas/assinaturas_state.dart';
 import 'package:app_dinix/pages/assinaturas/cadastro_assinatura/cadastro_assinatura_page.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
-import 'package:app_dinix/widgets/dinix_add_fab.dart';
+import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/empty.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
 import 'package:flutter/cupertino.dart';
@@ -57,7 +59,10 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
     }
   }
 
-  Widget _item(AssinaturaModel item) {
+  Widget _item(AssinaturaModel item, Map<String, CategoriaModel> categoriasPorId) {
+    final categoria = categoriasPorId[item.idCategoria ?? ''];
+    final icone = iconeDaCategoria(categoria, categoriasPorId: categoriasPorId);
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Material(
@@ -65,6 +70,15 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
         borderRadius: BorderRadius.circular(AppRadius.card),
         child: ListTile(
           onTap: () => _abrirCadastro(assinatura: item),
+          leading: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: DinixColors.primary.withValues(alpha: 0.16),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icone, color: DinixColors.primary, size: 22),
+          ),
           title: appText(
             item.nome ?? '',
             bold: true,
@@ -91,15 +105,10 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
 
   @override
   Widget build(BuildContext context) {
-    return scaffold(
+    return dinixMenuScaffold(
       title: 'Assinaturas',
-      centerTitle: true,
-      hideBackIcon: true,
-      background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
-      floatingActionButton: dinixAddFab(label: 'Assinatura', onTap: _abrirCadastro),
+      onAdd: () => _abrirCadastro(),
+      addTooltip: 'Nova assinatura',
       body: BlocBuilder<AssinaturasBloc, AssinaturasState>(
         bloc: bloc,
         builder: (context, state) {
@@ -135,7 +144,7 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
               controller: _scrollController,
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
               itemCount: state.assinaturas.length,
-              itemBuilder: (_, i) => _item(state.assinaturas[i]),
+              itemBuilder: (_, i) => _item(state.assinaturas[i], state.categoriasPorId),
             );
           }
           return appLoadingDinix();

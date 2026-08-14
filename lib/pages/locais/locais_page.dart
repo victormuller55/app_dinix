@@ -7,7 +7,7 @@ import 'package:app_dinix/pages/locais/locais_event.dart';
 import 'package:app_dinix/pages/locais/locais_state.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
-import 'package:app_dinix/widgets/dinix_add_fab.dart';
+import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/empty.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
 import 'package:flutter/cupertino.dart';
@@ -90,7 +90,7 @@ class _LocaisPageState extends State<LocaisPage> {
       appBarColor: DinixColors.primaryDark,
       titleColor: DinixColors.textPrimary,
       drawerColor: DinixColors.textPrimary,
-      floatingActionButton: dinixAddFab(label: 'Local', onTap: _abrirCadastro),
+      actions: [dinixAddAction(onTap: _abrirCadastro, tooltip: 'Novo local')],
       body: BlocBuilder<LocaisBloc, LocaisState>(
         bloc: bloc,
         builder: (context, state) {
@@ -124,7 +124,7 @@ class _LocaisPageState extends State<LocaisPage> {
             return listaRefreshBuilder(
               onRefresh: atualizar,
               controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
               itemCount: state.locais.length,
               itemBuilder: (_, i) => _item(state.locais[i]),
             );

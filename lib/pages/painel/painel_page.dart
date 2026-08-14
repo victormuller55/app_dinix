@@ -10,6 +10,7 @@ import 'package:app_dinix/pages/receitas/receitas_page.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
+import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -460,13 +461,8 @@ class _PainelPageState extends State<PainelPage> {
 
   @override
   Widget build(BuildContext context) {
-    return scaffold(
+    return dinixMenuScaffold(
       title: 'Início',
-      centerTitle: true,
-      hideBackIcon: true,
-      background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
       body: BlocBuilder<PainelBloc, PainelState>(
         bloc: bloc,
         builder: (context, state) {

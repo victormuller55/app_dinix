@@ -9,7 +9,7 @@ import 'package:app_dinix/pages/receitas/receitas_event.dart';
 import 'package:app_dinix/pages/receitas/receitas_state.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
-import 'package:app_dinix/widgets/dinix_add_fab.dart';
+import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/empty.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
 import 'package:flutter/cupertino.dart';
@@ -144,7 +144,7 @@ class _ReceitasPageState extends State<ReceitasPage> {
     return listaRefreshBuilder(
       onRefresh: atualizar,
       controller: _scrollController,
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       itemCount: state.receitas.length + 1 + (state.loadingMore ? 1 : 0),
       itemBuilder: (_, index) {
         if (index == 0) return _resumoDia(state.resumoDia);
@@ -196,10 +196,7 @@ class _ReceitasPageState extends State<ReceitasPage> {
       appBarColor: DinixColors.primaryDark,
       titleColor: DinixColors.textPrimary,
       drawerColor: DinixColors.textPrimary,
-      floatingActionButton: dinixAddFab(
-        label: 'Ganho',
-        onTap: _abrirCadastro,
-      ),
+      actions: [dinixAddAction(onTap: _abrirCadastro, tooltip: 'Novo ganho')],
       body: BlocBuilder<ReceitasBloc, ReceitasState>(
         bloc: bloc,
         builder: (context, state) {

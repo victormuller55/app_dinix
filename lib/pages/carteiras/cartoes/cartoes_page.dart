@@ -8,7 +8,7 @@ import 'package:app_dinix/pages/carteiras/cartoes/cartoes_state.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
-import 'package:app_dinix/widgets/dinix_add_fab.dart';
+import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/empty.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
 import 'package:flutter/cupertino.dart';
@@ -169,7 +169,7 @@ class _CartoesPageState extends State<CartoesPage> {
           return listaRefreshBuilder(
             onRefresh: atualizar,
             controller: _scrollController,
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
             itemCount: state.cartoes.length + (state.loadingMore ? 1 : 0),
             itemBuilder: (_, index) {
               if (index >= state.cartoes.length) {
@@ -196,7 +196,7 @@ class _CartoesPageState extends State<CartoesPage> {
       appBarColor: DinixColors.primaryDark,
       titleColor: DinixColors.textPrimary,
       drawerColor: DinixColors.textPrimary,
-      floatingActionButton: dinixAddFab(label: 'Cartão', onTap: _abrirCadastro),
+      actions: [dinixAddAction(onTap: _abrirCadastro, tooltip: 'Novo cartão')],
       body: _bodyBuilder(),
     );
   }

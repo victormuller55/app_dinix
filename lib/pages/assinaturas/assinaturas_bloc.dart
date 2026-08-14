@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:app_dinix/cache/cache_keys.dart';
+import 'package:app_dinix/cache/categoria_lookup.dart';
 import 'package:app_dinix/cache/list_bloc_helpers.dart';
 import 'package:app_dinix/function/service/api_error.dart';
 import 'package:app_dinix/function/service/session_expired.dart';
@@ -14,6 +15,22 @@ class AssinaturasBloc extends Bloc<AssinaturasEvent, AssinaturasState> {
     on<AssinaturasLoadMoreEvent>(_carregarMais);
   }
 
+  Future<AssinaturasSuccessState> _sucesso({
+    required List<AssinaturaModel> assinaturas,
+    required int numPag,
+    required int maxPag,
+    bool loadingMore = false,
+  }) async {
+    final categoriasPorId = await mapearCategoriasPorId();
+    return AssinaturasSuccessState(
+      assinaturas: assinaturas,
+      categoriasPorId: categoriasPorId,
+      numPag: numPag,
+      maxPag: maxPag,
+      loadingMore: loadingMore,
+    );
+  }
+
   Future<void> _carregar(AssinaturasLoadEvent event, Emitter<AssinaturasState> emit) async {
     final temLista = state is AssinaturasSuccessState;
 
@@ -23,7 +40,7 @@ class AssinaturasBloc extends Bloc<AssinaturasEvent, AssinaturasState> {
       forceRefresh: event.forceRefresh,
     );
     if (cached != null) {
-      emit(AssinaturasSuccessState(
+      emit(await _sucesso(
         assinaturas: cached.itens,
         numPag: cached.numPag,
         maxPag: cached.maxPag,
@@ -40,7 +57,7 @@ class AssinaturasBloc extends Bloc<AssinaturasEvent, AssinaturasState> {
 
     try {
       final pagina = await listarAssinaturas(forceRefresh: event.forceRefresh);
-      emit(AssinaturasSuccessState(
+      emit(await _sucesso(
         assinaturas: pagina.itens,
         numPag: pagina.numPag,
         maxPag: pagina.maxPag,
@@ -57,8 +74,12 @@ class AssinaturasBloc extends Bloc<AssinaturasEvent, AssinaturasState> {
     emit(atual.copyWith(loadingMore: true));
     try {
       final pagina = await listarAssinaturas(forceRefresh: true, pagina: atual.numPag + 1);
+      final categoriasPorId = atual.categoriasPorId.isEmpty
+          ? await mapearCategoriasPorId()
+          : atual.categoriasPorId;
       emit(atual.copyWith(
         assinaturas: [...atual.assinaturas, ...pagina.itens],
+        categoriasPorId: categoriasPorId,
         numPag: pagina.numPag,
         maxPag: pagina.maxPag,
         loadingMore: false,

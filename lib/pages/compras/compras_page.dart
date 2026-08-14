@@ -11,7 +11,7 @@ import 'package:app_dinix/pages/compras/compras_state.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
-import 'package:app_dinix/widgets/dinix_add_fab.dart';
+import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/empty.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
 import 'package:flutter/cupertino.dart';
@@ -327,15 +327,10 @@ class _ComprasPageState extends State<ComprasPage> {
 
   @override
   Widget build(BuildContext context) {
-    return scaffold(
+    return dinixMenuScaffold(
       title: 'Compras',
-      centerTitle: true,
-      hideBackIcon: true,
-      background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
-      floatingActionButton: dinixAddFab(label: 'Compra', onTap: _abrirCadastro),
+      onAdd: () => _abrirCadastro(),
+      addTooltip: 'Nova compra',
       body: BlocBuilder<ComprasBloc, ComprasState>(
         bloc: bloc,
         builder: (context, state) {

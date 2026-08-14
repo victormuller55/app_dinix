@@ -21,3 +21,11 @@ Future<List<CategoriaModel>> listarCategoriasLookup() async {
   );
   return paginacao.itens;
 }
+
+Future<Map<String, CategoriaModel>> mapearCategoriasPorId() async {
+  final categorias = await listarCategoriasLookup();
+  return {
+    for (final categoria in categorias)
+      if (categoria.id != null && categoria.id!.isNotEmpty) categoria.id!: categoria,
+  };
+}
