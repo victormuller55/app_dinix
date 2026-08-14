@@ -7,7 +7,7 @@ import 'package:app_dinix/pages/receitas/cadastro_receita/cadastro_receita_page.
 import 'package:app_dinix/pages/receitas/receitas_bloc.dart';
 import 'package:app_dinix/pages/receitas/receitas_event.dart';
 import 'package:app_dinix/pages/receitas/receitas_state.dart';
-import 'package:app_dinix/widgets/app_elevated_button.dart';
+import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/empty.dart';
@@ -165,25 +165,10 @@ class _ReceitasPageState extends State<ReceitasPage> {
   }
 
   Widget _error(ErrorModel errorModel) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            appText(
-              errorModel.mensagem ?? 'Não foi possível carregar os ganhos.',
-              color: DinixColors.textPrimary,
-              textAlign: TextAlign.center,
-            ),
-            appSizedBox(height: AppSpacing.medium),
-            appElevatedButtonDinix(
-              title: 'Tentar novamente',
-              onTap: () => bloc.add(ReceitasLoadEvent(forceRefresh: true)),
-            ),
-          ],
-        ),
-      ),
+    return appErrorState(
+      errorModel: errorModel,
+      subtitle: errorModel.mensagem ?? 'Não foi possível carregar os ganhos.',
+      onRetry: () => bloc.add(ReceitasLoadEvent(forceRefresh: true)),
     );
   }
 

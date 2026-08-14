@@ -250,7 +250,7 @@ Widget cadastroCampoValor({
               enabled: enabled,
               keyboardType: TextInputType.number,
               inputFormatters: [
-                MoedaInputFormatter(min: min, max: max),
+                MoedaInputFormatter(max: max),
               ],
               textAlign: TextAlign.center,
               style: TextStyle(
@@ -275,11 +275,8 @@ Widget cadastroCampoValor({
                   fontWeight: FontWeight.w600,
                   color: DinixColors.primary,
                 ),
-                errorStyle: TextStyle(
-                  fontFamily: AppFonts.family,
-                  fontSize: 12,
-                  color: AppColors.red,
-                ),
+                // Validação continua no Form; mensagem não aparece sob o campo.
+                errorStyle: const TextStyle(height: 0, fontSize: 0),
               ),
               validator: enabled ? validator : null,
               onChanged: (_) => onChanged?.call(),

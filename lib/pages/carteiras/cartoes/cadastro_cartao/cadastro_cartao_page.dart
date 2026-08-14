@@ -62,11 +62,6 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
     _preencher();
     _limiteFocus.addListener(_aoFocarLimite);
     bloc.add(CadastroCartaoLoadEvent());
-    if (!_isEdit) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _limiteFocus.requestFocus();
-      });
-    }
   }
 
   BancoOpcao? _resolverBanco(String? nome) {

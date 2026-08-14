@@ -17,6 +17,7 @@ import 'package:app_dinix/pages/perfil/trocar_senha_page.dart';
 import 'package:app_dinix/pages/receitas/receitas_page.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
+import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
@@ -451,28 +452,10 @@ class _PerfilPageState extends State<PerfilPage> {
   }
 
   Widget _error(ErrorModel errorModel) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Phosphor.warningCircle, color: AppColors.red, size: 42),
-            appSizedBox(height: AppSpacing.medium),
-            appText(
-              errorModel.mensagem ?? 'Não foi possível carregar o perfil.',
-              color: DinixColors.textPrimary,
-              textAlign: TextAlign.center,
-            ),
-            appSizedBox(height: AppSpacing.medium),
-            appElevatedButtonDinix(
-              title: 'Tentar novamente',
-              onTap: () => bloc.add(PerfilLoadEvent()),
-              height: 48,
-            ),
-          ],
-        ),
-      ),
+    return appErrorState(
+      errorModel: errorModel,
+      subtitle: errorModel.mensagem ?? 'Não foi possível carregar o perfil.',
+      onRetry: () => bloc.add(PerfilLoadEvent()),
     );
   }
 

@@ -68,11 +68,6 @@ class _CadastroCompraPageState extends State<CadastroCompraPage> {
     _preencher();
     _valorFocus.addListener(_aoFocarValor);
     bloc.add(CadastroCompraLoadEvent());
-    if (!_isEdit) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _valorFocus.requestFocus();
-      });
-    }
   }
 
   void _aoFocarValor() {

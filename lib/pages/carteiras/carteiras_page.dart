@@ -8,7 +8,7 @@ import 'package:app_dinix/pages/carteiras/carteiras_bloc.dart';
 import 'package:app_dinix/pages/carteiras/carteiras_event.dart';
 import 'package:app_dinix/pages/carteiras/carteiras_state.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cartoes_page.dart';
-import 'package:app_dinix/widgets/app_elevated_button.dart';
+import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
@@ -198,25 +198,10 @@ class _CarteirasPageState extends State<CarteirasPage> {
   }
 
   Widget _error(ErrorModel errorModel) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            appText(
-              errorModel.mensagem ?? 'Não foi possível carregar as contas.',
-              color: DinixColors.textPrimary,
-              textAlign: TextAlign.center,
-            ),
-            appSizedBox(height: AppSpacing.medium),
-            appElevatedButtonDinix(
-              title: 'Tentar novamente',
-              onTap: () => bloc.add(CarteirasLoadEvent(forceRefresh: true)),
-            ),
-          ],
-        ),
-      ),
+    return appErrorState(
+      errorModel: errorModel,
+      subtitle: errorModel.mensagem ?? 'Não foi possível carregar as contas.',
+      onRetry: () => bloc.add(CarteirasLoadEvent(forceRefresh: true)),
     );
   }
 

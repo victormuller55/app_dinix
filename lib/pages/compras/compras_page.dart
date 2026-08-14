@@ -8,7 +8,7 @@ import 'package:app_dinix/pages/compras/cadastro_compra/cadastro_compra_page.dar
 import 'package:app_dinix/pages/compras/compras_bloc.dart';
 import 'package:app_dinix/pages/compras/compras_event.dart';
 import 'package:app_dinix/pages/compras/compras_state.dart';
-import 'package:app_dinix/widgets/app_elevated_button.dart';
+import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
@@ -270,11 +270,11 @@ class _ComprasPageState extends State<ComprasPage> {
             return appLoadingDinix();
           }
           if (state is ComprasErrorState) {
-            return Center(
-              child: appElevatedButtonDinix(
-                title: 'Tentar novamente',
-                onTap: () => bloc.add(ComprasLoadEvent(forceRefresh: true)),
-              ),
+            return appErrorState(
+              errorModel: state.errorModel,
+              subtitle: state.errorModel.mensagem ??
+                  'Não foi possível carregar as compras.',
+              onRetry: () => bloc.add(ComprasLoadEvent(forceRefresh: true)),
             );
           }
           if (state is ComprasSuccessState) {

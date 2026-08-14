@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/function/fechar_teclado.dart';
 import 'package:app_dinix/function/form_validation.dart';
 import 'package:app_dinix/function/service/session_expired.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
@@ -57,6 +58,7 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
       await enviarCodigoNovoEmail(_email);
       if (!mounted) return;
       showToastSuccess(message: 'Código enviado para $_email');
+      fecharTeclado();
       setState(() {
         _aguardandoCodigo = true;
         _codigo = '';
@@ -169,7 +171,10 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
                 appTextButton(
                   text: 'Usar outro e-mail',
                   color: AppColors.grey400,
-                  onTap: () => setState(() => _aguardandoCodigo = false),
+                  onTap: () {
+                    fecharTeclado();
+                    setState(() => _aguardandoCodigo = false);
+                  },
                 ),
               ],
             ),

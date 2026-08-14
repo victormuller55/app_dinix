@@ -59,11 +59,6 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
     _preencher();
     _valorFocus.addListener(_aoFocarValor);
     bloc.add(CadastroReceitaLoadEvent());
-    if (!_isEdit) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _valorFocus.requestFocus();
-      });
-    }
   }
 
   void _aoFocarValor() {

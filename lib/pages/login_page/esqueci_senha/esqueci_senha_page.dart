@@ -1,5 +1,6 @@
 import 'package:app_dinix/app_config/app_theme.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/function/fechar_teclado.dart';
 import 'package:app_dinix/function/form_validation.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/function/validators.dart';
@@ -85,6 +86,7 @@ class _EsqueciSenhaPageState extends State<EsqueciSenhaPage> {
       Navigator.of(context).maybePop();
       return;
     }
+    fecharTeclado();
     setState(() {
       if (_passo == _PassoEsqueciSenha.codigo) {
         _passo = _PassoEsqueciSenha.email;
@@ -113,6 +115,7 @@ class _EsqueciSenhaPageState extends State<EsqueciSenhaPage> {
         _passo = _PassoEsqueciSenha.codigo;
         if (reenvio) _codigo = '';
       });
+      fecharTeclado();
     } catch (e) {
       showAppErrorFromException(e);
       if (reenvio) rethrow;
@@ -137,6 +140,7 @@ class _EsqueciSenhaPageState extends State<EsqueciSenhaPage> {
         return;
       }
       setState(() => _passo = _PassoEsqueciSenha.novaSenha);
+      fecharTeclado();
     } catch (e) {
       showAppErrorFromException(e);
     } finally {

@@ -143,11 +143,11 @@ String formataMoedaCampo(num? value) {
 }
 
 /// Formata digitação como moeda BR (centavos à direita).
+/// Permite campo vazio; o mínimo é validado no formulário, não na digitação.
 class MoedaInputFormatter extends TextInputFormatter {
-  final double? min;
   final double? max;
 
-  MoedaInputFormatter({this.min, this.max});
+  MoedaInputFormatter({this.max});
 
   @override
   TextEditingValue formatEditUpdate(
@@ -156,18 +156,10 @@ class MoedaInputFormatter extends TextInputFormatter {
   ) {
     final digits = newValue.text.replaceAll(RegExp(r'\D'), '');
     if (digits.isEmpty) {
-      if (min != null) {
-        final texto = formataMoedaCampo(min);
-        return TextEditingValue(
-          text: texto,
-          selection: TextSelection.collapsed(offset: texto.length),
-        );
-      }
       return const TextEditingValue(text: '');
     }
 
     var valor = int.parse(digits) / 100;
-    if (min != null && valor < min!) valor = min!;
     if (max != null && valor > max!) valor = max!;
 
     final texto = formataMoedaCampo(valor);

@@ -5,7 +5,7 @@ import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_page.dart';
 import 'package:app_dinix/pages/locais/locais_bloc.dart';
 import 'package:app_dinix/pages/locais/locais_event.dart';
 import 'package:app_dinix/pages/locais/locais_state.dart';
-import 'package:app_dinix/widgets/app_elevated_button.dart';
+import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/empty.dart';
@@ -98,11 +98,11 @@ class _LocaisPageState extends State<LocaisPage> {
             return appLoadingDinix();
           }
           if (state is LocaisErrorState) {
-            return Center(
-              child: appElevatedButtonDinix(
-                title: 'Tentar novamente',
-                onTap: () => bloc.add(LocaisLoadEvent(forceRefresh: true)),
-              ),
+            return appErrorState(
+              errorModel: state.errorModel,
+              subtitle: state.errorModel.mensagem ??
+                  'Não foi possível carregar os estabelecimentos.',
+              onRetry: () => bloc.add(LocaisLoadEvent(forceRefresh: true)),
             );
           }
           if (state is LocaisSuccessState) {

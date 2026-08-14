@@ -71,11 +71,6 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
     _preencher();
     _valorFocus.addListener(_aoFocarValor);
     bloc.add(CadastroAssinaturaLoadEvent());
-    if (!_isEdit) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) _valorFocus.requestFocus();
-      });
-    }
   }
 
   void _aoFocarValor() {

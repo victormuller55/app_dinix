@@ -8,7 +8,7 @@ import 'package:app_dinix/pages/assinaturas/assinaturas_bloc.dart';
 import 'package:app_dinix/pages/assinaturas/assinaturas_event.dart';
 import 'package:app_dinix/pages/assinaturas/assinaturas_state.dart';
 import 'package:app_dinix/pages/assinaturas/cadastro_assinatura/cadastro_assinatura_page.dart';
-import 'package:app_dinix/widgets/app_elevated_button.dart';
+import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/empty.dart';
@@ -265,11 +265,12 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
             return appLoadingDinix();
           }
           if (state is AssinaturasErrorState) {
-            return Center(
-              child: appElevatedButtonDinix(
-                title: 'Tentar novamente',
-                onTap: () => bloc.add(AssinaturasLoadEvent(forceRefresh: true)),
-              ),
+            return appErrorState(
+              errorModel: state.errorModel,
+              subtitle: state.errorModel.mensagem ??
+                  'Não foi possível carregar as assinaturas.',
+              onRetry: () =>
+                  bloc.add(AssinaturasLoadEvent(forceRefresh: true)),
             );
           }
           if (state is AssinaturasSuccessState) {

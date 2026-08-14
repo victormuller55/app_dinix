@@ -5,7 +5,7 @@ import 'package:app_dinix/pages/carteiras/cartoes/cadastro_cartao/cadastro_carta
 import 'package:app_dinix/pages/carteiras/cartoes/cartoes_bloc.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cartoes_event.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cartoes_state.dart';
-import 'package:app_dinix/widgets/app_elevated_button.dart';
+import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
@@ -129,25 +129,11 @@ class _CartoesPageState extends State<CartoesPage> {
           return appLoadingDinix();
         }
         if (state is CartoesErrorState) {
-          return Center(
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  appText(
-                    state.errorModel.mensagem ?? 'Erro ao carregar cartões.',
-                    color: DinixColors.textPrimary,
-                    textAlign: TextAlign.center,
-                  ),
-                  appSizedBox(height: AppSpacing.medium),
-                  appElevatedButtonDinix(
-                    title: 'Tentar novamente',
-                    onTap: () => bloc.add(CartoesLoadEvent(forceRefresh: true)),
-                  ),
-                ],
-              ),
-            ),
+          return appErrorState(
+            errorModel: state.errorModel,
+            subtitle:
+                state.errorModel.mensagem ?? 'Erro ao carregar cartões.',
+            onRetry: () => bloc.add(CartoesLoadEvent(forceRefresh: true)),
           );
         }
         if (state is CartoesSuccessState) {

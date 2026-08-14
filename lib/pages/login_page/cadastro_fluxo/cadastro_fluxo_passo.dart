@@ -1,7 +1,6 @@
 enum CadastroFluxoPasso {
   nome,
   email,
-  confirmarEmail,
   codigo,
   senha,
   contas,
@@ -20,8 +19,6 @@ extension CadastroFluxoPassoExt on CadastroFluxoPasso {
         return 'Como podemos te chamar?';
       case CadastroFluxoPasso.email:
         return 'Qual é o seu e-mail?';
-      case CadastroFluxoPasso.confirmarEmail:
-        return 'Confirme seu e-mail';
       case CadastroFluxoPasso.codigo:
         return 'Digite o código';
       case CadastroFluxoPasso.senha:
@@ -41,8 +38,6 @@ extension CadastroFluxoPassoExt on CadastroFluxoPasso {
         return 'Usamos seu nome para personalizar o app.';
       case CadastroFluxoPasso.email:
         return 'Enviaremos um código de verificação para este endereço.';
-      case CadastroFluxoPasso.confirmarEmail:
-        return 'Confirme o endereço antes de receber o código.';
       case CadastroFluxoPasso.codigo:
         return 'Informe o código que enviamos para o seu e-mail.';
       case CadastroFluxoPasso.senha:

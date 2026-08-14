@@ -1,13 +1,13 @@
 import 'package:app_dinix/app_config/app_auth.dart';
 import 'package:app_dinix/app_config/bancos_catalogo.dart';
 import 'package:app_dinix/cache/reference_data_prefetch.dart';
+import 'package:app_dinix/function/fechar_teclado.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/pages/login_page/biometria_permissao_page.dart';
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/cadastro_fluxo_dados.dart';
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/cadastro_fluxo_passo.dart';
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/steps/passo_cartoes_conteudo.dart';
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/steps/passo_codigo_conteudo.dart';
-import 'package:app_dinix/pages/login_page/cadastro_fluxo/steps/passo_confirmar_email_conteudo.dart';
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/steps/passo_contas_conteudo.dart';
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/steps/passo_email_conteudo.dart';
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/steps/passo_nome_conteudo.dart';
@@ -42,6 +42,7 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
   final GlobalKey<PassoSenhaConteudoState> _senhaKey = GlobalKey();
 
   void _irPara(CadastroFluxoPasso passo) {
+    fecharTeclado();
     setState(() => _passo = passo);
   }
 
@@ -206,8 +207,6 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
         _dados.email = _emailKey.currentState!.valor;
         _dados.emailVerificado = false;
         _dados.codigo = '';
-        _irPara(CadastroFluxoPasso.confirmarEmail);
-      case CadastroFluxoPasso.confirmarEmail:
         await _enviarCodigoEmail();
       case CadastroFluxoPasso.codigo:
         await _verificarCodigoEmail();
@@ -240,7 +239,6 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
 
   String get _botaoTitulo {
     if (_passo == CadastroFluxoPasso.cartoes) return 'Concluir cadastro';
-    if (_passo == CadastroFluxoPasso.confirmarEmail) return 'Enviar código';
     return 'Continuar';
   }
 
@@ -258,13 +256,11 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
           formKey: _formEmail,
           valorInicial: _dados.email,
         );
-      case CadastroFluxoPasso.confirmarEmail:
-        return PassoConfirmarEmailConteudo(email: _dados.email);
       case CadastroFluxoPasso.codigo:
         return PassoCodigoConteudo(
           email: _dados.email,
           valorInicial: _dados.codigo,
-          onChanged: (v) => setState(() => _dados.codigo = v),
+          onChanged: (v) => _dados.codigo = v,
           onReenviar: _reenviarCodigoEmail,
         );
       case CadastroFluxoPasso.senha:
