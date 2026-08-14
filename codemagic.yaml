@@ -63,12 +63,15 @@ workflows:
 
       - name: Configure Version
         script: |
-          VERSION_NAME=$(grep '^version:' pubspec.yaml | cut -d' ' -f2 | cut -d'+' -f1)
+          VERSION_LINE=$(grep '^version:' pubspec.yaml | cut -d' ' -f2)
+          VERSION_NAME=$(echo "$VERSION_LINE" | cut -d'+' -f1)
+          PUBSPEC_BUILD=$(echo "$VERSION_LINE" | cut -d'+' -f2)
+          CM_NUM=${CM_BUILD_NUMBER:-0}
 
-          if [ -n "$CM_BUILD_NUMBER" ]; then
-            BUILD_NUMBER=$CM_BUILD_NUMBER
+          if [ "$CM_NUM" -gt "$PUBSPEC_BUILD" ]; then
+            BUILD_NUMBER=$CM_NUM
           else
-            BUILD_NUMBER=1
+            BUILD_NUMBER=$PUBSPEC_BUILD
           fi
 
           echo "VERSION_NAME=$VERSION_NAME" >> $CM_ENV
