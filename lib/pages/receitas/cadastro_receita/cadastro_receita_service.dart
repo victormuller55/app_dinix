@@ -10,13 +10,19 @@ import 'package:app_dinix/services/receita_service.dart';
 
 Future<List<CategoriaModel>> listarOrigensGanho() async {
   final categorias = await listarCategoriasLookup();
-  final origens = categorias.where((c) {
+  final filhos = categorias.where((c) {
     final tipo = c.tipo;
-    if (tipo != TipoCategoria.receita && tipo != TipoCategoria.ambos) return false;
+    if (tipo != TipoCategoria.receita && tipo != TipoCategoria.ambos) {
+      return false;
+    }
     return c.idCategoriaPai != null && c.idCategoriaPai!.isNotEmpty;
   }).toList();
 
-  if (origens.isNotEmpty) return origens;
+  if (filhos.isNotEmpty) {
+    final parentIds = filhos.map((c) => c.idCategoriaPai!).toSet();
+    final pais = categorias.where((c) => parentIds.contains(c.id)).toList();
+    return [...pais, ...filhos];
+  }
 
   return categorias.where((c) {
     final tipo = c.tipo;

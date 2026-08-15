@@ -2,6 +2,7 @@ import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/models/cartao_credito_model.dart';
 import 'package:app_dinix/models/painel_model.dart';
+import 'package:app_dinix/pages/carteiras/cartoes/detalhe_cartao/detalhe_cartao_page.dart';
 import 'package:app_dinix/pages/compras/compras_page.dart';
 import 'package:app_dinix/pages/painel/painel_bloc.dart';
 import 'package:app_dinix/pages/painel/painel_event.dart';
@@ -59,13 +60,18 @@ class _PainelPageState extends State<PainelPage> {
   Widget _card({
     required Widget child,
     EdgeInsetsGeometry? padding,
+    VoidCallback? onTap,
   }) {
     return Material(
       color: DinixColors.surfaceElevated,
       borderRadius: BorderRadius.circular(AppRadius.card),
-      child: Padding(
-        padding: padding ?? const EdgeInsets.all(16),
-        child: child,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        child: Padding(
+          padding: padding ?? const EdgeInsets.all(16),
+          child: child,
+        ),
       ),
     );
   }
@@ -82,6 +88,27 @@ class _PainelPageState extends State<PainelPage> {
           appSizedBox(height: 8),
           appText(
             formataMoeda(saldo),
+            bold: true,
+            color: DinixColors.textPrimary,
+            fontSize: 32,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _valoresInvestidos(double total) {
+    return _card(
+      child: Column(
+        children: [
+          appText(
+            'Valores investidos',
+            color: AppColors.grey400,
+            fontSize: AppFontSizes.verySmall,
+          ),
+          appSizedBox(height: 8),
+          appText(
+            formataMoeda(total),
             bold: true,
             color: DinixColors.textPrimary,
             fontSize: 32,
@@ -123,116 +150,192 @@ class _PainelPageState extends State<PainelPage> {
   Widget _cartaoCredito(CartaoCreditoModel cartao) {
     final limite = cartao.limite ?? 0;
     final usado = cartao.limiteUsado ?? 0;
-    final disponivel = cartao.limiteDisponivel ?? (limite - usado).clamp(0, limite);
+    final disponivel =
+        cartao.limiteDisponivel ?? (limite - usado).clamp(0.0, limite);
     final percentual = limite <= 0 ? 0.0 : (usado / limite).clamp(0.0, 1.0);
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: _card(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
-              children: [
-                bancoIcon(
-                  banco: cartao.banco,
-                  fallback: cartao.nome,
-                  size: 32,
-                ),
-                appSizedBox(width: AppSpacing.normal),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      appText(
-                        cartao.nome ?? '',
-                        bold: true,
-                        color: DinixColors.textPrimary,
-                        fontSize: AppFontSizes.small,
-                      ),
-                      if ((cartao.banco ?? '').isNotEmpty)
-                        appText(
-                          cartao.banco ?? '',
-                          color: AppColors.grey400,
-                          fontSize: AppFontSizes.verySmall,
-                        ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            appSizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      appText(
-                        'Disponível',
-                        color: AppColors.grey400,
-                        fontSize: AppFontSizes.verySmall,
-                      ),
-                      appSizedBox(height: 4),
-                      appText(
-                        formataMoeda(disponivel),
-                        bold: true,
-                        color: const Color(0xFF4CAF50),
-                        fontSize: AppFontSizes.medium,
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      appText(
-                        'Usado',
-                        color: AppColors.grey400,
-                        fontSize: AppFontSizes.verySmall,
-                      ),
-                      appSizedBox(height: 4),
-                      appText(
-                        formataMoeda(usado),
-                        bold: true,
-                        color: const Color(0xFFEF5350),
-                        fontSize: AppFontSizes.medium,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            appSizedBox(height: 12),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: LinearProgressIndicator(
-                value: percentual,
-                minHeight: 6,
-                color: DinixColors.primary,
-                backgroundColor: AppColors.grey800,
+    return _card(
+      padding: const EdgeInsets.all(12),
+      onTap: () async {
+        await Navigator.of(context).push(
+          CupertinoPageRoute(
+            builder: (_) => DetalheCartaoPage(cartao: cartao),
+          ),
+        );
+        if (mounted) {
+          bloc.add(PainelLoadEvent(forceRefresh: true));
+        }
+      },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              bancoIcon(
+                banco: cartao.banco,
+                fallback: cartao.nome,
+                size: 28,
               ),
+              appSizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    appText(
+                      cartao.nome ?? '',
+                      bold: true,
+                      color: DinixColors.textPrimary,
+                      fontSize: AppFontSizes.verySmall,
+                    ),
+                    if ((cartao.banco ?? '').isNotEmpty)
+                      appText(
+                        cartao.banco ?? '',
+                        color: AppColors.grey400,
+                        fontSize: 11,
+                      ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          appSizedBox(height: 10),
+          appText(
+            'Disponível',
+            color: AppColors.grey400,
+            fontSize: 11,
+          ),
+          appSizedBox(height: 2),
+          appText(
+            formataMoeda(disponivel),
+            bold: true,
+            color: const Color(0xFF4CAF50),
+            fontSize: AppFontSizes.small,
+          ),
+          appSizedBox(height: 4),
+          appText(
+            'Usado ${formataMoeda(usado)}',
+            color: const Color(0xFFEF5350),
+            fontSize: 11,
+          ),
+          appSizedBox(height: 8),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: percentual,
+              minHeight: 5,
+              color: DinixColors.primary,
+              backgroundColor: AppColors.grey800,
             ),
-            appSizedBox(height: 8),
-            appText(
-              'Limite total: ${formataMoeda(limite)}',
-              color: AppColors.grey400,
-              fontSize: AppFontSizes.verySmall,
-            ),
-          ],
-        ),
+          ),
+          appSizedBox(height: 6),
+          appText(
+            'Limite ${formataMoeda(limite)}',
+            color: AppColors.grey400,
+            fontSize: 11,
+          ),
+        ],
+      ),
+    );
+  }
+
+  ({double sobrando, double usado, double total}) _totaisLimite(
+    List<CartaoCreditoModel> cartoes,
+  ) {
+    var sobrando = 0.0;
+    var usado = 0.0;
+    var total = 0.0;
+    for (final cartao in cartoes) {
+      final limite = cartao.limite ?? 0;
+      final usadoCartao = cartao.limiteUsado ?? 0;
+      final disponivel = cartao.limiteDisponivel ??
+          (limite - usadoCartao).clamp(0.0, limite);
+      sobrando += disponivel;
+      usado += usadoCartao;
+      total += limite;
+    }
+    return (sobrando: sobrando, usado: usado, total: total);
+  }
+
+  Widget _limiteSobrandoCard({
+    required double sobrando,
+    required double usado,
+    required double total,
+  }) {
+    final percentual = total <= 0 ? 0.0 : (usado / total * 100).clamp(0.0, 100.0);
+    final percentualTexto = percentual == percentual.roundToDouble()
+        ? percentual.toStringAsFixed(0)
+        : percentual.toStringAsFixed(1);
+
+    return _card(
+      child: Column(
+        children: [
+          appText(
+            'Limite sobrando',
+            color: AppColors.grey400,
+            fontSize: AppFontSizes.verySmall,
+          ),
+          appSizedBox(height: 8),
+          appText(
+            formataMoeda(sobrando),
+            bold: true,
+            color: DinixColors.textPrimary,
+            fontSize: 32,
+          ),
+          appSizedBox(height: 8),
+          appText(
+            '${formataMoeda(usado)} / ${formataMoeda(total)}',
+            color: AppColors.grey400,
+            fontSize: AppFontSizes.verySmall,
+          ),
+          appSizedBox(height: 2),
+          appText(
+            '$percentualTexto% do limite total usado',
+            color: AppColors.grey400,
+            fontSize: 11,
+          ),
+        ],
       ),
     );
   }
 
   Widget _cartoesCredito(List<CartaoCreditoModel> cartoes) {
     if (cartoes.isEmpty) return const SizedBox.shrink();
+
+    final totais = _totaisLimite(cartoes);
+    final linhas = <Widget>[];
+    for (var i = 0; i < cartoes.length; i += 2) {
+      final esquerda = cartoes[i];
+      final direita = i + 1 < cartoes.length ? cartoes[i + 1] : null;
+      linhas.add(
+        Padding(
+          padding: EdgeInsets.only(bottom: i + 2 < cartoes.length ? 10 : 0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(child: _cartaoCredito(esquerda)),
+              appSizedBox(width: AppSpacing.normal),
+              Expanded(
+                child: direita == null
+                    ? const SizedBox.shrink()
+                    : _cartaoCredito(direita),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _secaoTitulo('Cartões de crédito'),
-        ...cartoes.map(_cartaoCredito),
+        _limiteSobrandoCard(
+          sobrando: totais.sobrando,
+          usado: totais.usado,
+          total: totais.total,
+        ),
+        appSizedBox(height: 10),
+        ...linhas,
       ],
     );
   }
@@ -260,12 +363,6 @@ class _PainelPageState extends State<PainelPage> {
               titulo: 'Despesas',
               valor: painel.despesas.total,
               cor: const Color(0xFFEF5350),
-            ),
-            appSizedBox(width: AppSpacing.normal),
-            _metricaMini(
-              titulo: 'Disponível',
-              valor: painel.disponivel,
-              cor: DinixColors.primary,
             ),
           ],
         ),
@@ -384,7 +481,7 @@ class _PainelPageState extends State<PainelPage> {
       children: [
         Expanded(
           child: appElevatedButtonDinix(
-            title: 'Ganhos',
+            title: 'Entradas',
             onTap: () => Navigator.of(context).push(
               CupertinoPageRoute(builder: (_) => const ReceitasPage()),
             ),
@@ -394,7 +491,7 @@ class _PainelPageState extends State<PainelPage> {
         appSizedBox(width: AppSpacing.normal),
         Expanded(
           child: appElevatedButtonDinix(
-            title: 'Extrato',
+            title: 'Saídas',
             invertedStyle: true,
             onTap: () => Navigator.of(context).push(
               CupertinoPageRoute(builder: (_) => const ComprasPage()),
@@ -412,18 +509,18 @@ class _PainelPageState extends State<PainelPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _saldoContas(resumo.saldoContas),
+        appSizedBox(height: 12),
+        _valoresInvestidos(resumo.totalInvestimentos),
         appSizedBox(height: 16),
         _cartoesCredito(painel.cartoes),
         if (painel.cartoes.isNotEmpty) appSizedBox(height: 16),
         _resumoMes(painel),
         appSizedBox(height: 16),
         _atalhos(),
-        appSizedBox(height: 16),
-        _categorias(painel.despesasPorCategoria),
-        _proximosPagamentos(painel.proximosPagamentos),
         if (painel.receitas.total == 0 &&
             painel.despesas.total == 0 &&
-            resumo.saldoContas == 0)
+            resumo.saldoContas == 0 &&
+            resumo.totalInvestimentos == 0)
           Padding(
             padding: const EdgeInsets.only(top: 24),
             child: appText(

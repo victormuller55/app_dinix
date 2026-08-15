@@ -294,7 +294,7 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
             return listaRefreshBuilder(
               onRefresh: atualizar,
               controller: _scrollController,
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 40),
               itemCount: linhas.length,
               itemBuilder: (_, i) => linhas[i],
             );

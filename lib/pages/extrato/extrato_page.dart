@@ -1,4 +1,5 @@
-import 'package:app_dinix/pages/compras/compras_page.dart';
+import 'package:app_dinix/app_config/const/phosphor_icons.dart';
+import 'package:app_dinix/widgets/feature_placeholder.dart';
 import 'package:flutter/material.dart';
 
 class ExtratoPage extends StatelessWidget {
@@ -6,6 +7,12 @@ class ExtratoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ComprasPage();
+    return featureScaffold(
+      title: 'Extrato',
+      placeholderTitle: 'Extrato',
+      placeholderSubtitle:
+          'O histórico completo de movimentações vai aparecer aqui em breve.',
+      icon: Phosphor.listBullets,
+    );
   }
 }

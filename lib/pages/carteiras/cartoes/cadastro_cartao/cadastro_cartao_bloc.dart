@@ -32,8 +32,8 @@ class CadastroCartaoBloc extends Bloc<CadastroCartaoEvent, CadastroCartaoState> 
   ) async {
     emit(CadastroCartaoLoadingState());
     try {
-      await salvarCartao(event.cartao);
-      emit(CadastroCartaoSuccessState());
+      final salvo = await salvarCartao(event.cartao);
+      emit(CadastroCartaoSuccessState(cartao: salvo));
     } catch (e) {
       if (await tratarSessaoExpirada(e)) return;
       emit(CadastroCartaoErrorState(errorModel: errorModelFromException(e)));

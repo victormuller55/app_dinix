@@ -2,11 +2,11 @@ import 'package:app_dinix/app_config/app_platform.dart';
 import 'package:app_dinix/app_config/app_theme.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/cache/reference_data_prefetch.dart';
-import 'package:app_dinix/pages/assinaturas/assinaturas_page.dart';
 import 'package:app_dinix/pages/carteiras/carteiras_page.dart';
 import 'package:app_dinix/pages/compras/compras_page.dart';
 import 'package:app_dinix/pages/painel/painel_page.dart';
 import 'package:app_dinix/pages/perfil/perfil_page.dart';
+import 'package:app_dinix/pages/receitas/receitas_page.dart';
 import 'package:cupertino_native_better/cupertino_native_better.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -19,8 +19,7 @@ class _HomeNavItem {
   final IconData iconSelected;
   final CNSymbol sfIcon;
   final CNSymbol sfIconSelected;
-  final Widget Function(bool isActive)? pageBuilder;
-  final Widget? page;
+  final Widget page;
 
   const _HomeNavItem({
     required this.id,
@@ -29,13 +28,18 @@ class _HomeNavItem {
     required this.iconSelected,
     required this.sfIcon,
     required this.sfIconSelected,
-    this.page,
-    this.pageBuilder,
+    required this.page,
   });
 }
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
+
+  static _HomeShellState? _ativo;
+
+  static void irParaInicio() {
+    _ativo?._selectTab(0);
+  }
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -44,14 +48,15 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _currentIndex = 0;
 
-  static final List<_HomeNavItem> _items = [
+  // Instância (não static): hot reload atualiza os ícones da barra.
+  final List<_HomeNavItem> _items = [
     _HomeNavItem(
       id: 'painel',
       label: 'Início',
-      iconOutlined: Phosphor.squaresFour,
-      iconSelected: PhosphorFill.squaresFour,
-      sfIcon: CNSymbol('square.grid.2x2', size: 16),
-      sfIconSelected: CNSymbol('square.grid.2x2.fill', size: 16),
+      iconOutlined: Phosphor.house,
+      iconSelected: PhosphorFill.house,
+      sfIcon: CNSymbol('house', size: 16),
+      sfIconSelected: CNSymbol('house.fill', size: 16),
       page: PainelPage(),
     ),
     _HomeNavItem(
@@ -73,13 +78,13 @@ class _HomeShellState extends State<HomeShell> {
       page: CarteirasPage(),
     ),
     _HomeNavItem(
-      id: 'assinaturas',
-      label: 'Planos',
-      iconOutlined: Phosphor.stack,
-      iconSelected: PhosphorFill.stack,
-      sfIcon: CNSymbol('square.stack.3d.up', size: 16),
-      sfIconSelected: CNSymbol('square.stack.3d.up.fill', size: 16),
-      pageBuilder: (isActive) => AssinaturasPage(isActive: isActive),
+      id: 'entradas',
+      label: 'Entradas',
+      iconOutlined: Phosphor.trendUp,
+      iconSelected: PhosphorFill.trendUp,
+      sfIcon: CNSymbol('chart.line.uptrend.xyaxis', size: 16),
+      sfIconSelected: CNSymbol('chart.line.uptrend.xyaxis', size: 16),
+      page: ReceitasPage(isMenuTab: true),
     ),
     _HomeNavItem(
       id: 'perfil',
@@ -95,8 +100,17 @@ class _HomeShellState extends State<HomeShell> {
   @override
   void initState() {
     super.initState();
+    HomeShell._ativo = this;
     SystemChrome.setSystemUIOverlayStyle(kAppSystemUiOverlay);
     ReferenceDataPrefetch.sincronizar(forcar: false, mostrarProgresso: false);
+  }
+
+  @override
+  void dispose() {
+    if (HomeShell._ativo == this) {
+      HomeShell._ativo = null;
+    }
+    super.dispose();
   }
 
   void _selectTab(int index) {
@@ -171,14 +185,7 @@ class _HomeShellState extends State<HomeShell> {
 
     return IndexedStack(
       index: safeIndex,
-      children: _items.asMap().entries.map((entry) {
-        final item = entry.value;
-        final isActive = entry.key == safeIndex;
-        if (item.pageBuilder != null) {
-          return item.pageBuilder!(isActive);
-        }
-        return item.page!;
-      }).toList(),
+      children: _items.map((item) => item.page).toList(),
     );
   }
 

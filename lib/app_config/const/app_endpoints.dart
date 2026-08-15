@@ -3,7 +3,7 @@
 /// Celular físico na mesma rede → IP do notebook (ex.: 192.168.0.105).
 const String server = 'https://dinix.api.convertix.net.br';
 
-// const String server = 'http://localhost:8080';
+// const String server = 'http://10.0.2.2:8080';
 
 String get api => '$server/api/v1';
 
@@ -21,10 +21,8 @@ class AppEndpoints {
   static String endpointAuthRegistrar = '$api/autenticacao/registrar';
   static String endpointAuthEnviarCodigoEmail = '$api/autenticacao/enviar-codigo-email';
   static String endpointAuthVerificarEmail = '$api/autenticacao/verificar-email';
-  static String endpointAuthEsqueciSenhaEnviarCodigo =
-      '$api/autenticacao/esqueci-senha/enviar-codigo';
-  static String endpointAuthEsqueciSenhaRedefinir =
-      '$api/autenticacao/esqueci-senha/redefinir';
+  static String endpointAuthEsqueciSenhaEnviarCodigo = '$api/autenticacao/esqueci-senha/enviar-codigo';
+  static String endpointAuthEsqueciSenhaRedefinir = '$api/autenticacao/esqueci-senha/redefinir';
   static String endpointUsuariosEu = '$api/usuarios/eu';
   static String endpointUsuariosEuSenha = '$api/usuarios/eu/senha';
   static String endpointUsuariosEuEmail = '$api/usuarios/eu/email';
@@ -38,6 +36,14 @@ class AppEndpoints {
   // Cartões
   static String endpointCartoes = '$api/cartoes-de-credito';
   static String endpointCartoesPorId(String id) => '$api/cartoes-de-credito/$id';
+  static String endpointCartoesFaturas(String idCartao) =>
+      '$api/cartoes-de-credito/$idCartao/faturas';
+  static String endpointCartoesFecharFaturaAtual(String idCartao) =>
+      '$api/cartoes-de-credito/$idCartao/faturas/fechar-atual';
+  static String endpointCartoesFaturaPorId(String idFatura) =>
+      '$api/cartoes-de-credito/faturas/$idFatura';
+  static String endpointCartoesFaturaPagar(String idFatura) =>
+      '$api/cartoes-de-credito/faturas/$idFatura/pagar';
 
   // Categorias
   static String endpointCategorias = '$api/categorias';
@@ -64,14 +70,19 @@ class AppEndpoints {
   static String endpointTransferencias = '$api/transferencias';
   static String endpointTransferenciasPorId(String id) => '$api/transferencias/$id';
 
-  // Despesas recorrentes
+  // Despesas recorrentes / gastos mensais
   static String endpointDespesasRecorrentes = '$api/despesas-recorrentes';
   static String endpointDespesasRecorrentesPorId(String id) => '$api/despesas-recorrentes/$id';
+  static String endpointDespesasRecorrentesPendentes = '$api/despesas-recorrentes/pendentes';
+  static String endpointDespesasRecorrentesPagar(String id) =>
+      '$api/despesas-recorrentes/$id/pagar';
 
   // Assinaturas
   static String endpointAssinaturas = '$api/assinaturas';
   static String endpointAssinaturasResumo = '$api/assinaturas/resumo';
+  static String endpointAssinaturasPendentes = '$api/assinaturas/pendentes';
   static String endpointAssinaturasPorId(String id) => '$api/assinaturas/$id';
+  static String endpointAssinaturasPagar(String id) => '$api/assinaturas/$id/pagar';
 
   // Investimentos
   static String endpointInvestimentos = '$api/investimentos';

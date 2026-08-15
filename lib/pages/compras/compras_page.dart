@@ -2,14 +2,25 @@ import 'package:app_dinix/app_config/app_enums.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/function/categoria_icone.dart';
+import 'package:app_dinix/function/service/api_error.dart';
+import 'package:app_dinix/function/show_snackbar.dart';
+import 'package:app_dinix/models/cartao_credito_model.dart';
 import 'package:app_dinix/models/categoria_model.dart';
 import 'package:app_dinix/models/compra_model.dart';
+import 'package:app_dinix/models/conta_model.dart';
+import 'package:app_dinix/models/assinatura_model.dart';
+import 'package:app_dinix/models/gasto_mensal_model.dart';
+import 'package:app_dinix/pages/assinaturas/assinaturas_service.dart';
 import 'package:app_dinix/pages/compras/cadastro_compra/cadastro_compra_page.dart';
 import 'package:app_dinix/pages/compras/compras_bloc.dart';
 import 'package:app_dinix/pages/compras/compras_event.dart';
 import 'package:app_dinix/pages/compras/compras_state.dart';
+import 'package:app_dinix/pages/gastos_mensais/gastos_mensais_page.dart';
+import 'package:app_dinix/pages/gastos_mensais/gastos_mensais_service.dart';
+import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
+import 'package:app_dinix/widgets/app_select_sheet.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/empty.dart';
@@ -36,7 +47,8 @@ class _ComprasPageState extends State<ComprasPage> {
   void initState() {
     super.initState();
     _scrollController.addListener(() {
-      if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 120) {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 120) {
         bloc.add(ComprasLoadMoreEvent());
       }
     });
@@ -44,12 +56,158 @@ class _ComprasPageState extends State<ComprasPage> {
   }
 
   Future<void> _abrirCadastro({CompraModel? compra}) async {
-    final salvo = await Navigator.of(
-      context,
-    ).push<bool>(CupertinoPageRoute(builder: (_) => CadastroCompraPage(compra: compra)));
+    final salvo = await Navigator.of(context).push<bool>(
+      CupertinoPageRoute(builder: (_) => CadastroCompraPage(compra: compra)),
+    );
     if (salvo == true && mounted) {
       bloc.add(ComprasLoadEvent(forceRefresh: true));
     }
+  }
+
+  Future<void> _abrirGastosMensais() async {
+    await Navigator.of(context).push(
+      CupertinoPageRoute(builder: (_) => const GastosMensaisPage()),
+    );
+    if (mounted) {
+      bloc.add(ComprasLoadEvent(forceRefresh: true));
+    }
+  }
+
+  Future<void> _pagarPendente({
+    required String id,
+    required String nome,
+    required double? valor,
+    required String? formaPadrao,
+    required String? idContaPadrao,
+    required String? idCartaoPadrao,
+    required bool isAssinatura,
+    required ComprasSuccessState state,
+  }) async {
+    final forma = await showAppSelectSheet<String>(
+      context: context,
+      title: 'Como vai pagar?',
+      items: FormaPagamento.valores,
+      labelOf: FormaPagamento.rotulo,
+      selected: formaPadrao,
+    );
+    if (forma == null || !mounted) return;
+
+    String? idConta;
+    String? idCartao;
+
+    if (FormaPagamento.usaCartao(forma)) {
+      final cartoes = state.cartoesPorId.values.toList();
+      if (cartoes.isEmpty) {
+        showToastWarning(message: 'Cadastre um cartão antes.');
+        return;
+      }
+      final cartao = await showAppSelectSheet<CartaoCreditoModel>(
+        context: context,
+        title: 'Cartão',
+        items: cartoes,
+        labelOf: (c) => c.nome ?? '',
+        subtitleOf: (c) => c.banco,
+        selected: cartoes.where((c) => c.id == idCartaoPadrao).firstOrNull,
+        leadingOf: (c) => bancoIcon(banco: c.banco ?? c.nome, size: 32),
+      );
+      if (cartao == null || cartao.id == null || !mounted) return;
+      idCartao = cartao.id;
+    } else {
+      final contas = state.contasPorId.values.toList();
+      if (contas.isEmpty) {
+        showToastWarning(message: 'Cadastre uma conta antes.');
+        return;
+      }
+      final conta = await showAppSelectSheet<ContaModel>(
+        context: context,
+        title: 'Conta',
+        items: contas,
+        labelOf: (c) => c.nome ?? '',
+        subtitleOf: (c) => c.nomeBanco,
+        selected: contas.where((c) => c.id == idContaPadrao).firstOrNull,
+        leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
+      );
+      if (conta == null || conta.id == null || !mounted) return;
+      idConta = conta.id;
+    }
+
+    final destino = FormaPagamento.usaCartao(forma)
+        ? state.cartoesPorId[idCartao]?.nome ?? 'cartão'
+        : state.contasPorId[idConta]?.nome ?? 'conta';
+
+    final ok = await showAppConfirmDialog(
+      context,
+      title: 'Confirmar pagamento',
+      message:
+          'Registrar ${formataMoeda(valor)} de "$nome" via ${FormaPagamento.rotulo(forma)} ($destino)?',
+      confirmLabel: 'Pago',
+    );
+    if (ok != true || !mounted) return;
+
+    try {
+      final data = state.filtro.dataSelecionada;
+      final dataIso =
+          '${data.year}-${data.month.toString().padLeft(2, '0')}-${data.day.toString().padLeft(2, '0')}';
+      if (isAssinatura) {
+        await confirmarPagamentoAssinatura(
+          id: id,
+          formaPagamento: forma,
+          idConta: idConta,
+          idCartaoCredito: idCartao,
+          dataIso: dataIso,
+        );
+      } else {
+        await confirmarPagamentoGastoMensal(
+          id: id,
+          formaPagamento: forma,
+          idConta: idConta,
+          idCartaoCredito: idCartao,
+          dataIso: dataIso,
+        );
+      }
+      if (!mounted) return;
+      showToastSuccess(message: isAssinatura ? 'Assinatura paga' : 'Gasto mensal pago');
+      bloc.add(ComprasLoadEvent(forceRefresh: true));
+    } catch (e) {
+      if (!mounted) return;
+      showAppErrorSnackbar(errorModelFromException(e));
+    }
+  }
+
+  Future<void> _pagarGastoMensal(
+    GastoMensalModel gasto,
+    ComprasSuccessState state,
+  ) async {
+    final id = gasto.id;
+    if (id == null) return;
+    await _pagarPendente(
+      id: id,
+      nome: gasto.nome ?? '',
+      valor: gasto.valor,
+      formaPadrao: gasto.formaPagamento,
+      idContaPadrao: gasto.idConta,
+      idCartaoPadrao: gasto.idCartaoCredito,
+      isAssinatura: false,
+      state: state,
+    );
+  }
+
+  Future<void> _pagarAssinatura(
+    AssinaturaModel assinatura,
+    ComprasSuccessState state,
+  ) async {
+    final id = assinatura.id;
+    if (id == null) return;
+    await _pagarPendente(
+      id: id,
+      nome: assinatura.nome ?? '',
+      valor: assinatura.valor,
+      formaPadrao: assinatura.formaPagamento,
+      idContaPadrao: assinatura.idConta,
+      idCartaoPadrao: assinatura.idCartaoCredito,
+      isAssinatura: true,
+      state: state,
+    );
   }
 
   void _irDia(FiltroCompras atual, int delta) {
@@ -78,7 +236,8 @@ class _ComprasPageState extends State<ComprasPage> {
           entrando ? _direcaoDia * 0.45 : -_direcaoDia * 0.45,
           0,
         );
-        final deslize = Tween<Offset>(begin: inicio, end: Offset.zero).animate(animation);
+        final deslize =
+            Tween<Offset>(begin: inicio, end: Offset.zero).animate(animation);
         return ClipRect(
           child: SlideTransition(
             position: deslize,
@@ -182,9 +341,80 @@ class _ComprasPageState extends State<ComprasPage> {
     );
   }
 
+  Widget _itemPendente({
+    required String nome,
+    required double? valor,
+    required String subtitulo,
+    required IconData icone,
+    required VoidCallback onPagar,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Material(
+        color: DinixColors.surfaceElevated,
+        borderRadius: BorderRadius.circular(AppRadius.card),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 10, 8, 10),
+          child: Row(
+            children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: DinixColors.primary.withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icone, color: DinixColors.primary, size: 22),
+              ),
+              appSizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    appText(
+                      nome,
+                      bold: true,
+                      color: DinixColors.textPrimary,
+                      fontSize: AppFontSizes.small,
+                    ),
+                    appText(
+                      subtitulo,
+                      color: AppColors.grey400,
+                      fontSize: AppFontSizes.verySmall,
+                    ),
+                    appSizedBox(height: 2),
+                    appText(
+                      formataMoeda(valor),
+                      bold: true,
+                      color: const Color(0xFFEF5350),
+                      fontSize: AppFontSizes.small,
+                    ),
+                  ],
+                ),
+              ),
+              TextButton(
+                onPressed: onPagar,
+                style: TextButton.styleFrom(
+                  foregroundColor: DinixColors.primary,
+                ),
+                child: appText(
+                  'Pago',
+                  bold: true,
+                  color: DinixColors.primary,
+                  fontSize: AppFontSizes.small,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _item(CompraModel compra, Map<String, CategoriaModel> categoriasPorId) {
     final categoria = categoriasPorId[compra.idCategoria ?? ''];
-    final icone = iconeDaCategoria(categoria, categoriasPorId: categoriasPorId);
+    final icone =
+        iconeDaCategoria(categoria, categoriasPorId: categoriasPorId);
     final hora = formataHora(compra.horaCompra);
     final detalhes = [
       if (hora.isNotEmpty) hora,
@@ -214,7 +444,11 @@ class _ComprasPageState extends State<ComprasPage> {
             color: DinixColors.textPrimary,
             fontSize: AppFontSizes.small,
           ),
-          subtitle: appText(detalhes, color: AppColors.grey400, fontSize: AppFontSizes.verySmall),
+          subtitle: appText(
+            detalhes,
+            color: AppColors.grey400,
+            fontSize: AppFontSizes.verySmall,
+          ),
           trailing: appText(
             formataMoeda(compra.valorTotal),
             bold: true,
@@ -228,6 +462,28 @@ class _ComprasPageState extends State<ComprasPage> {
 
   List<Widget> _linhas(ComprasSuccessState state) {
     final widgets = <Widget>[_filtro(state.filtro)];
+    for (final pendente in state.pendentesAssinaturas) {
+      widgets.add(
+        _itemPendente(
+          nome: pendente.nome ?? '',
+          valor: pendente.valor,
+          subtitulo: 'Assinatura · pendente',
+          icone: Phosphor.stack,
+          onPagar: () => _pagarAssinatura(pendente, state),
+        ),
+      );
+    }
+    for (final pendente in state.pendentesMensais) {
+      widgets.add(
+        _itemPendente(
+          nome: pendente.nome ?? '',
+          valor: pendente.valor,
+          subtitulo: 'Gasto mensal · pendente',
+          icone: Phosphor.calendarBlank,
+          onPagar: () => _pagarGastoMensal(pendente, state),
+        ),
+      );
+    }
     for (final grupo in state.grupos) {
       widgets.add(_resumoDia(grupo));
       for (final compra in grupo.compras) {
@@ -249,6 +505,17 @@ class _ComprasPageState extends State<ComprasPage> {
   Widget build(BuildContext context) {
     return dinixMenuScaffold(
       title: 'Compras',
+      actions: [
+        IconButton(
+          onPressed: _abrirGastosMensais,
+          tooltip: 'Gastos mensais',
+          icon: const Icon(
+            Phosphor.calendarBlank,
+            color: DinixColors.primary,
+            size: 24,
+          ),
+        ),
+      ],
       onAdd: () => _abrirCadastro(),
       addTooltip: 'Nova compra',
       body: BlocBuilder<ComprasBloc, ComprasState>(
@@ -281,7 +548,10 @@ class _ComprasPageState extends State<ComprasPage> {
             Future<void> atualizar() async {
               bloc.add(ComprasLoadEvent(forceRefresh: true));
             }
-            if (state.compras.isEmpty) {
+            final vazio = state.compras.isEmpty &&
+                state.pendentesMensais.isEmpty &&
+                state.pendentesAssinaturas.isEmpty;
+            if (vazio) {
               return Column(
                 children: [
                   Padding(

@@ -4,8 +4,6 @@ import 'package:app_dinix/app_config/const/app_endpoints.dart';
 import 'package:app_dinix/function/service/session_expired.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/models/usuario_model.dart';
-import 'package:app_dinix/pages/assinaturas/cadastro_assinatura/cadastro_assinatura_page.dart';
-import 'package:app_dinix/pages/locais/locais_page.dart';
 import 'package:app_dinix/pages/perfil/apagar_conta_page.dart';
 import 'package:app_dinix/pages/perfil/editar_perfil_page.dart';
 import 'package:app_dinix/pages/perfil/perfil_bloc.dart';
@@ -14,7 +12,6 @@ import 'package:app_dinix/pages/perfil/perfil_service.dart';
 import 'package:app_dinix/pages/perfil/perfil_state.dart';
 import 'package:app_dinix/pages/perfil/trocar_email_page.dart';
 import 'package:app_dinix/pages/perfil/trocar_senha_page.dart';
-import 'package:app_dinix/pages/receitas/receitas_page.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_error_state.dart';
@@ -402,27 +399,6 @@ class _PerfilPageState extends State<PerfilPage> {
                 title: 'Trocar senha',
                 subtitle: 'Mínimo de 8 caracteres',
                 onTap: () => _abrir(const TrocarSenhaPage()),
-              ),
-            ],
-          ),
-          appSizedBox(height: AppSpacing.medium),
-          _secao(
-            titulo: 'Atalhos',
-            itens: [
-              _linha(
-                icon: Phosphor.money,
-                title: 'Ganhos',
-                onTap: () => _abrir(const ReceitasPage()),
-              ),
-              _linha(
-                icon: Phosphor.stack,
-                title: 'Nova assinatura',
-                onTap: () => _abrir(const CadastroAssinaturaPage()),
-              ),
-              _linha(
-                icon: Phosphor.storefront,
-                title: 'Estabelecimentos',
-                onTap: () => _abrir(const LocaisPage()),
               ),
             ],
           ),

@@ -3,7 +3,6 @@ import 'package:app_dinix/function/categoria_icone.dart';
 import 'package:app_dinix/function/form_validation.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/function/validators.dart';
-import 'package:app_dinix/models/categoria_model.dart';
 import 'package:app_dinix/models/local_model.dart';
 import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_bloc.dart';
 import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_event.dart';
@@ -13,7 +12,7 @@ import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_form_field_dinix.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
-import 'package:app_dinix/widgets/app_select_sheet.dart';
+import 'package:app_dinix/widgets/categoria_select_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muller_package/muller_package.dart'
@@ -78,13 +77,11 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
   Future<void> _escolherCategoria() async {
     final items = _lookups?.categorias ?? [];
     if (items.isEmpty) return;
-    final selecionada = await showAppSelectSheet<CategoriaModel>(
+    final selecionada = await showCategoriaSelectSheet(
       context: context,
       title: 'Categoria do estabelecimento',
-      items: items,
-      labelOf: (c) => c.nome ?? '',
+      categorias: items,
       selected: items.where((c) => c.id == _idCategoria).firstOrNull,
-      leadingOf: (c) => Icon(iconeDaCategoria(c), color: DinixColors.primary),
     );
     if (selecionada == null) return;
     setState(() => _idCategoria = selecionada.id);

@@ -2,6 +2,8 @@ import 'package:app_dinix/models/cartao_credito_model.dart';
 import 'package:app_dinix/models/categoria_model.dart';
 import 'package:app_dinix/models/compra_model.dart';
 import 'package:app_dinix/models/conta_model.dart';
+import 'package:app_dinix/models/assinatura_model.dart';
+import 'package:app_dinix/models/gasto_mensal_model.dart';
 import 'package:muller_package/muller_package.dart';
 
 class GastoPorBanco {
@@ -111,6 +113,8 @@ class ComprasLoadingState extends ComprasState {
 
 class ComprasSuccessState extends ComprasState {
   final List<CompraModel> compras;
+  final List<GastoMensalModel> pendentesMensais;
+  final List<AssinaturaModel> pendentesAssinaturas;
   final List<GrupoDiaCompras> grupos;
   final FiltroCompras filtro;
   final int numPag;
@@ -122,6 +126,8 @@ class ComprasSuccessState extends ComprasState {
 
   ComprasSuccessState({
     required this.compras,
+    this.pendentesMensais = const [],
+    this.pendentesAssinaturas = const [],
     required this.grupos,
     required this.filtro,
     this.numPag = 1,
@@ -136,6 +142,8 @@ class ComprasSuccessState extends ComprasState {
 
   ComprasSuccessState copyWith({
     List<CompraModel>? compras,
+    List<GastoMensalModel>? pendentesMensais,
+    List<AssinaturaModel>? pendentesAssinaturas,
     List<GrupoDiaCompras>? grupos,
     FiltroCompras? filtro,
     int? numPag,
@@ -147,6 +155,8 @@ class ComprasSuccessState extends ComprasState {
   }) {
     return ComprasSuccessState(
       compras: compras ?? this.compras,
+      pendentesMensais: pendentesMensais ?? this.pendentesMensais,
+      pendentesAssinaturas: pendentesAssinaturas ?? this.pendentesAssinaturas,
       grupos: grupos ?? this.grupos,
       filtro: filtro ?? this.filtro,
       numPag: numPag ?? this.numPag,

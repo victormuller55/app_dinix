@@ -7,7 +7,6 @@ import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/function/validators.dart';
 import 'package:app_dinix/models/assinatura_model.dart';
 import 'package:app_dinix/models/cartao_credito_model.dart';
-import 'package:app_dinix/models/categoria_model.dart';
 import 'package:app_dinix/models/conta_model.dart';
 import 'package:app_dinix/pages/assinaturas/cadastro_assinatura/cadastro_assinatura_bloc.dart';
 import 'package:app_dinix/pages/assinaturas/cadastro_assinatura/cadastro_assinatura_event.dart';
@@ -19,6 +18,7 @@ import 'package:app_dinix/widgets/app_form_field_dinix.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/app_select_sheet.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
+import 'package:app_dinix/widgets/categoria_select_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muller_package/muller_package.dart'
@@ -121,13 +121,11 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
   Future<void> _escolherCategoria() async {
     final items = _lookups?.categorias ?? [];
     if (items.isEmpty) return;
-    final selecionada = await showAppSelectSheet<CategoriaModel>(
+    final selecionada = await showCategoriaSelectSheet(
       context: context,
       title: 'Categoria',
-      items: items,
-      labelOf: (c) => c.nome ?? '',
+      categorias: items,
       selected: items.where((c) => c.id == _idCategoria).firstOrNull,
-      leadingOf: (c) => Icon(iconeDaCategoria(c), color: DinixColors.primary),
     );
     if (selecionada == null) return;
     setState(() => _idCategoria = selecionada.id);
@@ -349,11 +347,11 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
                   data: _dataInicio,
                   onChanged: (d) => setState(() => _dataInicio = d),
                 ),
-                if (!_isEdit)
+                  if (!_isEdit)
                   cadastroSwitch(
                     titulo: 'Pagamento foi hoje',
                     subtitulo:
-                        'Cobra agora na conta ou cartão selecionado. Se desmarcado, a cobrança ocorre na data de cobrança.',
+                        'Já registra o pagamento agora. Se desmarcado, a cobrança aparece pendente no dia da cobrança em Compras.',
                     value: _pagamentoHoje,
                     onChanged: (v) => setState(() {
                       _pagamentoHoje = v;

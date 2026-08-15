@@ -1,10 +1,11 @@
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/widgets/app_logo.dart';
+import 'package:app_dinix/widgets/dinix_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:muller_package/muller_package.dart'
     hide AppRadius, AppFontSizes, AppSpacing;
 
-/// Scaffold das abas do menu: logo à esquerda, título centralizado e ações à direita.
+/// Scaffold das abas do menu: menu drawer à esquerda, título centralizado e ações à direita.
 Widget dinixMenuScaffold({
   required String title,
   required Widget body,
@@ -14,6 +15,7 @@ Widget dinixMenuScaffold({
   Widget? floatingActionButton,
   Widget? bottomNavigationBar,
   bool extendBody = false,
+  bool showDrawer = true,
 }) {
   final sideActions = <Widget>[
     ...?actions,
@@ -32,6 +34,9 @@ Widget dinixMenuScaffold({
     extendBody: extendBody,
     floatingActionButton: floatingActionButton,
     bottomNavigationBar: bottomNavigationBar,
+    drawer: showDrawer ? const DinixAppDrawer() : null,
+    drawerScrimColor: Colors.black.withValues(alpha: 0.55),
+    drawerEnableOpenDragGesture: true,
     appBar: AppBar(
       elevation: 0,
       backgroundColor: DinixColors.primaryDark,
@@ -39,18 +44,40 @@ Widget dinixMenuScaffold({
       centerTitle: true,
       automaticallyImplyLeading: false,
       leadingWidth: 72,
-      leading: Padding(
-        padding: const EdgeInsets.only(left: 12),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: Image.asset(
-            kLogoAsset,
-            height: 26,
-            fit: BoxFit.contain,
-            filterQuality: FilterQuality.high,
-          ),
-        ),
-      ),
+      leading: showDrawer
+          ? Builder(
+              builder: (context) => Padding(
+                padding: const EdgeInsets.only(left: 12),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: GestureDetector(
+                    onTap: () => Scaffold.of(context).openDrawer(),
+                    behavior: HitTestBehavior.opaque,
+                    child: Tooltip(
+                      message: 'Menu',
+                      child: Image.asset(
+                        kLogoAsset,
+                        height: 26,
+                        fit: BoxFit.contain,
+                        filterQuality: FilterQuality.high,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            )
+          : Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Image.asset(
+                  kLogoAsset,
+                  height: 26,
+                  fit: BoxFit.contain,
+                  filterQuality: FilterQuality.high,
+                ),
+              ),
+            ),
       title: appText(
         title.toUpperCase(),
         color: DinixColors.textPrimary,

@@ -83,14 +83,10 @@ class _LocaisPageState extends State<LocaisPage> {
 
   @override
   Widget build(BuildContext context) {
-    return scaffold(
+    return dinixMenuScaffold(
       title: 'Estabelecimentos',
-      centerTitle: true,
-      background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
-      actions: [dinixAddAction(onTap: _abrirCadastro, tooltip: 'Novo local')],
+      onAdd: () => _abrirCadastro(),
+      addTooltip: 'Novo local',
       body: BlocBuilder<LocaisBloc, LocaisState>(
         bloc: bloc,
         builder: (context, state) {

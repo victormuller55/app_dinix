@@ -9,6 +9,7 @@ import 'package:app_dinix/models/conta_model.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cadastro_cartao/cadastro_cartao_bloc.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cadastro_cartao/cadastro_cartao_event.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cadastro_cartao/cadastro_cartao_state.dart';
+import 'package:app_dinix/pages/carteiras/cartoes/detalhe_cartao/detalhe_cartao_page.dart';
 import 'package:app_dinix/widgets/app_cadastro_style.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
@@ -17,6 +18,7 @@ import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/app_select_sheet.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
 import 'package:app_dinix/widgets/banco_select_sheet.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muller_package/muller_package.dart'
@@ -174,7 +176,15 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
       showToastSuccess(
         message: _isEdit ? 'Cartão atualizado' : 'Cartão cadastrado',
       );
-      Navigator.of(context).pop(true);
+      if (_isEdit) {
+        Navigator.of(context).pop(true);
+        return;
+      }
+      Navigator.of(context).pushReplacement(
+        CupertinoPageRoute(
+          builder: (_) => DetalheCartaoPage(cartao: state.cartao),
+        ),
+      );
     }
     if (state is CadastroCartaoDeletedState) {
       showToastSuccess(message: 'Cartão removido');

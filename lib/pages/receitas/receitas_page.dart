@@ -19,7 +19,9 @@ import 'package:muller_package/muller_package.dart'
     hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters;
 
 class ReceitasPage extends StatefulWidget {
-  const ReceitasPage({super.key});
+  final bool isMenuTab;
+
+  const ReceitasPage({super.key, this.isMenuTab = false});
 
   @override
   State<ReceitasPage> createState() => _ReceitasPageState();
@@ -134,7 +136,7 @@ class _ReceitasPageState extends State<ReceitasPage> {
         context: context,
         onRefresh: atualizar,
         child: emptyMessage(
-          title: 'Nenhum ganho lançado',
+          title: 'Nenhuma entrada',
           subtitle: 'Cadastre salários, freelances e outros recebimentos.',
           icon: Phosphor.money,
         ),
@@ -167,32 +169,43 @@ class _ReceitasPageState extends State<ReceitasPage> {
   Widget _error(ErrorModel errorModel) {
     return appErrorState(
       errorModel: errorModel,
-      subtitle: errorModel.mensagem ?? 'Não foi possível carregar os ganhos.',
+      subtitle: errorModel.mensagem ?? 'Não foi possível carregar as entradas.',
       onRetry: () => bloc.add(ReceitasLoadEvent(forceRefresh: true)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final body = BlocBuilder<ReceitasBloc, ReceitasState>(
+      bloc: bloc,
+      builder: (context, state) {
+        if (state is ReceitasLoadingState || state is ReceitasInitialState) {
+          return appLoadingDinix();
+        }
+        if (state is ReceitasErrorState) return _error(state.errorModel);
+        if (state is ReceitasSuccessState) return _lista(state);
+        return appLoadingDinix();
+      },
+    );
+
+    if (widget.isMenuTab) {
+      return dinixMenuScaffold(
+        title: 'Entradas',
+        onAdd: () => _abrirCadastro(),
+        addTooltip: 'Nova entrada',
+        body: body,
+      );
+    }
+
     return scaffold(
-      title: 'Ganhos',
+      title: 'Entradas',
       centerTitle: true,
       background: DinixColors.background,
       appBarColor: DinixColors.primaryDark,
       titleColor: DinixColors.textPrimary,
       drawerColor: DinixColors.textPrimary,
-      actions: [dinixAddAction(onTap: _abrirCadastro, tooltip: 'Novo ganho')],
-      body: BlocBuilder<ReceitasBloc, ReceitasState>(
-        bloc: bloc,
-        builder: (context, state) {
-          if (state is ReceitasLoadingState || state is ReceitasInitialState) {
-            return appLoadingDinix();
-          }
-          if (state is ReceitasErrorState) return _error(state.errorModel);
-          if (state is ReceitasSuccessState) return _lista(state);
-          return appLoadingDinix();
-        },
-      ),
+      actions: [dinixAddAction(onTap: _abrirCadastro, tooltip: 'Nova entrada')],
+      body: body,
     );
   }
 

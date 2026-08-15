@@ -12,6 +12,13 @@ Future<AppResponse> getAssinaturas({int numPag = 1, int itensPag = 20}) {
   );
 }
 
+Future<AppResponse> getAssinaturasPendentes(String dataIso) {
+  return getJson(
+    endpoint: AppEndpoints.endpointAssinaturasPendentes,
+    parameters: {'data': dataIso},
+  );
+}
+
 Future<AppResponse> postAssinatura(Map<String, dynamic> body) {
   return postJson(endpoint: AppEndpoints.endpointAssinaturas, body: body);
 }
@@ -22,4 +29,24 @@ Future<AppResponse> putAssinatura(String id, Map<String, dynamic> body) {
 
 Future<void> deleteAssinatura(String id) {
   return deleteJson(endpoint: AppEndpoints.endpointAssinaturasPorId(id));
+}
+
+Future<AppResponse> pagarAssinatura(
+  String id, {
+  required String formaPagamento,
+  String? idConta,
+  String? idCartaoCredito,
+  String? dataIso,
+}) {
+  return postJson(
+    endpoint: AppEndpoints.endpointAssinaturasPagar(id),
+    parameters: {
+      if (dataIso != null && dataIso.isNotEmpty) 'data': dataIso,
+    },
+    body: {
+      'forma_pagamento': formaPagamento,
+      'id_conta': idConta,
+      'id_cartao_credito': idCartaoCredito,
+    },
+  );
 }

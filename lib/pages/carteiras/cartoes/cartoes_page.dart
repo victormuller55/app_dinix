@@ -5,6 +5,7 @@ import 'package:app_dinix/pages/carteiras/cartoes/cadastro_cartao/cadastro_carta
 import 'package:app_dinix/pages/carteiras/cartoes/cartoes_bloc.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cartoes_event.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cartoes_state.dart';
+import 'package:app_dinix/pages/carteiras/cartoes/detalhe_cartao/detalhe_cartao_page.dart';
 import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
@@ -52,6 +53,15 @@ class _CartoesPageState extends State<CartoesPage> {
     }
   }
 
+  Future<void> _abrirDetalhe(CartaoCreditoModel cartao) async {
+    await Navigator.of(context).push(
+      CupertinoPageRoute(builder: (_) => DetalheCartaoPage(cartao: cartao)),
+    );
+    if (mounted) {
+      bloc.add(CartoesLoadEvent(forceRefresh: true));
+    }
+  }
+
   Widget _item(CartaoCreditoModel cartao) {
     final limite = cartao.limite ?? 0;
     final usado = cartao.limiteUsado ?? 0;
@@ -63,7 +73,7 @@ class _CartoesPageState extends State<CartoesPage> {
         color: DinixColors.surfaceElevated,
         borderRadius: BorderRadius.circular(AppRadius.card),
         child: InkWell(
-          onTap: () => _abrirCadastro(cartao: cartao),
+          onTap: () => _abrirDetalhe(cartao),
           borderRadius: BorderRadius.circular(AppRadius.card),
           child: Padding(
             padding: const EdgeInsets.all(16),
@@ -175,14 +185,10 @@ class _CartoesPageState extends State<CartoesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return scaffold(
+    return dinixMenuScaffold(
       title: 'Cartões',
-      centerTitle: true,
-      background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
-      actions: [dinixAddAction(onTap: _abrirCadastro, tooltip: 'Novo cartão')],
+      onAdd: () => _abrirCadastro(),
+      addTooltip: 'Novo cartão',
       body: _bodyBuilder(),
     );
   }

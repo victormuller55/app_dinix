@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:muller_package/muller_package.dart' hide AppRadius, AppFontSizes, AppSpacing;
-import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/empty.dart';
+import 'package:flutter/material.dart';
 
 Widget featurePlaceholder({
   required String title,
@@ -22,14 +21,10 @@ Widget featureScaffold({
   required String placeholderTitle,
   required String placeholderSubtitle,
   required IconData icon,
+  bool hideBackIcon = false,
 }) {
-  return scaffold(
+  return dinixMenuScaffold(
     title: title,
-    centerTitle: true,
-    hideBackIcon: true,
-    background: DinixColors.background,
-    appBarColor: DinixColors.primaryDark,
-    titleColor: DinixColors.textPrimary,
     body: featurePlaceholder(
       title: placeholderTitle,
       subtitle: placeholderSubtitle,

@@ -1,3 +1,4 @@
+import 'package:app_dinix/models/cartao_credito_model.dart';
 import 'package:app_dinix/models/conta_model.dart';
 import 'package:muller_package/muller_package.dart';
 
@@ -12,7 +13,10 @@ class CadastroCartaoReadyState extends CadastroCartaoState {
   CadastroCartaoReadyState({required this.contas});
 }
 
-class CadastroCartaoSuccessState extends CadastroCartaoState {}
+class CadastroCartaoSuccessState extends CadastroCartaoState {
+  final CartaoCreditoModel cartao;
+  CadastroCartaoSuccessState({required this.cartao});
+}
 
 class CadastroCartaoDeletedState extends CadastroCartaoState {}
 

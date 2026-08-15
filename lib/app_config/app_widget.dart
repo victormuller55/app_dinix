@@ -17,7 +17,7 @@ class AppWidget extends StatelessWidget {
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: kAppSystemUiOverlay,
       child: MaterialApp(
-        title: 'Dinix Gastos',
+        title: 'Dinix',
         navigatorKey: AppContext.navigatorKey,
         debugShowCheckedModeBanner: false,
         theme: buildAppTheme(isIOS: isIOSPlatform),

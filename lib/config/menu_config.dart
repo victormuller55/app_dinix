@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:app_dinix/pages/assinaturas/assinaturas_page.dart';
 import 'package:app_dinix/pages/carteiras/carteiras_page.dart';
 import 'package:app_dinix/pages/compras/compras_page.dart';
 import 'package:app_dinix/pages/painel/painel_page.dart';
 import 'package:app_dinix/pages/perfil/perfil_page.dart';
+import 'package:app_dinix/pages/receitas/receitas_page.dart';
 import 'package:app_dinix/app_config/const/phosphor_icons.dart';
 
 class MenuItem {
@@ -25,7 +25,7 @@ class MenuConfig {
     MenuItem(
       id: 'painel',
       title: 'Início',
-      icon: Phosphor.squaresFour,
+      icon: Phosphor.house,
       page: PainelPage(),
     ),
     MenuItem(
@@ -41,10 +41,10 @@ class MenuConfig {
       page: CarteirasPage(),
     ),
     MenuItem(
-      id: 'assinaturas',
-      title: 'Assinaturas',
-      icon: Phosphor.stack,
-      page: AssinaturasPage(),
+      id: 'entradas',
+      title: 'Entradas',
+      icon: Phosphor.trendUp,
+      page: ReceitasPage(isMenuTab: true),
     ),
     MenuItem(
       id: 'perfil',

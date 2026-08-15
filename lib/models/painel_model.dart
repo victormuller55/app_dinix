@@ -142,9 +142,11 @@ class PainelModel {
 class PainelResumoModel {
   final PainelModel painel;
   final double saldoContas;
+  final double totalInvestimentos;
 
   PainelResumoModel({
     required this.painel,
     required this.saldoContas,
+    this.totalInvestimentos = 0,
   });
 }
