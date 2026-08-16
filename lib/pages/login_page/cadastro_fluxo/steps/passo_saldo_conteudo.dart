@@ -111,10 +111,10 @@ class _SaldoContaCampoState extends State<_SaldoContaCampo> {
                     controller: _controller,
                     keyboardType: TextInputType.number,
                     inputFormatters: [AppFormFormatters.valor],
-                    style: const TextStyle(color: DinixColors.textPrimary),
+                    style: TextStyle(color: DinixColors.textPrimary),
                     decoration: InputDecoration(
                       hintText: '0,00',
-                      hintStyle: TextStyle(color: AppColors.grey400),
+                      hintStyle: TextStyle(color: DinixColors.textMuted),
                       filled: true,
                       fillColor: DinixColors.background,
                       border: OutlineInputBorder(
@@ -127,13 +127,13 @@ class _SaldoContaCampoState extends State<_SaldoContaCampo> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(AppRadius.input),
-                        borderSide: const BorderSide(
+                        borderSide: BorderSide(
                           color: DinixColors.primary,
                           width: AppBorder.active,
                         ),
                       ),
                       prefixText: 'R\$ ',
-                      prefixStyle: const TextStyle(color: DinixColors.textPrimary),
+                      prefixStyle: TextStyle(color: DinixColors.textPrimary),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                     ),
                     onChanged: (v) => widget.onChanged(parseValor(v) ?? 0),

@@ -1,6 +1,7 @@
 import 'package:app_dinix/app_config/app_platform.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/app_config/const/app_endpoints.dart';
+import 'package:app_dinix/app_config/theme/theme_controller.dart';
 import 'package:app_dinix/function/service/session_expired.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/models/usuario_model.dart';
@@ -18,7 +19,6 @@ import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
-import 'package:app_dinix/widgets/native_ios_ui.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -83,62 +83,48 @@ class _PerfilPageState extends State<PerfilPage> {
   Future<void> _escolherFoto(UsuarioModel usuario) async {
     if (_enviandoFoto) return;
 
-    final String? acao;
-    if (isIOSPlatform) {
-      final actions = <NativeIosAction>[
-        const NativeIosAction(id: 'camera', title: 'Câmera'),
-        const NativeIosAction(id: 'galeria', title: 'Galeria'),
-        if (_urlFoto(usuario) != null)
-          const NativeIosAction(id: 'remover', title: 'Remover foto', destructive: true),
-      ];
-      acao = await showNativeIosActionSheet(
-        title: 'Foto de perfil',
-        actions: actions,
-      );
-    } else {
-      acao = await showModalBottomSheet<String>(
-        context: context,
-        backgroundColor: DinixColors.surfaceElevated,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.card)),
-        ),
-        builder: (ctx) {
-          return SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
-                  child: appText(
-                    'Foto de perfil',
-                    bold: true,
-                    color: DinixColors.textPrimary,
-                    fontSize: AppFontSizes.normal,
-                  ),
+    final acao = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: DinixColors.surfaceElevated,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.card)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                child: appText(
+                  'Foto de perfil',
+                  bold: true,
+                  color: DinixColors.textPrimary,
+                  fontSize: AppFontSizes.normal,
                 ),
+              ),
+              ListTile(
+                leading: Icon(Phosphor.camera, color: DinixColors.primary),
+                title: appText('Câmera', color: DinixColors.textPrimary, bold: true),
+                onTap: () => Navigator.pop(ctx, 'camera'),
+              ),
+              ListTile(
+                leading: Icon(Phosphor.image, color: DinixColors.primary),
+                title: appText('Galeria', color: DinixColors.textPrimary, bold: true),
+                onTap: () => Navigator.pop(ctx, 'galeria'),
+              ),
+              if (_urlFoto(usuario) != null)
                 ListTile(
-                  leading: Icon(Phosphor.camera, color: DinixColors.primary),
-                  title: appText('Câmera', color: DinixColors.textPrimary, bold: true),
-                  onTap: () => Navigator.pop(ctx, 'camera'),
+                  leading: Icon(Phosphor.trash, color: AppColors.red),
+                  title: appText('Remover foto', color: AppColors.red, bold: true),
+                  onTap: () => Navigator.pop(ctx, 'remover'),
                 ),
-                ListTile(
-                  leading: Icon(Phosphor.image, color: DinixColors.primary),
-                  title: appText('Galeria', color: DinixColors.textPrimary, bold: true),
-                  onTap: () => Navigator.pop(ctx, 'galeria'),
-                ),
-                if (_urlFoto(usuario) != null)
-                  ListTile(
-                    leading: Icon(Phosphor.trash, color: AppColors.red),
-                    title: appText('Remover foto', color: AppColors.red, bold: true),
-                    onTap: () => Navigator.pop(ctx, 'remover'),
-                  ),
-                appSizedBox(height: AppSpacing.small),
-              ],
-            ),
-          );
-        },
-      );
-    }
+              appSizedBox(height: AppSpacing.small),
+            ],
+          ),
+        );
+      },
+    );
 
     if (acao == null || !mounted) return;
     if (acao == 'remover') {
@@ -211,7 +197,7 @@ class _PerfilPageState extends State<PerfilPage> {
                           child: appText(
                             _iniciais(usuario.nome),
                             bold: true,
-                            color: Colors.black,
+                            color: DinixColors.onPrimary,
                             fontSize: AppFontSizes.big,
                           ),
                         ),
@@ -225,7 +211,7 @@ class _PerfilPageState extends State<PerfilPage> {
                             child: appText(
                               _iniciais(usuario.nome),
                               bold: true,
-                              color: Colors.black,
+                              color: DinixColors.onPrimary,
                               fontSize: AppFontSizes.big,
                             ),
                           ),
@@ -247,7 +233,6 @@ class _PerfilPageState extends State<PerfilPage> {
                     padding: EdgeInsets.all(6),
                     child: CircularProgressIndicator(
                       strokeWidth: 2,
-                      color: DinixColors.primary,
                     ),
                   )
                 : Icon(Phosphor.camera, size: 14, color: DinixColors.primary),
@@ -281,7 +266,7 @@ class _PerfilPageState extends State<PerfilPage> {
                   appSizedBox(height: 6),
                   appText(
                     usuario.email ?? '',
-                    color: AppColors.grey400,
+                    color: DinixColors.textMuted,
                     fontSize: AppFontSizes.verySmall,
                     textAlign: TextAlign.center,
                   ),
@@ -302,7 +287,7 @@ class _PerfilPageState extends State<PerfilPage> {
           padding: const EdgeInsets.fromLTRB(4, 0, 4, 8),
           child: appText(
             titulo.toUpperCase(),
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: 11,
             bold: true,
           ),
@@ -322,6 +307,123 @@ class _PerfilPageState extends State<PerfilPage> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _opcaoTema({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required ThemeMode mode,
+    VoidCallback? onSelected,
+  }) {
+    final selecionado = ThemeController.instance.mode == mode;
+    return ListTile(
+      onTap: () {
+        ThemeController.instance.setMode(mode);
+        onSelected?.call();
+      },
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 2),
+      leading: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: DinixColors.primary.withValues(alpha: 0.16),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Icon(icon, color: DinixColors.primary, size: 18),
+      ),
+      title: appText(
+        title,
+        color: DinixColors.textPrimary,
+        bold: true,
+        fontSize: AppFontSizes.small,
+      ),
+      subtitle: appText(subtitle, color: DinixColors.textMuted, fontSize: 12),
+      trailing: Icon(
+        selecionado ? Phosphor.radioButton : Phosphor.circle,
+        color: selecionado ? DinixColors.primary : DinixColors.textMuted,
+        size: 20,
+      ),
+    );
+  }
+
+  (IconData icon, String titulo, String descricao) _infoTema(ThemeMode mode) {
+    switch (mode) {
+      case ThemeMode.light:
+        return (
+          Phosphor.sun,
+          'Modo claro',
+          'Fundo claro e detalhes em azul',
+        );
+      case ThemeMode.dark:
+        return (
+          Phosphor.moon,
+          'Modo escuro',
+          'Fundo escuro e detalhes em laranja',
+        );
+      case ThemeMode.system:
+        return (
+          Phosphor.deviceMobile,
+          'Seguir dispositivo',
+          'Usa o tema claro/escuro do celular',
+        );
+    }
+  }
+
+  Future<void> _abrirModalTema() async {
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: DinixColors.surfaceElevated,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.card)),
+      ),
+      builder: (ctx) {
+        return ListenableBuilder(
+          listenable: ThemeController.instance,
+          builder: (context, _) {
+            void fechar() => Navigator.pop(ctx);
+            return SafeArea(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+                    child: appText(
+                      'Aparência',
+                      bold: true,
+                      color: DinixColors.textPrimary,
+                      fontSize: AppFontSizes.normal,
+                    ),
+                  ),
+                  _opcaoTema(
+                    icon: Phosphor.sun,
+                    title: 'Modo claro',
+                    subtitle: 'Fundo claro e detalhes em azul',
+                    mode: ThemeMode.light,
+                    onSelected: fechar,
+                  ),
+                  _opcaoTema(
+                    icon: Phosphor.moon,
+                    title: 'Modo escuro',
+                    subtitle: 'Fundo escuro e detalhes em laranja',
+                    mode: ThemeMode.dark,
+                    onSelected: fechar,
+                  ),
+                  _opcaoTema(
+                    icon: Phosphor.deviceMobile,
+                    title: 'Seguir dispositivo',
+                    subtitle: 'Usa o tema claro/escuro do celular',
+                    mode: ThemeMode.system,
+                    onSelected: fechar,
+                  ),
+                  appSizedBox(height: AppSpacing.small),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -353,8 +455,8 @@ class _PerfilPageState extends State<PerfilPage> {
       ),
       subtitle: subtitle == null
           ? null
-          : appText(subtitle, color: AppColors.grey400, fontSize: 12),
-      trailing: Icon(Phosphor.caretRight, color: AppColors.grey400, size: 16),
+          : appText(subtitle, color: DinixColors.textMuted, fontSize: 12),
+      trailing: Icon(Phosphor.caretRight, color: DinixColors.textMuted, size: 16),
     );
   }
 
@@ -401,6 +503,24 @@ class _PerfilPageState extends State<PerfilPage> {
                 onTap: () => _abrir(const TrocarSenhaPage()),
               ),
             ],
+          ),
+          appSizedBox(height: AppSpacing.medium),
+          ListenableBuilder(
+            listenable: ThemeController.instance,
+            builder: (context, _) {
+              final atual = _infoTema(ThemeController.instance.mode);
+              return _secao(
+                titulo: 'Aparência',
+                itens: [
+                  _linha(
+                    icon: atual.$1,
+                    title: 'Tema',
+                    subtitle: atual.$2,
+                    onTap: _abrirModalTema,
+                  ),
+                ],
+              );
+            },
           ),
           appSizedBox(height: AppSpacing.medium),
           _secao(

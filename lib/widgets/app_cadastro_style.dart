@@ -54,7 +54,7 @@ Widget cadastroSecao(String titulo, Widget child) {
       children: [
         appText(
           titulo,
-          color: AppColors.grey400,
+          color: DinixColors.textMuted,
           fontSize: AppFontSizes.verySmall,
           bold: true,
         ),
@@ -93,7 +93,7 @@ Widget cadastroChip({
             Icon(
               icon,
               size: 16,
-              color: selecionado ? Colors.black : DinixColors.primary,
+              color: selecionado ? DinixColors.onPrimary : DinixColors.primary,
             ),
             const SizedBox(width: 6),
           ],
@@ -101,7 +101,7 @@ Widget cadastroChip({
             child: appText(
               label,
               bold: selecionado,
-              color: selecionado ? Colors.black : DinixColors.textPrimary,
+              color: selecionado ? DinixColors.onPrimary : DinixColors.textPrimary,
               fontSize: AppFontSizes.verySmall,
               textAlign: TextAlign.center,
             ),
@@ -163,7 +163,7 @@ Widget cadastroBotaoSeletor({
               child: appText(
                 preenchido ? valor : tituloVazio,
                 bold: preenchido,
-                color: preenchido ? DinixColors.textPrimary : AppColors.grey400,
+                color: preenchido ? DinixColors.textPrimary : DinixColors.textMuted,
                 fontSize: AppFontSizes.small,
               ),
             ),
@@ -171,10 +171,10 @@ Widget cadastroBotaoSeletor({
               IconButton(
                 onPressed: onClear,
                 visualDensity: VisualDensity.compact,
-                icon: Icon(Phosphor.x, color: AppColors.grey400, size: 18),
+                icon: Icon(Phosphor.x, color: DinixColors.textMuted, size: 18),
               )
             else
-              Icon(Phosphor.caretDown, color: AppColors.grey400, size: 18),
+              Icon(Phosphor.caretDown, color: DinixColors.textMuted, size: 18),
           ],
         ),
       ),
@@ -266,7 +266,7 @@ Widget cadastroCampoValor({
                   fontFamily: AppFonts.family,
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.grey400,
+                  color: DinixColors.textMuted,
                 ),
                 prefixText: 'R\$ ',
                 prefixStyle: TextStyle(
@@ -397,7 +397,7 @@ Widget cadastroSwitch({
           ? null
           : appText(
               subtitulo,
-              color: AppColors.grey400,
+              color: DinixColors.textMuted,
               fontSize: AppFontSizes.verySmall,
             ),
       onChanged: onChanged,

@@ -64,7 +64,7 @@ Widget appErrorState({
           appSizedBox(height: AppSpacing.small),
           appText(
             descricao,
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.small,
             textAlign: TextAlign.center,
           ),

@@ -73,7 +73,7 @@ class _EditarPerfilPageState extends State<EditarPerfilPage> {
                 children: [
                   appText(
                     'Esse nome aparece nos seus lançamentos e no perfil.',
-                    color: AppColors.grey400,
+                    color: DinixColors.textMuted,
                     fontSize: AppFontSizes.verySmall,
                   ),
                   _nomeForm.formulario,

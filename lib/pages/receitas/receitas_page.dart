@@ -74,7 +74,7 @@ class _ReceitasPageState extends State<ReceitasPage> {
           children: [
             appText(
               'Hoje · ${isoParaBr(resumo.dataIso)}',
-              color: AppColors.grey400,
+              color: DinixColors.textMuted,
               fontSize: AppFontSizes.verySmall,
             ),
             appSizedBox(height: AppSpacing.small),
@@ -113,7 +113,7 @@ class _ReceitasPageState extends State<ReceitasPage> {
           ),
           subtitle: appText(
             '${isoParaBr(receita.dataRecebimento)} · ${_nomeOrigem(receita, categorias)} · ${_nomeConta(receita, contas)}',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           trailing: appText(

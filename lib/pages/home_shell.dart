@@ -1,6 +1,7 @@
 import 'package:app_dinix/app_config/app_platform.dart';
 import 'package:app_dinix/app_config/app_theme.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/app_config/theme/dinix_theme_scope.dart';
 import 'package:app_dinix/cache/reference_data_prefetch.dart';
 import 'package:app_dinix/pages/carteiras/carteiras_page.dart';
 import 'package:app_dinix/pages/compras/compras_page.dart';
@@ -11,7 +12,6 @@ import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:cupertino_native_better/cupertino_native_better.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:muller_package/muller_package.dart' hide AppRadius, AppFontSizes, AppSpacing;
 
 class _HomeNavItem {
   final String id;
@@ -102,7 +102,6 @@ class _HomeShellState extends State<HomeShell> {
   void initState() {
     super.initState();
     HomeShell._ativo = this;
-    SystemChrome.setSystemUIOverlayStyle(kAppSystemUiOverlay);
     ReferenceDataPrefetch.sincronizar(forcar: false, mostrarProgresso: false);
   }
 
@@ -128,7 +127,7 @@ class _HomeShellState extends State<HomeShell> {
       child: Center(
         child: Icon(
           selected ? item.iconSelected : item.iconOutlined,
-          color: selected ? DinixColors.primary : AppColors.grey400,
+          color: selected ? DinixColors.primary : DinixColors.textMuted,
           size: 26,
         ),
       ),
@@ -183,17 +182,29 @@ class _HomeShellState extends State<HomeShell> {
 
   Widget _body() {
     final safeIndex = _currentIndex.clamp(0, _items.length - 1);
+    final themeGen = DinixThemeScope.maybeOf(context)?.generation ?? 0;
 
     return IndexedStack(
       index: safeIndex,
-      children: _items.map((item) => item.page).toList(),
+      children: [
+        for (final item in _items)
+          KeyedSubtree(
+            // Recria a aba ao trocar tema — as pages ficam na mesma instância
+            // e o Flutter não rebuilda widgets idênticos no IndexedStack.
+            key: ValueKey('${item.id}-theme-$themeGen'),
+            child: item.page,
+          ),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    DinixThemeScope.depend(context);
+    final brightness = Theme.of(context).brightness;
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: kAppSystemUiOverlay,
+      value: systemUiOverlayFor(brightness),
       child: Scaffold(
         backgroundColor: DinixColors.background,
         extendBody: isIOSPlatform,
@@ -203,7 +214,7 @@ class _HomeShellState extends State<HomeShell> {
                   _body(),
                   ValueListenableBuilder<bool>(
                     valueListenable: dinixDrawerAberto,
-                    builder: (_, drawerAberto, __) {
+                    builder: (_, drawerAberto, _) {
                       if (drawerAberto) return const SizedBox.shrink();
                       return Positioned(
                         left: 0,

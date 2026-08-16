@@ -47,7 +47,7 @@ Future<BancoOpcao?> showBancoSelectSheet({
                       color: DinixColors.textPrimary,
                     ),
                     trailing: selecionado
-                        ? const Icon(Phosphor.check, color: DinixColors.primary)
+                        ? Icon(Phosphor.check, color: DinixColors.primary)
                         : null,
                     onTap: () => Navigator.pop(ctx, banco),
                   );

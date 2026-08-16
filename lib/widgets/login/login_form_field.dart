@@ -86,7 +86,7 @@ class _LoginFormFieldWidgetState extends State<_LoginFormFieldWidget> {
     super.dispose();
   }
 
-  Color get _iconColor => _focused ? DinixColors.primary : AppColors.grey400;
+  Color get _iconColor => _focused ? DinixColors.primary : DinixColors.textMuted;
 
   Color get _borderColor {
     if (_focused) return DinixColors.primary;
@@ -142,7 +142,7 @@ class _LoginFormFieldWidgetState extends State<_LoginFormFieldWidget> {
                         _obscure
                             ? Phosphor.eyeSlash
                             : Phosphor.eye,
-                        color: _focused ? DinixColors.primary : AppColors.grey400,
+                        color: _focused ? DinixColors.primary : DinixColors.textMuted,
                       ),
                     )
                   : null,
@@ -153,7 +153,7 @@ class _LoginFormFieldWidgetState extends State<_LoginFormFieldWidget> {
               focusedErrorBorder: _border(AppColors.red, width: AppBorder.active),
               hintStyle: TextStyle(
                 fontSize: AppFontSizes.verySmall,
-                color: AppColors.grey400,
+                color: DinixColors.textMuted,
               ),
               contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             ),

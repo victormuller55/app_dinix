@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/app_config/theme/dinix_theme_scope.dart';
 import 'package:app_dinix/widgets/app_logo.dart';
 import 'package:app_dinix/widgets/dinix_drawer.dart';
 import 'package:flutter/material.dart';
@@ -20,79 +21,98 @@ Widget dinixMenuScaffold({
   bool extendBody = false,
   bool showDrawer = true,
 }) {
-  final sideActions = <Widget>[
-    ...?actions,
-    if (onAdd != null)
-      IconButton(
-        onPressed: onAdd,
-        tooltip: addTooltip,
-        icon: const Icon(Phosphor.plus, color: DinixColors.primary, size: 26),
-      ),
-    if ((actions == null || actions.isEmpty) && onAdd == null)
-      const SizedBox(width: 72),
-  ];
+  return Builder(
+    builder: (context) {
+      DinixThemeScope.depend(context);
 
-  return Scaffold(
-    backgroundColor: DinixColors.background,
-    extendBody: extendBody,
-    floatingActionButton: floatingActionButton,
-    bottomNavigationBar: bottomNavigationBar,
-    drawer: showDrawer ? const DinixAppDrawer() : null,
-    drawerScrimColor: Colors.black.withValues(alpha: 0.55),
-    drawerEnableOpenDragGesture: true,
-    onDrawerChanged: showDrawer
-        ? (aberto) => dinixDrawerAberto.value = aberto
-        : null,
-    appBar: AppBar(
-      elevation: 0,
-      backgroundColor: DinixColors.primaryDark,
-      foregroundColor: DinixColors.textPrimary,
-      centerTitle: true,
-      automaticallyImplyLeading: false,
-      leadingWidth: 72,
-      leading: showDrawer
-          ? Builder(
-              builder: (context) => Padding(
-                padding: const EdgeInsets.only(left: 12),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: GestureDetector(
-                    onTap: () => Scaffold.of(context).openDrawer(),
-                    behavior: HitTestBehavior.opaque,
-                    child: Tooltip(
-                      message: 'Menu',
-                      child: Image.asset(
-                        kLogoAsset,
-                        height: 26,
-                        fit: BoxFit.contain,
-                        filterQuality: FilterQuality.high,
+      final sideActions = <Widget>[
+        ...?actions,
+        if (onAdd != null)
+          IconButton(
+            onPressed: onAdd,
+            tooltip: addTooltip,
+            icon: Icon(Phosphor.plus, color: DinixColors.primary, size: 26),
+          ),
+        if ((actions == null || actions.isEmpty) && onAdd == null)
+          const SizedBox(width: 72),
+      ];
+
+      return Scaffold(
+        backgroundColor: DinixColors.background,
+        extendBody: extendBody,
+        floatingActionButton: floatingActionButton,
+        bottomNavigationBar: bottomNavigationBar,
+        drawer: showDrawer ? const DinixAppDrawer() : null,
+        drawerScrimColor: Colors.black.withValues(alpha: 0.55),
+        drawerEnableOpenDragGesture: true,
+        onDrawerChanged: showDrawer
+            ? (aberto) => dinixDrawerAberto.value = aberto
+            : null,
+        appBar: AppBar(
+          elevation: 0,
+          backgroundColor: DinixColors.primaryDark,
+          foregroundColor: DinixColors.textPrimary,
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+          leadingWidth: 72,
+          leading: showDrawer
+              ? Builder(
+                  builder: (context) {
+                    final isLight =
+                        Theme.of(context).brightness == Brightness.light;
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 8),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: IconButton(
+                          onPressed: () => Scaffold.of(context).openDrawer(),
+                          tooltip: 'Menu',
+                          icon: isLight
+                              ? Icon(
+                                  Phosphor.list,
+                                  color: DinixColors.primary,
+                                  size: 28,
+                                )
+                              : Image.asset(
+                                  kLogoAsset,
+                                  height: 26,
+                                  fit: BoxFit.contain,
+                                  filterQuality: FilterQuality.high,
+                                ),
+                        ),
                       ),
-                    ),
+                    );
+                  },
+                )
+              : Padding(
+                  padding: const EdgeInsets.only(left: 12),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Theme.of(context).brightness == Brightness.light
+                        ? Icon(
+                            Phosphor.list,
+                            color: DinixColors.primary,
+                            size: 26,
+                          )
+                        : Image.asset(
+                            kLogoAsset,
+                            height: 26,
+                            fit: BoxFit.contain,
+                            filterQuality: FilterQuality.high,
+                          ),
                   ),
                 ),
-              ),
-            )
-          : Padding(
-              padding: const EdgeInsets.only(left: 12),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Image.asset(
-                  kLogoAsset,
-                  height: 26,
-                  fit: BoxFit.contain,
-                  filterQuality: FilterQuality.high,
-                ),
-              ),
-            ),
-      title: appText(
-        title.toUpperCase(),
-        color: DinixColors.textPrimary,
-        fontSize: AppFontSizes.verySmall,
-        bold: true,
-      ),
-      actions: sideActions,
-    ),
-    body: SafeArea(child: body),
+          title: appText(
+            title.toUpperCase(),
+            color: DinixColors.textPrimary,
+            fontSize: AppFontSizes.verySmall,
+            bold: true,
+          ),
+          actions: sideActions,
+        ),
+        body: SafeArea(child: body),
+      );
+    },
   );
 }
 
@@ -103,6 +123,6 @@ Widget dinixAddAction({
   return IconButton(
     onPressed: onTap,
     tooltip: tooltip,
-    icon: const Icon(Phosphor.plus, color: DinixColors.primary, size: 26),
+    icon: Icon(Phosphor.plus, color: DinixColors.primary, size: 26),
   );
 }

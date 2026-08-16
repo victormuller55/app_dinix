@@ -153,8 +153,9 @@ Widget _animatedElevatedButton({
     }
 
     return (
-      backgroundColor: hover ? const Color(0xFFFFB74D) : DinixColors.primary,
-      textColor: Colors.black,
+      backgroundColor:
+          hover ? Color.lerp(DinixColors.primary, Colors.white, 0.22)! : DinixColors.primary,
+      textColor: DinixColors.onPrimary,
       borderColor: DinixColors.primary,
       borderWidth: 0,
     );

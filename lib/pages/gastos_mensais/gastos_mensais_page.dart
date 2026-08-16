@@ -108,7 +108,7 @@ class _GastosMensaisPageState extends State<GastosMensaisPage> {
               color: DinixColors.primary.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
+            child: Icon(
               Phosphor.calendarBlank,
               color: DinixColors.primary,
               size: 22,
@@ -122,7 +122,7 @@ class _GastosMensaisPageState extends State<GastosMensaisPage> {
           ),
           subtitle: appText(
             detalhes,
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           trailing: appText(

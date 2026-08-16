@@ -355,7 +355,7 @@ class _ComprasPageState extends State<ComprasPage> {
           children: [
             appText(
               rotuloDiaRelativo(grupo.dataIso),
-              color: AppColors.grey400,
+              color: DinixColors.textMuted,
               fontSize: AppFontSizes.verySmall,
             ),
             appSizedBox(height: AppSpacing.small),
@@ -440,7 +440,7 @@ class _ComprasPageState extends State<ComprasPage> {
                     ),
                     appText(
                       subtitulo,
-                      color: AppColors.grey400,
+                      color: DinixColors.textMuted,
                       fontSize: AppFontSizes.verySmall,
                     ),
                     appSizedBox(height: 2),
@@ -507,7 +507,7 @@ class _ComprasPageState extends State<ComprasPage> {
           ),
           subtitle: appText(
             detalhes,
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           trailing: appText(
@@ -583,7 +583,7 @@ class _ComprasPageState extends State<ComprasPage> {
         IconButton(
           onPressed: _abrirGastosMensais,
           tooltip: 'Gastos mensais',
-          icon: const Icon(
+          icon: Icon(
             Phosphor.calendarBlank,
             color: DinixColors.primary,
             size: 24,

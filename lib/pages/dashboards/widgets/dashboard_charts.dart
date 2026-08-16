@@ -31,16 +31,16 @@ const _mesesCurtos = [
   'Dez',
 ];
 
-const _coresCategoria = [
-  DinixColors.primary,
-  Color(0xFF42A5F5),
-  Color(0xFFAB47BC),
-  Color(0xFF26A69A),
-  Color(0xFFEF5350),
-  Color(0xFFFFCA28),
-  Color(0xFF8D6E63),
-  Color(0xFF78909C),
-];
+List<Color> get _coresCategoria => [
+      DinixColors.primary,
+      const Color(0xFF42A5F5),
+      const Color(0xFFAB47BC),
+      const Color(0xFF26A69A),
+      const Color(0xFFEF5350),
+      const Color(0xFFFFCA28),
+      const Color(0xFF8D6E63),
+      const Color(0xFF78909C),
+    ];
 
 class ChartEmptyHint extends StatelessWidget {
   final String message;
@@ -54,7 +54,7 @@ class ChartEmptyHint extends StatelessWidget {
       child: Center(
         child: appText(
           message,
-          color: AppColors.grey400,
+          color: DinixColors.textMuted,
           fontSize: AppFontSizes.verySmall,
           textAlign: TextAlign.center,
         ),
@@ -83,7 +83,7 @@ class ChartLegendDot extends StatelessWidget {
         Flexible(
           child: appText(
             label,
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: 11,
           ),
         ),
@@ -156,7 +156,7 @@ class GraficoReceitasDespesas extends StatelessWidget {
                     reservedSize: 42,
                     getTitlesWidget: (value, _) => appText(
                       _moedaCurta(value),
-                      color: AppColors.grey400,
+                      color: DinixColors.textMuted,
                       fontSize: 9,
                     ),
                   ),
@@ -174,7 +174,7 @@ class GraficoReceitasDespesas extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 6),
                         child: appText(
                           labels[i],
-                          color: AppColors.grey400,
+                          color: DinixColors.textMuted,
                           fontSize: 11,
                         ),
                       );
@@ -341,7 +341,7 @@ class GraficoUsoCartoes extends StatelessWidget {
                       ),
                       appText(
                         '${(pct * 100).round()}%',
-                        color: AppColors.grey400,
+                        color: DinixColors.textMuted,
                         fontSize: 11,
                       ),
                     ],
@@ -509,7 +509,7 @@ class GraficoEvolucaoPatrimonio extends StatelessWidget {
                 reservedSize: 44,
                 getTitlesWidget: (value, _) => appText(
                   _moedaCurta(value),
-                  color: AppColors.grey400,
+                  color: DinixColors.textMuted,
                   fontSize: 9,
                 ),
               ),
@@ -538,7 +538,7 @@ class GraficoEvolucaoPatrimonio extends StatelessWidget {
                     padding: const EdgeInsets.only(top: 6),
                     child: appText(
                       mes,
-                      color: AppColors.grey400,
+                      color: DinixColors.textMuted,
                       fontSize: 10,
                     ),
                   );
@@ -637,7 +637,7 @@ class GraficoPrevisao extends StatelessWidget {
                     reservedSize: 42,
                     getTitlesWidget: (value, _) => appText(
                       _moedaCurta(value),
-                      color: AppColors.grey400,
+                      color: DinixColors.textMuted,
                       fontSize: 9,
                     ),
                   ),
@@ -655,7 +655,7 @@ class GraficoPrevisao extends StatelessWidget {
                         padding: const EdgeInsets.only(top: 6),
                         child: appText(
                           labels[i],
-                          color: AppColors.grey400,
+                          color: DinixColors.textMuted,
                           fontSize: 10,
                         ),
                       );

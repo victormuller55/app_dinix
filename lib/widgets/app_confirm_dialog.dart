@@ -39,7 +39,7 @@ Future<bool?> showAppConfirmDialog(
       ),
       content: appText(
         message,
-        color: AppColors.grey400,
+        color: DinixColors.textMuted,
         fontSize: AppFontSizes.verySmall,
       ),
       actions: [
@@ -47,7 +47,7 @@ Future<bool?> showAppConfirmDialog(
           onPressed: () => Navigator.pop(ctx, false),
           child: Text(
             cancelLabel,
-            style: TextStyle(color: AppColors.grey400),
+            style: TextStyle(color: DinixColors.textMuted),
           ),
         ),
         TextButton(

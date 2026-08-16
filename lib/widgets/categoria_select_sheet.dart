@@ -221,7 +221,7 @@ class _CategoriaSelectSheetState extends State<_CategoriaSelectSheet> {
           padding: const EdgeInsets.all(24),
           child: appText(
             'Nenhuma categoria disponível.',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
           ),
         ),
       );

@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/app_platform.dart';
+import 'package:app_dinix/app_config/const/dinix_colors.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -9,8 +10,11 @@ Widget _iosRefreshIndicator(
   double refreshTriggerPullDistance,
   double refreshIndicatorExtent,
 ) {
-  return const Center(
-    child: CupertinoActivityIndicator(color: Colors.white, radius: 10),
+  return Center(
+    child: CupertinoActivityIndicator(
+      color: DinixColors.primary,
+      radius: 10,
+    ),
   );
 }
 
@@ -45,8 +49,8 @@ Widget listaRefreshBuilder({
   }
 
   return RefreshIndicator(
-    color: Colors.white,
-    backgroundColor: Colors.black,
+    color: DinixColors.primary,
+    backgroundColor: DinixColors.surfaceElevated,
     onRefresh: onRefresh,
     child: ListView.builder(
       controller: controller,
@@ -92,8 +96,8 @@ Widget listaRefreshVazia({
           ? constraints.maxHeight
           : MediaQuery.sizeOf(context).height * 0.62;
       return RefreshIndicator(
-        color: Colors.white,
-        backgroundColor: Colors.black,
+        color: DinixColors.primary,
+        backgroundColor: DinixColors.surfaceElevated,
         onRefresh: onRefresh,
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
@@ -132,8 +136,8 @@ Widget dinixRefresh({
   }
 
   return RefreshIndicator(
-    color: Colors.white,
-    backgroundColor: Colors.black,
+    color: DinixColors.primary,
+    backgroundColor: DinixColors.surfaceElevated,
     onRefresh: onRefresh,
     child: SingleChildScrollView(
       controller: controller,

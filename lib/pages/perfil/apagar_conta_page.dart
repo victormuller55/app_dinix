@@ -105,7 +105,7 @@ class _ApagarContaPageState extends State<ApagarContaPage> {
                   appSizedBox(height: AppSpacing.medium),
                   appText(
                     'Confirme com a senha atual para continuar.',
-                    color: AppColors.grey400,
+                    color: DinixColors.textMuted,
                     fontSize: AppFontSizes.verySmall,
                   ),
                   _senhaForm.formulario,

@@ -38,7 +38,7 @@ class PassoCodigoConteudo extends StatelessWidget {
         appSizedBox(height: AppSpacing.medium),
         appText(
           'O código expira em 3 horas. Você pode pedir um novo a cada 5 minutos. Verifique também a caixa de spam.',
-          color: AppColors.grey400,
+          color: DinixColors.textMuted,
           fontSize: AppFontSizes.verySmall,
           textAlign: TextAlign.center,
         ),

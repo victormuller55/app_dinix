@@ -92,7 +92,7 @@ class _BiometriaPermissaoPageState extends State<BiometriaPermissaoPage> {
                     borderRadius: BorderRadius.circular(24),
                     border: Border.all(color: AppColors.grey800),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Phosphor.fingerprint,
                     size: 44,
                     color: DinixColors.primary,
@@ -109,7 +109,7 @@ class _BiometriaPermissaoPageState extends State<BiometriaPermissaoPage> {
                 appSizedBox(height: AppSpacing.small),
                 appText(
                   'Na próxima vez que abrir o app, use a digital ou o Face ID deste celular para entrar mais rápido e com mais segurança.',
-                  color: AppColors.grey400,
+                  color: DinixColors.textMuted,
                   fontSize: AppFontSizes.verySmall,
                   textAlign: TextAlign.center,
                 ),

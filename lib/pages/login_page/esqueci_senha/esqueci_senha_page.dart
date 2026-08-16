@@ -215,7 +215,7 @@ class _EsqueciSenhaPageState extends State<EsqueciSenhaPage> {
           elevation: 0,
           leading: IconButton(
             onPressed: _voltar,
-            icon: const Icon(Phosphor.arrowLeft, color: DinixColors.textPrimary),
+            icon: Icon(Phosphor.arrowLeft, color: DinixColors.textPrimary),
           ),
           title: appText(
             'Recuperar senha',
@@ -251,7 +251,7 @@ class _EsqueciSenhaPageState extends State<EsqueciSenhaPage> {
                             appSizedBox(height: AppSpacing.small),
                             appText(
                               _subtitulo,
-                              color: AppColors.grey400,
+                              color: DinixColors.textMuted,
                               fontSize: AppFontSizes.verySmall,
                               textAlign: TextAlign.center,
                             ),

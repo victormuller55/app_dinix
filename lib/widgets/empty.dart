@@ -25,7 +25,7 @@ Widget emptyMessage({
           appSizedBox(height: AppSpacing.small),
           appText(
             subtitle,
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             textAlign: TextAlign.center,
           ),
         ],

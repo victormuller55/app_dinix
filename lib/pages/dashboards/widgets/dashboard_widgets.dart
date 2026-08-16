@@ -59,14 +59,14 @@ class MetricRow extends StatelessWidget {
               children: [
                 appText(
                   label,
-                  color: AppColors.grey400,
+                  color: DinixColors.textMuted,
                   fontSize: AppFontSizes.verySmall,
                 ),
                 if (hint != null) ...[
                   appSizedBox(height: 2),
                   appText(
                     hint!,
-                    color: AppColors.grey400,
+                    color: DinixColors.textMuted,
                     fontSize: 11,
                   ),
                 ],

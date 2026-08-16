@@ -111,13 +111,13 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
         children: [
           appText(
             'Atual: ${widget.emailAtual}',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: AppSpacing.small),
           appText(
             'Enviaremos um código para confirmar o novo endereço. Se o e-mail já estiver cadastrado, não será possível usá-lo.',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           _emailForm.formulario,
@@ -155,7 +155,7 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
                 appSizedBox(height: AppSpacing.medium),
                 appText(
                   'O código expira em 3 horas. Você pode pedir um novo a cada 5 minutos. Verifique também a caixa de spam.',
-                  color: AppColors.grey400,
+                  color: DinixColors.textMuted,
                   fontSize: AppFontSizes.verySmall,
                   textAlign: TextAlign.center,
                 ),
@@ -170,7 +170,7 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
                 appSizedBox(height: AppSpacing.normal),
                 appTextButton(
                   text: 'Usar outro e-mail',
-                  color: AppColors.grey400,
+                  color: DinixColors.textMuted,
                   onTap: () {
                     fecharTeclado();
                     setState(() => _aguardandoCodigo = false);

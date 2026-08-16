@@ -72,10 +72,10 @@ class _LocaisPageState extends State<LocaisPage> {
           title: appText(local.nome ?? '', bold: true, color: DinixColors.textPrimary),
           subtitle: appText(
             local.nomeCategoria ?? local.descricao ?? '',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
-          trailing: Icon(Phosphor.caretRight, color: AppColors.grey400),
+          trailing: Icon(Phosphor.caretRight, color: DinixColors.textMuted),
         ),
       ),
     );

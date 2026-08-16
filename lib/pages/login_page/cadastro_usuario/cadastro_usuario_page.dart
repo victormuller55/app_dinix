@@ -95,7 +95,7 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
           appSizedBox(height: AppSpacing.small),
           appText(
             'Informe seus dados para começar a controlar seus gastos.',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: AppSpacing.normal),

@@ -90,7 +90,7 @@ class _LoginPageState extends State<LoginPage> {
           appSizedBox(height: AppSpacing.small),
           appText(
             'Entre com e-mail e senha para continuar.',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: AppSpacing.normal),

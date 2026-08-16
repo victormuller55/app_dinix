@@ -68,11 +68,11 @@ Future<T?> showAppSelectSheet<T>({
                           ? null
                           : appText(
                               subtitle,
-                              color: AppColors.grey400,
+                              color: DinixColors.textMuted,
                               fontSize: AppFontSizes.verySmall,
                             ),
                       trailing: selectedItem
-                          ? const Icon(Phosphor.check, color: DinixColors.primary)
+                          ? Icon(Phosphor.check, color: DinixColors.primary)
                           : null,
                       onTap: () => Navigator.pop(ctx, item),
                     );

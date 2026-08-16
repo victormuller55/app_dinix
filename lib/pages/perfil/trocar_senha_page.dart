@@ -89,7 +89,7 @@ class _TrocarSenhaPageState extends State<TrocarSenhaPage> {
                 children: [
                   appText(
                     'Use no mínimo 8 caracteres. Você continua conectado depois de trocar.',
-                    color: AppColors.grey400,
+                    color: DinixColors.textMuted,
                     fontSize: AppFontSizes.verySmall,
                   ),
                   _atualForm.formulario,

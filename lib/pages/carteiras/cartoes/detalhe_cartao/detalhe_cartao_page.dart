@@ -232,7 +232,7 @@ class _DetalheCartaoPageState extends State<DetalheCartaoPage> {
                       ),
                       appText(
                         _cartao.banco ?? '',
-                        color: AppColors.grey400,
+                        color: DinixColors.textMuted,
                         fontSize: AppFontSizes.verySmall,
                       ),
                     ],
@@ -243,7 +243,7 @@ class _DetalheCartaoPageState extends State<DetalheCartaoPage> {
             appSizedBox(height: AppSpacing.medium),
             appText(
               'Limite sobrando',
-              color: AppColors.grey400,
+              color: DinixColors.textMuted,
               fontSize: AppFontSizes.verySmall,
             ),
             appSizedBox(height: 6),
@@ -256,7 +256,7 @@ class _DetalheCartaoPageState extends State<DetalheCartaoPage> {
             appSizedBox(height: 8),
             appText(
               '${formataMoeda(usado)} / ${formataMoeda(limite)}',
-              color: AppColors.grey400,
+              color: DinixColors.textMuted,
               fontSize: AppFontSizes.verySmall,
             ),
           ],
@@ -292,7 +292,7 @@ class _DetalheCartaoPageState extends State<DetalheCartaoPage> {
                         fatura.rotuloStatus,
                         color: fatura.isAtual
                             ? DinixColors.primary
-                            : AppColors.grey400,
+                            : DinixColors.textMuted,
                         fontSize: AppFontSizes.verySmall,
                       ),
                     ],
@@ -307,7 +307,7 @@ class _DetalheCartaoPageState extends State<DetalheCartaoPage> {
                 if (!fatura.isAtual && !fatura.isPaga) ...[
                   appSizedBox(width: 4),
                   PopupMenuButton<String>(
-                    icon: Icon(Phosphor.dotsThreeVertical, color: AppColors.grey400),
+                    icon: Icon(Phosphor.dotsThreeVertical, color: DinixColors.textMuted),
                     color: DinixColors.surfaceElevated,
                     onSelected: (value) {
                       if (value == 'pagar') _pagarFatura(fatura);

@@ -82,7 +82,7 @@ class _PainelPageState extends State<PainelPage> {
         children: [
           appText(
             'Saldo em contas',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: 8),
@@ -103,7 +103,7 @@ class _PainelPageState extends State<PainelPage> {
         children: [
           appText(
             'Valores investidos',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: 8),
@@ -131,7 +131,7 @@ class _PainelPageState extends State<PainelPage> {
           children: [
             appText(
               titulo,
-              color: AppColors.grey400,
+              color: DinixColors.textMuted,
               fontSize: AppFontSizes.verySmall,
             ),
             appSizedBox(height: 6),
@@ -153,6 +153,9 @@ class _PainelPageState extends State<PainelPage> {
     final disponivel =
         cartao.limiteDisponivel ?? (limite - usado).clamp(0.0, limite);
     final percentual = limite <= 0 ? 0.0 : (usado / limite).clamp(0.0, 1.0);
+    final corBanco = bancoCatalogoDe(cartao.banco, fallback: cartao.nome)
+            ?.corColor ??
+        DinixColors.primary;
 
     return _card(
       padding: const EdgeInsets.all(12),
@@ -190,7 +193,7 @@ class _PainelPageState extends State<PainelPage> {
                     if ((cartao.banco ?? '').isNotEmpty)
                       appText(
                         cartao.banco ?? '',
-                        color: AppColors.grey400,
+                        color: DinixColors.textMuted,
                         fontSize: 11,
                       ),
                   ],
@@ -201,7 +204,7 @@ class _PainelPageState extends State<PainelPage> {
           appSizedBox(height: 10),
           appText(
             'Disponível',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: 11,
           ),
           appSizedBox(height: 2),
@@ -223,14 +226,14 @@ class _PainelPageState extends State<PainelPage> {
             child: LinearProgressIndicator(
               value: percentual,
               minHeight: 5,
-              color: DinixColors.primary,
+              color: corBanco,
               backgroundColor: AppColors.grey800,
             ),
           ),
           appSizedBox(height: 6),
           appText(
             'Limite ${formataMoeda(limite)}',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: 11,
           ),
         ],
@@ -271,7 +274,7 @@ class _PainelPageState extends State<PainelPage> {
         children: [
           appText(
             'Limite sobrando',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: 8),
@@ -284,13 +287,13 @@ class _PainelPageState extends State<PainelPage> {
           appSizedBox(height: 8),
           appText(
             '${formataMoeda(usado)} / ${formataMoeda(total)}',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: 2),
           appText(
             '$percentualTexto% do limite total usado',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: 11,
           ),
         ],
@@ -455,7 +458,7 @@ class _PainelPageState extends State<PainelPage> {
                         ),
                         appText(
                           '${_rotuloTipoPagamento(item.tipo)} · ${isoParaBr(item.dataVencimento)}',
-                          color: AppColors.grey400,
+                          color: DinixColors.textMuted,
                           fontSize: AppFontSizes.verySmall,
                         ),
                       ],
@@ -525,7 +528,7 @@ class _PainelPageState extends State<PainelPage> {
             padding: const EdgeInsets.only(top: 24),
             child: appText(
               'Cadastre contas, ganhos e compras para ver seu resumo completo.',
-              color: AppColors.grey400,
+              color: DinixColors.textMuted,
               fontSize: AppFontSizes.verySmall,
               textAlign: TextAlign.center,
             ),

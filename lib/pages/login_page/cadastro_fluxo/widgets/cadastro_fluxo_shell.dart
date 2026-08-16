@@ -41,7 +41,7 @@ class CadastroFluxoShell extends StatelessWidget {
               ? null
               : IconButton(
                   onPressed: onVoltar,
-                  icon: const Icon(Phosphor.arrowLeft, color: DinixColors.textPrimary),
+                  icon: Icon(Phosphor.arrowLeft, color: DinixColors.textPrimary),
                 ),
           title: appText(
             'Cadastro',
@@ -82,7 +82,7 @@ class CadastroFluxoShell extends StatelessWidget {
                       appSizedBox(height: AppSpacing.small),
                       appText(
                         passo.subtitulo,
-                        color: AppColors.grey400,
+                        color: DinixColors.textMuted,
                         fontSize: AppFontSizes.verySmall,
                       ),
                       appSizedBox(height: AppSpacing.big),
@@ -99,7 +99,7 @@ class CadastroFluxoShell extends StatelessWidget {
                     if (onPular != null) ...[
                       appTextButton(
                         text: 'Pular por agora',
-                        color: AppColors.grey400,
+                        color: DinixColors.textMuted,
                         onTap: () => onPular!(),
                       ),
                       appSizedBox(height: AppSpacing.small),

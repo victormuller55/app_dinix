@@ -42,7 +42,7 @@ class PassoCartoesConteudo extends StatelessWidget {
     if (bancosDisponiveis.isEmpty) {
       return appText(
         'Cadastre ao menos uma conta no passo anterior para adicionar cartões.',
-        color: AppColors.grey400,
+        color: DinixColors.textMuted,
         textAlign: TextAlign.center,
       );
     }
@@ -82,7 +82,7 @@ class PassoCartoesConteudo extends StatelessWidget {
                   ),
                   subtitle: appText(
                     ativo ? 'Preencha os dados abaixo' : 'Toque para incluir',
-                    color: AppColors.grey400,
+                    color: DinixColors.textMuted,
                     fontSize: AppFontSizes.verySmall,
                   ),
                   onChanged: (_) => onToggle(banco),
@@ -146,7 +146,7 @@ class _CartaoCamposState extends State<_CartaoCampos> {
   InputDecoration _decoration(String hint) {
     return InputDecoration(
       hintText: hint,
-      hintStyle: TextStyle(color: AppColors.grey400),
+      hintStyle: TextStyle(color: DinixColors.textMuted),
       filled: true,
       fillColor: DinixColors.background,
       border: OutlineInputBorder(
@@ -159,7 +159,7 @@ class _CartaoCamposState extends State<_CartaoCampos> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(AppRadius.input),
-        borderSide: const BorderSide(
+        borderSide: BorderSide(
           color: DinixColors.primary,
           width: AppBorder.active,
         ),
@@ -177,7 +177,7 @@ class _CartaoCamposState extends State<_CartaoCampos> {
         children: [
           appText(
             'Limite',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: 6),
@@ -185,7 +185,7 @@ class _CartaoCamposState extends State<_CartaoCampos> {
             controller: _limiteController,
             keyboardType: TextInputType.number,
             inputFormatters: [AppFormFormatters.valor],
-            style: const TextStyle(color: DinixColors.textPrimary),
+            style: TextStyle(color: DinixColors.textPrimary),
             decoration: _decoration('0,00').copyWith(prefixText: 'R\$ '),
             onChanged: (v) => widget.onChanged(
               widget.cartao,
@@ -202,7 +202,7 @@ class _CartaoCamposState extends State<_CartaoCampos> {
                   children: [
                     appText(
                       'Fechamento',
-                      color: AppColors.grey400,
+                      color: DinixColors.textMuted,
                       fontSize: AppFontSizes.verySmall,
                     ),
                     appSizedBox(height: 6),
@@ -213,7 +213,7 @@ class _CartaoCamposState extends State<_CartaoCampos> {
                         FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(2),
                       ],
-                      style: const TextStyle(color: DinixColors.textPrimary),
+                      style: TextStyle(color: DinixColors.textPrimary),
                       decoration: _decoration('Ex: 10'),
                       onChanged: (v) => widget.onChanged(
                         widget.cartao,
@@ -231,7 +231,7 @@ class _CartaoCamposState extends State<_CartaoCampos> {
                   children: [
                     appText(
                       'Vencimento',
-                      color: AppColors.grey400,
+                      color: DinixColors.textMuted,
                       fontSize: AppFontSizes.verySmall,
                     ),
                     appSizedBox(height: 6),
@@ -242,7 +242,7 @@ class _CartaoCamposState extends State<_CartaoCampos> {
                         FilteringTextInputFormatter.digitsOnly,
                         LengthLimitingTextInputFormatter(2),
                       ],
-                      style: const TextStyle(color: DinixColors.textPrimary),
+                      style: TextStyle(color: DinixColors.textPrimary),
                       decoration: _decoration('Ex: 17'),
                       onChanged: (v) => widget.onChanged(
                         widget.cartao,

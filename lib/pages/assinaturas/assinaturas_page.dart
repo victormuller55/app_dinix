@@ -143,7 +143,7 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
           children: [
             appText(
               qtd == 1 ? '1 assinatura ativa' : '$qtd assinaturas ativas',
-              color: AppColors.grey400,
+              color: DinixColors.textMuted,
               fontSize: AppFontSizes.verySmall,
             ),
             appSizedBox(height: AppSpacing.small),
@@ -155,7 +155,7 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
             ),
             appText(
               'Total mensal',
-              color: AppColors.grey400,
+              color: DinixColors.textMuted,
               fontSize: AppFontSizes.verySmall,
             ),
             if (tipos.isNotEmpty) ...[
@@ -231,7 +231,7 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
             item.dataProximaCobranca != null
                 ? 'Próxima: ${isoParaBr(item.dataProximaCobranca)}'
                 : 'Dia ${item.diaCobranca ?? '-'}',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           trailing: appText(

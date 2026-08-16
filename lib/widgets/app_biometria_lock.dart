@@ -27,7 +27,7 @@ Widget appBiometriaLockScreen({
                 appSizedBox(height: AppSpacing.big),
                 appText(
                   mensagem,
-                  color: AppColors.grey400,
+                  color: DinixColors.textMuted,
                   fontSize: AppFontSizes.verySmall,
                   textAlign: TextAlign.center,
                 ),
@@ -48,7 +48,7 @@ Widget appBiometriaLockScreen({
                     onPressed: onUsarSenha,
                     child: appText(
                       'Entrar com senha',
-                      color: AppColors.grey400,
+                      color: DinixColors.textMuted,
                     ),
                   ),
               ],

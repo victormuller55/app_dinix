@@ -1,6 +1,7 @@
 import 'package:app_dinix/app_config/app_auth.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/app_config/const/app_endpoints.dart';
+import 'package:app_dinix/app_config/theme/dinix_theme_scope.dart';
 import 'package:app_dinix/models/usuario_model.dart';
 import 'package:app_dinix/pages/assinaturas/assinaturas_page.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cartoes_page.dart';
@@ -201,12 +202,12 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
 
   Widget _avatarFallback(String iniciais) {
     return ColoredBox(
-      color: const Color(0xFF2A2A2E),
+      color: DinixColors.primary,
       child: Center(
         child: appText(
           iniciais,
           bold: true,
-          color: DinixColors.textPrimary,
+          color: DinixColors.onPrimary,
           fontSize: AppFontSizes.normal,
         ),
       ),
@@ -264,7 +265,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
               const Spacer(),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(Phosphor.x, color: AppColors.grey400, size: 22),
+                icon: Icon(Phosphor.x, color: DinixColors.textMuted, size: 22),
                 tooltip: 'Fechar',
               ),
             ],
@@ -291,7 +292,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
                       appSizedBox(height: 4),
                       appText(
                         email,
-                        color: AppColors.grey400,
+                        color: DinixColors.textMuted,
                         fontSize: AppFontSizes.verySmall,
                         maxLines: 1,
                         overflow: true,
@@ -362,7 +363,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
               ),
               Icon(
                 Phosphor.caretRight,
-                color: AppColors.grey400,
+                color: DinixColors.textMuted,
                 size: 16,
               ),
             ],
@@ -401,7 +402,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
                     duration: const Duration(milliseconds: 180),
                     child: Icon(
                       Phosphor.caretRight,
-                      color: AppColors.grey400,
+                      color: DinixColors.textMuted,
                       size: 16,
                     ),
                   ),
@@ -476,6 +477,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
 
   @override
   Widget build(BuildContext context) {
+    DinixThemeScope.depend(context);
     return Drawer(
       backgroundColor: DinixColors.background,
       elevation: 24,
@@ -513,7 +515,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
                 child: appText(
                   'Menu',
-                  color: AppColors.grey400,
+                  color: DinixColors.textMuted,
                   fontSize: AppFontSizes.verySmall,
                 ),
               ),

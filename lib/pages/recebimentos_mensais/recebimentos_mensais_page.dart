@@ -85,7 +85,7 @@ class _RecebimentosMensaisPageState extends State<RecebimentosMensaisPage> {
               color: DinixColors.primary.withValues(alpha: 0.16),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
+            child: Icon(
               Phosphor.trendUp,
               color: DinixColors.primary,
               size: 22,
@@ -99,7 +99,7 @@ class _RecebimentosMensaisPageState extends State<RecebimentosMensaisPage> {
           ),
           subtitle: appText(
             detalhes,
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           trailing: appText(

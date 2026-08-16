@@ -66,6 +66,9 @@ class _CartoesPageState extends State<CartoesPage> {
     final limite = cartao.limite ?? 0;
     final usado = cartao.limiteUsado ?? 0;
     final percentual = limite <= 0 ? 0.0 : (usado / limite).clamp(0.0, 1.0);
+    final corBanco = bancoCatalogoDe(cartao.banco, fallback: cartao.nome)
+            ?.corColor ??
+        DinixColors.primary;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -99,7 +102,7 @@ class _CartoesPageState extends State<CartoesPage> {
                           ),
                           appText(
                             cartao.banco ?? '',
-                            color: AppColors.grey400,
+                            color: DinixColors.textMuted,
                             fontSize: AppFontSizes.verySmall,
                           ),
                         ],
@@ -113,14 +116,14 @@ class _CartoesPageState extends State<CartoesPage> {
                   child: LinearProgressIndicator(
                     value: percentual,
                     minHeight: 6,
-                    color: DinixColors.primary,
+                    color: corBanco,
                     backgroundColor: AppColors.grey800,
                   ),
                 ),
                 appSizedBox(height: AppSpacing.small),
                 appText(
                   '${formataMoeda(usado)} de ${formataMoeda(limite)}',
-                  color: AppColors.grey400,
+                  color: DinixColors.textMuted,
                   fontSize: AppFontSizes.verySmall,
                 ),
               ],

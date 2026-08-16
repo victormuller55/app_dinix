@@ -1,19 +1,31 @@
+import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/app_config/theme/dinix_palette.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:muller_package/muller_package.dart' hide AppRadius, AppFontSizes, AppSpacing;
-import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:muller_package/muller_package.dart'
+    hide AppRadius, AppFontSizes, AppSpacing;
 
-const SystemUiOverlayStyle kAppSystemUiOverlay = SystemUiOverlayStyle(
-  statusBarColor: DinixColors.primaryDark,
-  statusBarIconBrightness: Brightness.light,
-  statusBarBrightness: Brightness.dark,
-  systemStatusBarContrastEnforced: false,
-  systemNavigationBarColor: DinixColors.primaryDark,
-  systemNavigationBarIconBrightness: Brightness.light,
-  systemNavigationBarDividerColor: DinixColors.primaryDark,
-  systemNavigationBarContrastEnforced: false,
-);
+SystemUiOverlayStyle systemUiOverlayFor(Brightness brightness) {
+  final palette =
+      brightness == Brightness.dark ? DinixPalette.dark : DinixPalette.light;
+  final dark = brightness == Brightness.dark;
+  return SystemUiOverlayStyle(
+    statusBarColor: palette.primaryDark,
+    statusBarIconBrightness: dark ? Brightness.light : Brightness.dark,
+    statusBarBrightness: dark ? Brightness.dark : Brightness.light,
+    systemStatusBarContrastEnforced: false,
+    systemNavigationBarColor: palette.primaryDark,
+    systemNavigationBarIconBrightness:
+        dark ? Brightness.light : Brightness.dark,
+    systemNavigationBarDividerColor: palette.primaryDark,
+    systemNavigationBarContrastEnforced: false,
+  );
+}
+
+/// Overlay inicial (antes do tema carregar). Preferência padrão = escuro.
+final SystemUiOverlayStyle kAppSystemUiOverlay =
+    systemUiOverlayFor(Brightness.dark);
 
 TextTheme _buildTextTheme({required Color color}) {
   return Typography.material2021(platform: TargetPlatform.android)
@@ -25,49 +37,55 @@ TextTheme _buildTextTheme({required Color color}) {
       );
 }
 
-ThemeData buildAppTheme({required bool isIOS}) {
-  const offWhite = Color(0xFFF5F5F5);
-  const surface = Color(0xFF121212);
-  final textTheme = _buildTextTheme(color: offWhite);
+ThemeData buildAppTheme({
+  required bool isIOS,
+  required Brightness brightness,
+}) {
+  final dark = brightness == Brightness.dark;
+  final palette = dark ? DinixPalette.dark : DinixPalette.light;
+
+  final textColor = palette.textPrimary;
+  final textTheme = _buildTextTheme(color: textColor);
+  final overlay = systemUiOverlayFor(brightness);
 
   final colorScheme = ColorScheme.fromSeed(
-    seedColor: DinixColors.primary,
-    primary: DinixColors.primary,
-    secondary: DinixColors.secondary,
-    brightness: Brightness.dark,
-    surface: surface,
+    seedColor: palette.primary,
+    primary: palette.primary,
+    secondary: palette.secondary,
+    brightness: brightness,
+    surface: palette.surface,
   );
 
   final base = ThemeData(
     useMaterial3: true,
-    brightness: Brightness.dark,
+    brightness: brightness,
     fontFamily: AppFonts.family,
     colorScheme: colorScheme,
-    primaryColor: DinixColors.primary,
-    scaffoldBackgroundColor: DinixColors.background,
+    primaryColor: palette.primary,
+    scaffoldBackgroundColor: palette.background,
     textTheme: textTheme,
     primaryTextTheme: textTheme,
     appBarTheme: AppBarTheme(
-      backgroundColor: DinixColors.primaryDark,
-      foregroundColor: offWhite,
+      backgroundColor: palette.primaryDark,
+      foregroundColor: textColor,
       elevation: 0,
       centerTitle: true,
-      systemOverlayStyle: kAppSystemUiOverlay,
+      systemOverlayStyle: overlay,
       titleTextStyle: textTheme.titleLarge?.copyWith(
         fontFamily: AppFonts.family,
-        color: offWhite,
+        color: textColor,
         fontWeight: FontWeight.w600,
       ),
       toolbarTextStyle: textTheme.bodyMedium?.copyWith(
         fontFamily: AppFonts.family,
-        color: offWhite,
+        color: textColor,
       ),
     ),
-    dividerColor: const Color(0xFF2C2C2C),
+    dividerColor: dark ? const Color(0xFF2C2C2C) : const Color(0xFFE0E0E0),
     inputDecorationTheme: InputDecorationTheme(
       hintStyle: TextStyle(
         fontFamily: AppFonts.family,
-        color: AppColors.grey400,
+        color: palette.textMuted,
         fontSize: 13,
         letterSpacing: 1,
       ),
@@ -84,22 +102,24 @@ ThemeData buildAppTheme({required bool isIOS}) {
     snackBarTheme: SnackBarThemeData(
       contentTextStyle: textTheme.bodyMedium?.copyWith(
         fontFamily: AppFonts.family,
-        color: offWhite,
+        color: textColor,
       ),
     ),
-    progressIndicatorTheme: const ProgressIndicatorThemeData(
-      color: Colors.white,
-      circularTrackColor: Color(0x33FFFFFF),
-      refreshBackgroundColor: Colors.black,
+    progressIndicatorTheme: ProgressIndicatorThemeData(
+      color: dark ? Colors.white : palette.primary,
+      circularTrackColor:
+          dark ? const Color(0x33FFFFFF) : const Color(0x330D47A1),
+      refreshBackgroundColor: palette.surfaceElevated,
     ),
     dialogTheme: DialogThemeData(
+      backgroundColor: palette.surfaceElevated,
       titleTextStyle: textTheme.titleLarge?.copyWith(
         fontFamily: AppFonts.family,
-        color: offWhite,
+        color: textColor,
       ),
       contentTextStyle: textTheme.bodyMedium?.copyWith(
         fontFamily: AppFonts.family,
-        color: offWhite,
+        color: textColor,
       ),
     ),
   );
@@ -112,35 +132,35 @@ ThemeData buildAppTheme({required bool isIOS}) {
     highlightColor: Colors.transparent,
     hoverColor: Colors.transparent,
     cupertinoOverrideTheme: CupertinoThemeData(
-      brightness: Brightness.dark,
-      primaryColor: DinixColors.primary,
+      brightness: brightness,
+      primaryColor: palette.primary,
       applyThemeToAll: true,
       textTheme: CupertinoTextThemeData(
-        primaryColor: offWhite,
+        primaryColor: textColor,
         textStyle: TextStyle(
           fontFamily: AppFonts.family,
-          color: offWhite,
+          color: textColor,
         ),
         actionTextStyle: TextStyle(
           fontFamily: AppFonts.family,
-          color: DinixColors.primary,
+          color: palette.primary,
           fontWeight: FontWeight.w600,
         ),
         navTitleTextStyle: TextStyle(
           fontFamily: AppFonts.family,
-          color: offWhite,
+          color: textColor,
           fontWeight: FontWeight.w600,
           fontSize: 17,
         ),
         navLargeTitleTextStyle: TextStyle(
           fontFamily: AppFonts.family,
-          color: offWhite,
+          color: textColor,
           fontWeight: FontWeight.bold,
           fontSize: 34,
         ),
         tabLabelTextStyle: TextStyle(
           fontFamily: AppFonts.family,
-          color: offWhite,
+          color: textColor,
           fontSize: 10,
         ),
       ),
@@ -154,29 +174,29 @@ ThemeData buildAppTheme({required bool isIOS}) {
     ),
     dialogTheme: DialogThemeData(
       elevation: 0,
-      backgroundColor: DinixColors.surfaceElevated,
+      backgroundColor: palette.surfaceElevated,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       titleTextStyle: textTheme.titleLarge?.copyWith(
         fontFamily: AppFonts.family,
-        color: offWhite,
+        color: textColor,
       ),
       contentTextStyle: textTheme.bodyMedium?.copyWith(
         fontFamily: AppFonts.family,
-        color: offWhite,
+        color: textColor,
       ),
     ),
     switchTheme: SwitchThemeData(
       trackOutlineColor: const WidgetStatePropertyAll(Colors.transparent),
       trackColor: WidgetStateProperty.resolveWith((states) {
-        if (states.contains(WidgetState.selected)) return DinixColors.primary;
+        if (states.contains(WidgetState.selected)) return palette.primary;
         return null;
       }),
     ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         elevation: 0,
-        backgroundColor: DinixColors.secondary,
-        foregroundColor: Colors.black,
+        backgroundColor: palette.secondary,
+        foregroundColor: palette.onPrimary,
         minimumSize: const Size.fromHeight(50),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         textStyle: const TextStyle(
@@ -189,15 +209,15 @@ ThemeData buildAppTheme({required bool isIOS}) {
     ),
     listTileTheme: ListTileThemeData(
       contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-      iconColor: DinixColors.primary,
-      textColor: offWhite,
+      iconColor: palette.primary,
+      textColor: textColor,
       titleTextStyle: textTheme.titleMedium?.copyWith(
         fontFamily: AppFonts.family,
-        color: offWhite,
+        color: textColor,
       ),
       subtitleTextStyle: textTheme.bodySmall?.copyWith(
         fontFamily: AppFonts.family,
-        color: AppColors.grey400,
+        color: palette.textMuted,
       ),
     ),
   );

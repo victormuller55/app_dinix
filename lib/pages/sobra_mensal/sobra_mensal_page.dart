@@ -87,7 +87,7 @@ class _SobraMensalPageState extends State<SobraMensalPage> {
         children: [
           appText(
             'Média dos próximos ${resumo.meses.length} meses',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: 8),
@@ -134,7 +134,7 @@ class _SobraMensalPageState extends State<SobraMensalPage> {
         children: [
           appText(
             titulo,
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: 4),
@@ -220,7 +220,7 @@ class _SobraMensalPageState extends State<SobraMensalPage> {
           Expanded(
             child: appText(
               titulo,
-              color: AppColors.grey400,
+              color: DinixColors.textMuted,
               fontSize: AppFontSizes.verySmall,
             ),
           ),
@@ -244,7 +244,7 @@ class _SobraMensalPageState extends State<SobraMensalPage> {
         children: [
           appText(
             'Recebimentos mensais − gastos em conta − assinaturas em conta − faturas de cartão.',
-            color: AppColors.grey400,
+            color: DinixColors.textMuted,
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: 14),

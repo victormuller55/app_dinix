@@ -36,7 +36,7 @@ AppFormField criarCampoDinix({
     icon: Icon(icon, size: 22),
     iconColor: DinixColors.primary,
     inputColor: DinixColors.textPrimary,
-    hintColor: AppColors.grey400,
+    hintColor: DinixColors.textMuted,
     backgroundColor: DinixColors.surfaceElevated,
     borderColor: AppColors.grey800,
     hoverBorderColor: DinixColors.primary,
@@ -175,7 +175,7 @@ class _CampoPrefixoWidgetState extends State<CampoPrefixoDinix> {
             hintStyle: TextStyle(
               fontFamily: AppFonts.family,
               fontSize: 13,
-              color: AppColors.grey400,
+              color: DinixColors.textMuted,
               letterSpacing: 1,
             ),
             errorStyle: TextStyle(

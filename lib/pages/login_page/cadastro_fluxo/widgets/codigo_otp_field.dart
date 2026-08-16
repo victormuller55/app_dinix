@@ -160,7 +160,7 @@ class _CodigoOtpFieldState extends State<CodigoOtpField> {
                 textInputAction: index == _tamanho - 1
                     ? TextInputAction.done
                     : TextInputAction.next,
-                style: const TextStyle(
+                style: TextStyle(
                   fontFamily: AppFonts.family,
                   color: DinixColors.textPrimary,
                   fontSize: 22,

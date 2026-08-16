@@ -86,7 +86,7 @@ class _DashboardsPageState extends State<DashboardsPage> {
   }
 
   Color _corVariacao(double percentual, {required bool receita}) {
-    if (percentual == 0) return AppColors.grey400;
+    if (percentual == 0) return DinixColors.textMuted;
     if (receita) return percentual > 0 ? _corReceita : _corDespesa;
     return percentual > 0 ? _corDespesa : _corReceita;
   }
@@ -124,7 +124,7 @@ class _DashboardsPageState extends State<DashboardsPage> {
             children: [
               appText(
                 _nomeMes(painel.mes, painel.ano),
-                color: AppColors.grey400,
+                color: DinixColors.textMuted,
                 fontSize: AppFontSizes.verySmall,
               ),
               appSizedBox(height: 12),
@@ -207,7 +207,7 @@ class _DashboardsPageState extends State<DashboardsPage> {
                   padding: const EdgeInsets.only(top: 4),
                   child: appText(
                     'Nenhum cartão cadastrado.',
-                    color: AppColors.grey400,
+                    color: DinixColors.textMuted,
                     fontSize: AppFontSizes.verySmall,
                   ),
                 ),
@@ -313,7 +313,7 @@ class _DashboardsPageState extends State<DashboardsPage> {
                         ),
                         appText(
                           '$pct%',
-                          color: AppColors.grey400,
+                          color: DinixColors.textMuted,
                           fontSize: 11,
                         ),
                         appSizedBox(width: 10),
@@ -383,7 +383,7 @@ class _DashboardsPageState extends State<DashboardsPage> {
                               if ((item.data ?? '').isNotEmpty)
                                 appText(
                                   isoParaBr(item.data),
-                                  color: AppColors.grey400,
+                                  color: DinixColors.textMuted,
                                   fontSize: 11,
                                 ),
                             ],

@@ -80,7 +80,7 @@ class _CarteirasPageState extends State<CarteirasPage> {
             children: [
               appText(
                 'Total em contas',
-                color: AppColors.grey400,
+                color: DinixColors.textMuted,
                 fontSize: AppFontSizes.verySmall,
               ),
               appSizedBox(height: 6),
@@ -141,7 +141,7 @@ class _CarteirasPageState extends State<CarteirasPage> {
                       ),
                       appText(
                         TipoConta.rotulo(conta.tipoConta),
-                        color: AppColors.grey400,
+                        color: DinixColors.textMuted,
                         fontSize: AppFontSizes.verySmall,
                       ),
                     ],
@@ -228,7 +228,7 @@ class _CarteirasPageState extends State<CarteirasPage> {
       actions: [
         IconButton(
           onPressed: _abrirCartoes,
-          icon: const Icon(Phosphor.creditCard, color: DinixColors.primary),
+          icon: Icon(Phosphor.creditCard, color: DinixColors.primary),
           tooltip: 'Cartões',
         ),
       ],
