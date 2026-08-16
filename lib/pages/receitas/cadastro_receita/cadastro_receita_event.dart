@@ -8,7 +8,13 @@ class CadastroReceitaLoadEvent extends CadastroReceitaEvent {}
 
 class CadastroReceitaSaveEvent extends CadastroReceitaEvent {
   final ReceitaModel receita;
-  CadastroReceitaSaveEvent({required this.receita});
+  /// Se false, grava como recebimento mensal do próximo mês (confirma no dia 1).
+  final bool creditarAgora;
+
+  CadastroReceitaSaveEvent({
+    required this.receita,
+    this.creditarAgora = true,
+  });
 }
 
 class CadastroReceitaDeleteEvent extends CadastroReceitaEvent {

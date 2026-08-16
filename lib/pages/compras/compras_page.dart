@@ -10,6 +10,7 @@ import 'package:app_dinix/models/compra_model.dart';
 import 'package:app_dinix/models/conta_model.dart';
 import 'package:app_dinix/models/assinatura_model.dart';
 import 'package:app_dinix/models/gasto_mensal_model.dart';
+import 'package:app_dinix/models/recebimento_mensal_model.dart';
 import 'package:app_dinix/pages/assinaturas/assinaturas_service.dart';
 import 'package:app_dinix/pages/compras/cadastro_compra/cadastro_compra_page.dart';
 import 'package:app_dinix/pages/compras/compras_bloc.dart';
@@ -17,6 +18,7 @@ import 'package:app_dinix/pages/compras/compras_event.dart';
 import 'package:app_dinix/pages/compras/compras_state.dart';
 import 'package:app_dinix/pages/gastos_mensais/gastos_mensais_page.dart';
 import 'package:app_dinix/pages/gastos_mensais/gastos_mensais_service.dart';
+import 'package:app_dinix/pages/recebimentos_mensais/recebimentos_mensais_service.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
@@ -210,6 +212,63 @@ class _ComprasPageState extends State<ComprasPage> {
     );
   }
 
+  Future<void> _receberRecebimentoMensal(
+    RecebimentoMensalModel item,
+    ComprasSuccessState state,
+  ) async {
+    final id = item.id;
+    if (id == null) return;
+
+    String? idConta = item.idConta;
+    if (idConta == null || idConta.isEmpty) {
+      final contas = state.contasPorId.values.toList();
+      if (contas.isEmpty) {
+        showToastWarning(message: 'Cadastre uma conta antes.');
+        return;
+      }
+      final selecionada = await showAppSelectSheet<ContaModel>(
+        context: context,
+        title: 'Conta de destino',
+        items: contas,
+        labelOf: (c) => c.nome ?? 'Conta',
+        subtitleOf: (c) => c.nomeBanco,
+        selected: null,
+        leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
+      );
+      if (selecionada == null) return;
+      idConta = selecionada.id;
+    }
+    if (idConta == null || idConta.isEmpty) return;
+    if (!mounted) return;
+
+    final ok = await showAppConfirmDialog(
+      context,
+      title: 'Confirmar recebimento',
+      message:
+          'Marcar "${item.nome ?? ''}" (${formataMoeda(item.valor)}) como recebido?',
+      confirmLabel: 'Recebido',
+      icon: Phosphor.trendUp,
+    );
+    if (ok != true || !mounted) return;
+
+    try {
+      final data = state.filtro.dataSelecionada;
+      final dataIso =
+          '${data.year}-${data.month.toString().padLeft(2, '0')}-${data.day.toString().padLeft(2, '0')}';
+      await confirmarRecebimentoMensal(
+        id: id,
+        idConta: idConta,
+        dataIso: dataIso,
+      );
+      if (!mounted) return;
+      showToastSuccess(message: 'Recebimento confirmado');
+      bloc.add(ComprasLoadEvent(forceRefresh: true));
+    } catch (e) {
+      if (!mounted) return;
+      showAppErrorSnackbar(errorModelFromException(e));
+    }
+  }
+
   void _irDia(FiltroCompras atual, int delta) {
     setState(() => _direcaoDia = delta);
     final alvo = atual.dataSelecionada.add(Duration(days: delta));
@@ -347,6 +406,8 @@ class _ComprasPageState extends State<ComprasPage> {
     required String subtitulo,
     required IconData icone,
     required VoidCallback onPagar,
+    String botaoLabel = 'Pago',
+    Color valorCor = const Color(0xFFEF5350),
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
@@ -386,7 +447,7 @@ class _ComprasPageState extends State<ComprasPage> {
                     appText(
                       formataMoeda(valor),
                       bold: true,
-                      color: const Color(0xFFEF5350),
+                      color: valorCor,
                       fontSize: AppFontSizes.small,
                     ),
                   ],
@@ -398,7 +459,7 @@ class _ComprasPageState extends State<ComprasPage> {
                   foregroundColor: DinixColors.primary,
                 ),
                 child: appText(
-                  'Pago',
+                  botaoLabel,
                   bold: true,
                   color: DinixColors.primary,
                   fontSize: AppFontSizes.small,
@@ -462,6 +523,19 @@ class _ComprasPageState extends State<ComprasPage> {
 
   List<Widget> _linhas(ComprasSuccessState state) {
     final widgets = <Widget>[_filtro(state.filtro)];
+    for (final pendente in state.pendentesRecebimentos) {
+      widgets.add(
+        _itemPendente(
+          nome: pendente.nome ?? '',
+          valor: pendente.valor,
+          subtitulo: 'Recebimento mensal · pendente',
+          icone: Phosphor.trendUp,
+          botaoLabel: 'Recebido',
+          valorCor: const Color(0xFF4CAF50),
+          onPagar: () => _receberRecebimentoMensal(pendente, state),
+        ),
+      );
+    }
     for (final pendente in state.pendentesAssinaturas) {
       widgets.add(
         _itemPendente(
@@ -550,7 +624,8 @@ class _ComprasPageState extends State<ComprasPage> {
             }
             final vazio = state.compras.isEmpty &&
                 state.pendentesMensais.isEmpty &&
-                state.pendentesAssinaturas.isEmpty;
+                state.pendentesAssinaturas.isEmpty &&
+                state.pendentesRecebimentos.isEmpty;
             if (vazio) {
               return Column(
                 children: [

@@ -46,6 +46,8 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
   String? _idConta;
   late DateTime _dataRecebimento;
   bool _recorrente = false;
+  /// Marcado = credita na conta agora. Desmarcado = agenda para o próximo mês.
+  bool _creditarAgora = true;
 
   @override
   void initState() {
@@ -170,6 +172,7 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
           observacoes:
               _obsForm.value.trim().isEmpty ? null : _obsForm.value.trim(),
         ),
+        creditarAgora: _isEdit || _creditarAgora,
       ),
     );
   }
@@ -194,7 +197,11 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
     }
     if (state is CadastroReceitaSuccessState) {
       showToastSuccess(
-        message: _isEdit ? 'Ganho atualizado' : 'Ganho cadastrado',
+        message: _isEdit
+            ? 'Ganho atualizado'
+            : state.creditarAgora
+                ? 'Ganho cadastrado'
+                : 'Ganho agendado para o próximo mês',
       );
       Navigator.of(context).pop(true);
     }
@@ -275,12 +282,24 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
                     onTap: _escolherConta,
                   ),
                 ),
-                cadastroSwitch(
-                  titulo: 'Recebimento recorrente',
-                  subtitulo: 'Aparece na previsão mensal',
-                  value: _recorrente,
-                  onChanged: (v) => setState(() => _recorrente = v),
-                ),
+                if (!_isEdit)
+                  cadastroSwitch(
+                    titulo: 'Adicionar ao saldo agora',
+                    subtitulo: _creditarAgora
+                        ? 'O valor entra na conta imediatamente'
+                        : 'Salva para o próximo mês e aparece no dia 1 para confirmar',
+                    value: _creditarAgora,
+                    onChanged: (v) => setState(() => _creditarAgora = v),
+                  ),
+                if (!_isEdit || _creditarAgora)
+                  cadastroSwitch(
+                    titulo: 'Recebimento recorrente',
+                    subtitulo: _creditarAgora
+                        ? 'Aparece na previsão mensal'
+                        : 'Mantém nos meses seguintes após o primeiro',
+                    value: _recorrente,
+                    onChanged: (v) => setState(() => _recorrente = v),
+                  ),
                 cadastroSecao('Observações', _obsForm.formulario),
                 appSizedBox(height: AppSpacing.medium),
                 appElevatedButtonDinix(

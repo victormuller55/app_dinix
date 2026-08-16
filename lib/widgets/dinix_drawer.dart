@@ -4,12 +4,15 @@ import 'package:app_dinix/app_config/const/app_endpoints.dart';
 import 'package:app_dinix/models/usuario_model.dart';
 import 'package:app_dinix/pages/assinaturas/assinaturas_page.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cartoes_page.dart';
+import 'package:app_dinix/pages/dashboards/dashboards_page.dart';
 import 'package:app_dinix/pages/extrato/extrato_page.dart';
 import 'package:app_dinix/pages/gastos_mensais/gastos_mensais_page.dart';
 import 'package:app_dinix/pages/home_shell.dart';
 import 'package:app_dinix/pages/locais/locais_page.dart';
 import 'package:app_dinix/pages/login_page/entrar_page.dart';
 import 'package:app_dinix/pages/perfil/perfil_service.dart';
+import 'package:app_dinix/pages/recebimentos_mensais/recebimentos_mensais_page.dart';
+import 'package:app_dinix/pages/sobra_mensal/sobra_mensal_page.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_logo.dart';
 import 'package:flutter/cupertino.dart';
@@ -31,6 +34,18 @@ class _DrawerItem {
   });
 }
 
+class _DrawerGroup {
+  final String title;
+  final IconData icon;
+  final List<_DrawerItem> itens;
+
+  const _DrawerGroup({
+    required this.title,
+    required this.icon,
+    required this.itens,
+  });
+}
+
 class DinixAppDrawer extends StatefulWidget {
   const DinixAppDrawer({super.key});
 
@@ -40,37 +55,72 @@ class DinixAppDrawer extends StatefulWidget {
 
 class _DinixAppDrawerState extends State<DinixAppDrawer> {
   UsuarioModel? _usuario;
+  final Set<String> _gruposAbertos = {};
 
-  static const _itens = <_DrawerItem>[
-    _DrawerItem(
-      title: 'Início',
-      icon: Phosphor.house,
-      inicio: true,
+  static const _inicio = _DrawerItem(
+    title: 'Início',
+    icon: Phosphor.house,
+    inicio: true,
+  );
+
+  static const _grupos = <_DrawerGroup>[
+    _DrawerGroup(
+      title: 'Análises',
+      icon: Phosphor.chartPie,
+      itens: [
+        _DrawerItem(
+          title: 'Dashboards',
+          icon: Phosphor.chartBar,
+          page: DashboardsPage(),
+        ),
+        _DrawerItem(
+          title: 'Extrato',
+          icon: Phosphor.listBullets,
+          page: ExtratoPage(),
+        ),
+        _DrawerItem(
+          title: 'Simulação próximos meses',
+          icon: Phosphor.chartLineUp,
+          page: SobraMensalPage(),
+        ),
+      ],
     ),
-    _DrawerItem(
-      title: 'Extrato',
-      icon: Phosphor.listBullets,
-      page: ExtratoPage(),
+    _DrawerGroup(
+      title: 'Recorrências',
+      icon: Phosphor.arrowsClockwise,
+      itens: [
+        _DrawerItem(
+          title: 'Recebimentos mensais',
+          icon: Phosphor.trendUp,
+          page: RecebimentosMensaisPage(),
+        ),
+        _DrawerItem(
+          title: 'Gastos mensais',
+          icon: Phosphor.calendarBlank,
+          page: GastosMensaisPage(),
+        ),
+        _DrawerItem(
+          title: 'Assinaturas',
+          icon: Phosphor.stack,
+          page: AssinaturasPage(),
+        ),
+      ],
     ),
-    _DrawerItem(
-      title: 'Assinaturas',
-      icon: Phosphor.stack,
-      page: AssinaturasPage(),
-    ),
-    _DrawerItem(
-      title: 'Gastos mensais',
-      icon: Phosphor.calendarBlank,
-      page: GastosMensaisPage(),
-    ),
-    _DrawerItem(
-      title: 'Cartões',
-      icon: Phosphor.creditCard,
-      page: CartoesPage(),
-    ),
-    _DrawerItem(
-      title: 'Estabelecimentos',
-      icon: Phosphor.storefront,
-      page: LocaisPage(),
+    _DrawerGroup(
+      title: 'Cadastros',
+      icon: Phosphor.folders,
+      itens: [
+        _DrawerItem(
+          title: 'Cartões',
+          icon: Phosphor.creditCard,
+          page: CartoesPage(),
+        ),
+        _DrawerItem(
+          title: 'Estabelecimentos',
+          icon: Phosphor.storefront,
+          page: LocaisPage(),
+        ),
+      ],
     ),
   ];
 
@@ -137,6 +187,16 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
     Navigator.of(context).pop();
     await sairDaConta();
     open(screen: const LoginPage(), closePrevious: true);
+  }
+
+  void _toggleGrupo(String titulo) {
+    setState(() {
+      if (_gruposAbertos.contains(titulo)) {
+        _gruposAbertos.remove(titulo);
+      } else {
+        _gruposAbertos.add(titulo);
+      }
+    });
   }
 
   Widget _avatarFallback(String iniciais) {
@@ -247,7 +307,23 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
     );
   }
 
-  Widget _item(_DrawerItem item) {
+  Widget _iconeCaixa(IconData icon, {Color? color, double size = 40}) {
+    final cor = color ?? DinixColors.primary;
+    return Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(
+        color: cor.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Icon(icon, color: cor, size: size * 0.5),
+    );
+  }
+
+  Widget _item(
+    _DrawerItem item, {
+    bool submenu = false,
+  }) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -261,17 +337,17 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
         },
         borderRadius: BorderRadius.circular(AppRadius.card),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          padding: EdgeInsets.fromLTRB(
+            submenu ? 28 : 12,
+            submenu ? 10 : 12,
+            12,
+            submenu ? 10 : 12,
+          ),
           child: Row(
             children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: DinixColors.primary.withValues(alpha: 0.14),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(item.icon, color: DinixColors.primary, size: 20),
+              _iconeCaixa(
+                item.icon,
+                size: submenu ? 34 : 40,
               ),
               appSizedBox(width: 12),
               Expanded(
@@ -279,7 +355,9 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
                   item.title,
                   bold: true,
                   color: DinixColors.textPrimary,
-                  fontSize: AppFontSizes.small,
+                  fontSize: submenu
+                      ? AppFontSizes.verySmall
+                      : AppFontSizes.small,
                 ),
               ),
               Icon(
@@ -291,6 +369,69 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _grupo(_DrawerGroup grupo) {
+    final aberto = _gruposAbertos.contains(grupo.title);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => _toggleGrupo(grupo.title),
+            borderRadius: BorderRadius.circular(AppRadius.card),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              child: Row(
+                children: [
+                  _iconeCaixa(grupo.icon),
+                  appSizedBox(width: 12),
+                  Expanded(
+                    child: appText(
+                      grupo.title,
+                      bold: true,
+                      color: DinixColors.textPrimary,
+                      fontSize: AppFontSizes.small,
+                    ),
+                  ),
+                  AnimatedRotation(
+                    turns: aberto ? 0.25 : 0,
+                    duration: const Duration(milliseconds: 180),
+                    child: Icon(
+                      Phosphor.caretRight,
+                      color: AppColors.grey400,
+                      size: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        AnimatedCrossFade(
+          firstChild: const SizedBox(width: double.infinity),
+          secondChild: Column(
+            children: [
+              for (var i = 0; i < grupo.itens.length; i++) ...[
+                if (i > 0)
+                  Divider(
+                    height: 1,
+                    color: AppColors.grey800.withValues(alpha: 0.45),
+                    indent: 74,
+                    endIndent: 12,
+                  ),
+                _item(grupo.itens[i], submenu: true),
+              ],
+            ],
+          ),
+          crossFadeState:
+              aberto ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          duration: const Duration(milliseconds: 180),
+          sizeCurve: Curves.easeOutCubic,
+        ),
+      ],
     );
   }
 
@@ -306,15 +447,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Row(
               children: [
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: AppColors.red.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(Phosphor.signOut, color: AppColors.red, size: 20),
-                ),
+                _iconeCaixa(Phosphor.signOut, color: AppColors.red),
                 appSizedBox(width: 12),
                 Expanded(
                   child: appText(
@@ -332,6 +465,15 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
     );
   }
 
+  Widget _divisor({double indent = 64}) {
+    return Divider(
+      height: 1,
+      color: AppColors.grey800.withValues(alpha: 0.55),
+      indent: indent,
+      endIndent: 12,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -345,7 +487,8 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
       child: DecoratedBox(
         decoration: BoxDecoration(
           color: DinixColors.background,
-          borderRadius: const BorderRadius.horizontal(right: Radius.circular(20)),
+          borderRadius:
+              const BorderRadius.horizontal(right: Radius.circular(20)),
           border: Border(
             right: BorderSide(color: AppColors.grey800.withValues(alpha: 0.9)),
           ),
@@ -375,16 +518,16 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
                 ),
               ),
               Expanded(
-                child: ListView.separated(
+                child: ListView(
                   padding: const EdgeInsets.fromLTRB(8, 8, 8, 8),
-                  itemCount: _itens.length,
-                  separatorBuilder: (_, _) => Divider(
-                    height: 1,
-                    color: AppColors.grey800.withValues(alpha: 0.55),
-                    indent: 64,
-                    endIndent: 12,
-                  ),
-                  itemBuilder: (context, index) => _item(_itens[index]),
+                  children: [
+                    _item(_inicio),
+                    _divisor(),
+                    for (var i = 0; i < _grupos.length; i++) ...[
+                      _grupo(_grupos[i]),
+                      if (i < _grupos.length - 1) _divisor(),
+                    ],
+                  ],
                 ),
               ),
               Padding(

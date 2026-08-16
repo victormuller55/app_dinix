@@ -5,11 +5,13 @@ import 'package:app_dinix/function/service/session_expired.dart';
 import 'package:app_dinix/models/assinatura_model.dart';
 import 'package:app_dinix/models/compra_model.dart';
 import 'package:app_dinix/models/gasto_mensal_model.dart';
+import 'package:app_dinix/models/recebimento_mensal_model.dart';
 import 'package:app_dinix/pages/assinaturas/assinaturas_service.dart';
 import 'package:app_dinix/pages/compras/compras_event.dart';
 import 'package:app_dinix/pages/compras/compras_service.dart';
 import 'package:app_dinix/pages/compras/compras_state.dart';
 import 'package:app_dinix/pages/gastos_mensais/gastos_mensais_service.dart';
+import 'package:app_dinix/pages/recebimentos_mensais/recebimentos_mensais_service.dart';
 
 class ComprasBloc extends Bloc<ComprasEvent, ComprasState> {
   FiltroCompras _filtro = FiltroCompras.hoje();
@@ -40,6 +42,14 @@ class ComprasBloc extends Bloc<ComprasEvent, ComprasState> {
   Future<List<AssinaturaModel>> _assinaturasPendentesDoDia() async {
     try {
       return await listarAssinaturasPendentes(_filtro.dataSelecionada);
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<List<RecebimentoMensalModel>> _recebimentosPendentesDoDia() async {
+    try {
+      return await listarRecebimentosMensaisPendentes(_filtro.dataSelecionada);
     } catch (_) {
       return [];
     }
@@ -127,10 +137,12 @@ class ComprasBloc extends Bloc<ComprasEvent, ComprasState> {
     final categoriasPorId = await mapearCategorias();
     final pendentesMensais = await _gastosPendentesDoDia();
     final pendentesAssinaturas = await _assinaturasPendentesDoDia();
+    final pendentesRecebimentos = await _recebimentosPendentesDoDia();
     return ComprasSuccessState(
       compras: compras,
       pendentesMensais: pendentesMensais,
       pendentesAssinaturas: pendentesAssinaturas,
+      pendentesRecebimentos: pendentesRecebimentos,
       grupos: montarGruposPorDia(
         compras: compras,
         contasPorId: contasPorId,

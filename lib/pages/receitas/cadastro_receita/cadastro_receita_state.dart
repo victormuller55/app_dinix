@@ -13,7 +13,11 @@ class CadastroReceitaReadyState extends CadastroReceitaState {
   CadastroReceitaReadyState({required this.lookups});
 }
 
-class CadastroReceitaSuccessState extends CadastroReceitaState {}
+class CadastroReceitaSuccessState extends CadastroReceitaState {
+  final bool creditarAgora;
+
+  CadastroReceitaSuccessState({this.creditarAgora = true});
+}
 
 class CadastroReceitaDeletedState extends CadastroReceitaState {}
 

@@ -7,6 +7,7 @@ import 'package:app_dinix/pages/compras/compras_page.dart';
 import 'package:app_dinix/pages/painel/painel_page.dart';
 import 'package:app_dinix/pages/perfil/perfil_page.dart';
 import 'package:app_dinix/pages/receitas/receitas_page.dart';
+import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:cupertino_native_better/cupertino_native_better.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -200,14 +201,20 @@ class _HomeShellState extends State<HomeShell> {
             ? Stack(
                 children: [
                   _body(),
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    child: _iosLiquidGlassBar(
-                      items: _items,
-                      currentIndex: _currentIndex,
-                    ),
+                  ValueListenableBuilder<bool>(
+                    valueListenable: dinixDrawerAberto,
+                    builder: (_, drawerAberto, __) {
+                      if (drawerAberto) return const SizedBox.shrink();
+                      return Positioned(
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        child: _iosLiquidGlassBar(
+                          items: _items,
+                          currentIndex: _currentIndex,
+                        ),
+                      );
+                    },
                   ),
                 ],
               )

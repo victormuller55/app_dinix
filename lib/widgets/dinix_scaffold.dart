@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:muller_package/muller_package.dart'
     hide AppRadius, AppFontSizes, AppSpacing;
 
+/// Indica se algum drawer Dinix está aberto (ex.: para esconder a CNTabBar no iOS).
+final ValueNotifier<bool> dinixDrawerAberto = ValueNotifier<bool>(false);
+
 /// Scaffold das abas do menu: menu drawer à esquerda, título centralizado e ações à direita.
 Widget dinixMenuScaffold({
   required String title,
@@ -37,6 +40,9 @@ Widget dinixMenuScaffold({
     drawer: showDrawer ? const DinixAppDrawer() : null,
     drawerScrimColor: Colors.black.withValues(alpha: 0.55),
     drawerEnableOpenDragGesture: true,
+    onDrawerChanged: showDrawer
+        ? (aberto) => dinixDrawerAberto.value = aberto
+        : null,
     appBar: AppBar(
       elevation: 0,
       backgroundColor: DinixColors.primaryDark,

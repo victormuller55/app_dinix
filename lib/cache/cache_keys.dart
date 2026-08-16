@@ -11,4 +11,5 @@ class CacheKeys {
   static const painel = 'painel';
   static const assinaturas = 'assinaturas_list';
   static const gastosMensais = 'gastos_mensais_list';
+  static const recebimentosMensais = 'recebimentos_mensais_list';
 }

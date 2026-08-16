@@ -31,8 +31,12 @@ class CadastroReceitaBloc extends Bloc<CadastroReceitaEvent, CadastroReceitaStat
   ) async {
     emit(CadastroReceitaLoadingState());
     try {
-      await salvarReceita(event.receita);
-      emit(CadastroReceitaSuccessState());
+      if (event.creditarAgora) {
+        await salvarReceita(event.receita);
+      } else {
+        await salvarGanhoParaProximoMes(event.receita);
+      }
+      emit(CadastroReceitaSuccessState(creditarAgora: event.creditarAgora));
     } catch (e) {
       if (await tratarSessaoExpirada(e)) return;
       emit(CadastroReceitaErrorState(errorModel: errorModelFromException(e)));
