@@ -5,9 +5,11 @@ import 'package:app_dinix/function/validators.dart';
 import 'package:app_dinix/pages/login_page/cadastro_usuario/cadastro_usuario_bloc.dart';
 import 'package:app_dinix/pages/login_page/cadastro_usuario/cadastro_usuario_event.dart';
 import 'package:app_dinix/pages/login_page/cadastro_usuario/cadastro_usuario_state.dart';
+import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/login/login_form_field.dart';
+import 'package:app_dinix/widgets/politica_privacidade_aceite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,6 +31,7 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
   late final LoginFormField _emailForm;
   late final LoginFormField _senhaForm;
   late final LoginFormField _confirmarSenhaForm;
+  bool _aceitouPolitica = false;
 
   @override
   void initState() {
@@ -70,6 +73,12 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
 
   void _salvarCadastro() {
     if (!_validarFormulario()) return;
+    if (!_aceitouPolitica) {
+      showToastWarning(
+        message: 'Aceite a Política de Privacidade para continuar',
+      );
+      return;
+    }
     bloc.add(
       CadastroUsuarioSaveEvent(
         nome: _nomeForm.value.trim(),
@@ -103,6 +112,11 @@ class _CadastroUsuarioPageState extends State<CadastroUsuarioPage> {
           _emailForm.formulario,
           _senhaForm.formulario,
           _confirmarSenhaForm.formulario,
+          appSizedBox(height: AppSpacing.medium),
+          PoliticaPrivacidadeAceite(
+            aceito: _aceitouPolitica,
+            onChanged: (aceito) => setState(() => _aceitouPolitica = aceito),
+          ),
           appSizedBox(height: AppSpacing.medium),
           appElevatedButtonDinix(
             title: AppStrings.cadastrar,

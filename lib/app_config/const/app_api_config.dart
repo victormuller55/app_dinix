@@ -9,5 +9,5 @@ class AppApiConfig {
   static const String appVersion = '1.0.0';
 
   static const String privacyPolicyUrl =
-      'https://convertix.net.br/pages/politica-privacidade.html';
+      'https://convertix.net.br/pages/politica-privacidade-dinix.html';
 }

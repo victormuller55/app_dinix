@@ -1,5 +1,6 @@
 import 'package:app_dinix/app_config/app_auth.dart';
 import 'package:app_dinix/app_config/bancos_catalogo.dart';
+import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/cache/reference_data_prefetch.dart';
 import 'package:app_dinix/function/fechar_teclado.dart';
 import 'package:app_dinix/function/show_snackbar.dart';
@@ -18,6 +19,7 @@ import 'package:app_dinix/pages/login_page/cadastro_fluxo/cadastro_fluxo_service
 import 'package:app_dinix/pages/login_page/cadastro_fluxo/verificacao_email_service.dart';
 import 'package:app_dinix/pages/login_page/cadastro_usuario/cadastro_usuario_service.dart';
 import 'package:app_dinix/pages/login_page/entrar_service.dart';
+import 'package:app_dinix/widgets/politica_privacidade_aceite.dart';
 import 'package:flutter/material.dart';
 import 'package:muller_package/muller_package.dart'
     hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters;
@@ -33,6 +35,7 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
   final CadastroFluxoDados _dados = CadastroFluxoDados();
   CadastroFluxoPasso _passo = CadastroFluxoPasso.nome;
   bool _carregando = false;
+  bool _aceitouPolitica = false;
 
   final GlobalKey<FormState> _formNome = GlobalKey<FormState>();
   final GlobalKey<FormState> _formEmail = GlobalKey<FormState>();
@@ -165,7 +168,16 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
     }
   }
 
+  bool _exigirAceitePolitica() {
+    if (_aceitouPolitica) return true;
+    showToastWarning(
+      message: 'Aceite a Política de Privacidade para continuar',
+    );
+    return false;
+  }
+
   Future<void> _concluirCadastro() async {
+    if (!_exigirAceitePolitica()) return;
     setState(() => _carregando = true);
     try {
       var usuario = await registrarUsuario(
@@ -200,6 +212,7 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
     switch (_passo) {
       case CadastroFluxoPasso.nome:
         if (!(_nomeKey.currentState?.validar() ?? false)) return;
+        if (!_exigirAceitePolitica()) return;
         _dados.nome = _nomeKey.currentState!.valor;
         _irPara(CadastroFluxoPasso.email);
       case CadastroFluxoPasso.email:
@@ -245,10 +258,20 @@ class _CadastroFluxoPageState extends State<CadastroFluxoPage> {
   Widget _conteudoPasso() {
     switch (_passo) {
       case CadastroFluxoPasso.nome:
-        return PassoNomeConteudo(
-          key: _nomeKey,
-          formKey: _formNome,
-          valorInicial: _dados.nome,
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            PassoNomeConteudo(
+              key: _nomeKey,
+              formKey: _formNome,
+              valorInicial: _dados.nome,
+            ),
+            appSizedBox(height: AppSpacing.medium),
+            PoliticaPrivacidadeAceite(
+              aceito: _aceitouPolitica,
+              onChanged: (aceito) => setState(() => _aceitouPolitica = aceito),
+            ),
+          ],
         );
       case CadastroFluxoPasso.email:
         return PassoEmailConteudo(

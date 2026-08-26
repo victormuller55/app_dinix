@@ -7,10 +7,12 @@ import 'package:app_dinix/pages/login_page/entrar_bloc.dart';
 import 'package:app_dinix/pages/login_page/entrar_event.dart';
 import 'package:app_dinix/pages/login_page/entrar_state.dart';
 import 'package:app_dinix/pages/login_page/esqueci_senha/esqueci_senha_page.dart';
+import 'package:app_dinix/function/show_snackbar.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/app_logo.dart';
 import 'package:app_dinix/widgets/login/login_form_field.dart';
+import 'package:app_dinix/widgets/politica_privacidade_aceite.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,6 +32,7 @@ class _LoginPageState extends State<LoginPage> {
 
   late final LoginFormField _loginForm;
   late final LoginFormField _passwordForm;
+  bool _aceitouPolitica = false;
 
   @override
   void initState() {
@@ -59,6 +62,12 @@ class _LoginPageState extends State<LoginPage> {
 
   void _salvarLogin() {
     if (!_validarFormulario()) return;
+    if (!_aceitouPolitica) {
+      showToastWarning(
+        message: 'Aceite a Política de Privacidade para continuar',
+      );
+      return;
+    }
     bloc.add(EntrarLoginEvent(_loginForm.value.trim(), _passwordForm.value));
   }
 
@@ -101,6 +110,11 @@ class _LoginPageState extends State<LoginPage> {
             text: 'Esqueci minha senha',
             color: DinixColors.primary,
             onTap: _abrirEsqueciSenha,
+          ),
+          appSizedBox(height: AppSpacing.normal),
+          PoliticaPrivacidadeAceite(
+            aceito: _aceitouPolitica,
+            onChanged: (aceito) => setState(() => _aceitouPolitica = aceito),
           ),
           appSizedBox(height: AppSpacing.normal),
           appElevatedButtonDinix(title: AppStrings.entrar, onTap: _salvarLogin, height: 52),
