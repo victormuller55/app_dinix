@@ -6,6 +6,7 @@ import 'package:app_dinix/function/validators.dart';
 import 'package:app_dinix/pages/perfil/perfil_service.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_form_field_dinix.dart';
+import 'package:app_dinix/widgets/app_form_hint_banner.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:muller_package/muller_package.dart'
@@ -85,15 +86,18 @@ class _TrocarSenhaPageState extends State<TrocarSenhaPage> {
               key: _formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
                 children: [
-                  appText(
-                    'Use no mínimo 8 caracteres. Você continua conectado depois de trocar.',
-                    color: DinixColors.textMuted,
-                    fontSize: AppFontSizes.verySmall,
+                  AppFormHintBanner(
+                    icon: Phosphor.lockKey,
+                    message:
+                        'Use no mínimo 8 caracteres. Você continua conectado depois de trocar.',
                   ),
+                  appSizedBox(height: AppSpacing.normal),
                   _atualForm.formulario,
+                  appSizedBox(height: AppSpacing.normal),
                   _novaForm.formulario,
+                  appSizedBox(height: AppSpacing.normal),
                   _confirmarForm.formulario,
                   appSizedBox(height: AppSpacing.medium),
                   appElevatedButtonDinix(

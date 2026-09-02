@@ -8,6 +8,7 @@ import 'package:app_dinix/pages/perfil/perfil_service.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_form_field_dinix.dart';
+import 'package:app_dinix/widgets/app_form_hint_banner.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:muller_package/muller_package.dart'
@@ -78,29 +79,13 @@ class _ApagarContaPageState extends State<ApagarContaPage> {
               key: _formKey,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               child: ListView(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.red.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(AppRadius.card),
-                      border: Border.all(color: AppColors.red.withValues(alpha: 0.35)),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Icon(Phosphor.warning, color: AppColors.red, size: 22),
-                        appSizedBox(width: AppSpacing.normal),
-                        Expanded(
-                          child: appText(
-                            'Sua conta será encerrada. Compras, ganhos e carteiras deixam de ficar acessíveis neste login.',
-                            color: DinixColors.textPrimary,
-                            fontSize: AppFontSizes.verySmall,
-                          ),
-                        ),
-                      ],
-                    ),
+                  AppFormHintBanner(
+                    icon: Phosphor.warning,
+                    tint: AppColors.red,
+                    message:
+                        'Sua conta será encerrada. Compras, ganhos e carteiras deixam de ficar acessíveis neste login.',
                   ),
                   appSizedBox(height: AppSpacing.medium),
                   appText(
@@ -108,6 +93,7 @@ class _ApagarContaPageState extends State<ApagarContaPage> {
                     color: DinixColors.textMuted,
                     fontSize: AppFontSizes.verySmall,
                   ),
+                  appSizedBox(height: AppSpacing.normal),
                   _senhaForm.formulario,
                   appSizedBox(height: AppSpacing.medium),
                   appElevatedButtonDinix(

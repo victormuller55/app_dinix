@@ -6,7 +6,7 @@ import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:muller_package/muller_package.dart'
-    hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters;
+    hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters, appTextButton;
 
 class CadastroFluxoShell extends StatelessWidget {
   final CadastroFluxoPasso passo;

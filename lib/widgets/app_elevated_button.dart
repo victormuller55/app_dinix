@@ -1,7 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:muller_package/muller_package.dart' hide AppRadius, AppFontSizes, AppSpacing;
+import 'package:muller_package/muller_package.dart'
+    hide AppRadius, AppFontSizes, AppSpacing, appTextButton;
 import 'package:app_dinix/app_config/app_platform.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
+
+String tituloBotao(String title) {
+  return title
+      .trim()
+      .split(RegExp(r'\s+'))
+      .where((word) => word.isNotEmpty)
+      .map((word) {
+        final lower = word.toLowerCase();
+        return '${lower[0].toUpperCase()}${lower.substring(1)}';
+      })
+      .join(' ');
+}
+
+Widget appTextButton({
+  required String text,
+  double? padding,
+  double? fontSize,
+  Color? color,
+  required void Function() onTap,
+}) {
+  return TextButton(
+    onPressed: onTap,
+    child: Padding(
+      padding: EdgeInsets.all(padding ?? 0),
+      child: appText(
+        tituloBotao(text),
+        fontSize: fontSize,
+        color: color,
+        letterSpacing: 0.2,
+        bold: true,
+      ),
+    ),
+  );
+}
 
 Widget appElevatedButtonDinix({
   required String title,
@@ -19,7 +54,7 @@ Widget appElevatedButtonDinix({
   var hover = false;
   final borderRadius = radius ?? (isIOSPlatform ? 12.0 : AppRadius.input);
   final buttonHeight = height ?? (isIOSPlatform ? 50.0 : 48.0);
-  final label = title.toUpperCase();
+  final label = tituloBotao(title);
   final textSize = fontSize ?? (isIOSPlatform ? 17.0 : AppFontSizes.verySmall);
 
   return StatefulBuilder(

@@ -1,10 +1,11 @@
 import 'dart:async';
 
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:flutter/material.dart';
 import 'package:muller_package/muller_package.dart'
-    hide AppRadius, AppFontSizes, AppSpacing;
+    hide AppRadius, AppFontSizes, AppSpacing, appTextButton;
 
 /// Botão de reenvio com contagem regressiva (desabilitado enquanto conta).
 class ReenviarCodigoBotao extends StatefulWidget {

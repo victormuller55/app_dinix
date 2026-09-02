@@ -21,6 +21,7 @@ workflows:
       vars:
         # Apple ID from App Store Connect (App information -> Apple ID)
         APP_STORE_APPLE_ID: "6801598678"
+        APP_BUNDLE_ID: "com.net.convertix.dinix"
 
     triggering:
       events:
@@ -65,18 +66,27 @@ workflows:
         script: |
           set -euo pipefail
 
-          VERSION_LINE=$(grep '^version:' pubspec.yaml | cut -d' ' -f2)
+          VERSION_LINE=$(grep '^version:' pubspec.yaml | awk '{print $2}' | tr -d '\r')
           VERSION_NAME=$(echo "$VERSION_LINE" | cut -d'+' -f1)
-          PUBSPEC_BUILD=$(echo "$VERSION_LINE" | cut -d'+' -f2 | tr -cd '0-9')
+          PUBSPEC_BUILD=$(echo "$VERSION_LINE" | cut -d'+' -f2)
           PUBSPEC_BUILD=${PUBSPEC_BUILD:-0}
-          CM_NUM=$(echo "${CM_BUILD_NUMBER:-0}" | tr -cd '0-9')
-          CM_NUM=${CM_NUM:-0}
 
           digits() {
-            local v
-            v=$(printf '%s' "${1:-0}" | tr -cd '0-9')
-            printf '%s' "${v:-0}"
+            local raw
+            raw=$(printf '%s' "${1:-}" | tr -d '\r' | tr -d '[:space:]')
+            if [ -z "$raw" ]; then
+              printf '0'
+              return
+            fi
+            if printf '%s' "$raw" | grep -Eq '^[0-9]+$'; then
+              printf '%s' "$raw"
+            else
+              printf '0'
+            fi
           }
+
+          PUBSPEC_BUILD=$(digits "$PUBSPEC_BUILD")
+          CM_NUM=$(digits "${CM_BUILD_NUMBER:-0}")
 
           STORE=0
           TESTFLIGHT=0
@@ -108,6 +118,46 @@ workflows:
           echo "ASC latest.........: $LATEST"
           echo "Next build number..: $BUILD_NUMBER"
           echo ""
+
+      - name: Validate Version Config
+        script: |
+          set -euo pipefail
+
+          echo "VERSION_NAME............: ${VERSION_NAME:?VERSION_NAME nao definido}"
+          echo "BUILD_NUMBER............: ${BUILD_NUMBER:?BUILD_NUMBER nao definido}"
+          echo "APP_BUNDLE_ID...........: ${APP_BUNDLE_ID:?APP_BUNDLE_ID nao definido}"
+
+          if [ "$VERSION_NAME" = "1.0.0" ]; then
+            echo "ERRO: VERSION_NAME 1.0.0 esta fechada no App Store Connect."
+            exit 1
+          fi
+
+          if ! printf '%s' "$BUILD_NUMBER" | grep -Eq '^[0-9]+$'; then
+            echo "ERRO: BUILD_NUMBER invalido: $BUILD_NUMBER"
+            exit 1
+          fi
+
+          if [ "$BUILD_NUMBER" -lt 1 ]; then
+            echo "ERRO: BUILD_NUMBER precisa ser >= 1"
+            exit 1
+          fi
+
+          echo ""
+          echo "Info.plist fonte (ios/Runner/Info.plist)"
+          /usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" ios/Runner/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Print :CFBundleVersion" ios/Runner/Info.plist || true
+          /usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" ios/Runner/Info.plist || true
+
+          if ! /usr/libexec/PlistBuddy -c "Print :INAlternativeAppNames:0:INAlternativeAppName" ios/Runner/Info.plist >/dev/null 2>&1; then
+            echo "ERRO: INAlternativeAppNames deve ser array de dicionarios com INAlternativeAppName"
+            /usr/libexec/PlistBuddy -c "Print :INAlternativeAppNames" ios/Runner/Info.plist || true
+            exit 1
+          fi
+
+          ALT_NAME=$(/usr/libexec/PlistBuddy -c "Print :INAlternativeAppNames:0:INAlternativeAppName" ios/Runner/Info.plist)
+          echo "INAlternativeAppNames...: array de dictionaries"
+          echo "INAlternativeAppName....: $ALT_NAME"
+          echo "Validacao de versao e Info.plist fonte OK"
 
       - name: Install CocoaPods
         script: |
@@ -175,6 +225,70 @@ workflows:
             --build-number="$BUILD_NUMBER" \
             --no-tree-shake-icons \
             --export-options-plist=/Users/builder/export_options.plist
+
+      - name: Validate IPA Info.plist
+        script: |
+          set -euo pipefail
+
+          APP_PLIST=""
+          if [ -f "build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app/Info.plist" ]; then
+            APP_PLIST="build/ios/archive/Runner.xcarchive/Products/Applications/Runner.app/Info.plist"
+          else
+            IPA=$(ls build/ios/ipa/*.ipa 2>/dev/null | head -n 1 || true)
+            if [ -z "${IPA:-}" ]; then
+              echo "ERRO: IPA nao encontrado em build/ios/ipa"
+              exit 1
+            fi
+            WORK=$(mktemp -d)
+            unzip -q -o "$IPA" -d "$WORK"
+            APP_PLIST=$(find "$WORK/Payload" -name Info.plist -path "*.app/Info.plist" | head -n 1 || true)
+          fi
+
+          if [ -z "${APP_PLIST:-}" ] || [ ! -f "$APP_PLIST" ]; then
+            echo "ERRO: Info.plist final do Runner.app nao encontrado"
+            exit 1
+          fi
+
+          echo "Info.plist final........: $APP_PLIST"
+          echo ""
+
+          MARKETING=$(/usr/libexec/PlistBuddy -c "Print :CFBundleShortVersionString" "$APP_PLIST")
+          CURRENT=$(/usr/libexec/PlistBuddy -c "Print :CFBundleVersion" "$APP_PLIST")
+          BUNDLE=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP_PLIST")
+
+          echo "MARKETING_VERSION.......: $MARKETING"
+          echo "CURRENT_PROJECT_VERSION.: $CURRENT"
+          echo "VERSION_NAME............: $VERSION_NAME"
+          echo "BUILD_NUMBER............: $BUILD_NUMBER"
+          echo "CFBundleIdentifier......: $BUNDLE"
+
+          if [ "$MARKETING" != "$VERSION_NAME" ]; then
+            echo "ERRO: CFBundleShortVersionString ($MARKETING) != VERSION_NAME ($VERSION_NAME)"
+            exit 1
+          fi
+
+          if [ "$CURRENT" != "$BUILD_NUMBER" ]; then
+            echo "ERRO: CFBundleVersion ($CURRENT) != BUILD_NUMBER ($BUILD_NUMBER)"
+            exit 1
+          fi
+
+          if [ "$BUNDLE" != "$APP_BUNDLE_ID" ]; then
+            echo "ERRO: CFBundleIdentifier ($BUNDLE) != $APP_BUNDLE_ID"
+            exit 1
+          fi
+
+          if ! /usr/libexec/PlistBuddy -c "Print :INAlternativeAppNames:0:INAlternativeAppName" "$APP_PLIST" >/dev/null 2>&1; then
+            echo "ERRO: INAlternativeAppNames no IPA nao e array de dictionaries"
+            echo "Tipo/valor encontrado:"
+            /usr/libexec/PlistBuddy -c "Print :INAlternativeAppNames" "$APP_PLIST" || true
+            exit 1
+          fi
+
+          ALT_NAME=$(/usr/libexec/PlistBuddy -c "Print :INAlternativeAppNames:0:INAlternativeAppName" "$APP_PLIST")
+          echo "INAlternativeAppNames...: array de dictionaries"
+          echo "INAlternativeAppName....: $ALT_NAME"
+          echo ""
+          echo "Validacao do Info.plist final OK"
 
     artifacts:
       - build/ios/ipa/*.ipa

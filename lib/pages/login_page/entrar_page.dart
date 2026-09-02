@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:muller_package/muller_package.dart'
-    hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters;
+    hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters, appTextButton;
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

@@ -8,11 +8,12 @@ import 'package:app_dinix/pages/login_page/cadastro_fluxo/widgets/codigo_otp_fie
 import 'package:app_dinix/pages/perfil/perfil_service.dart';
 import 'package:app_dinix/widgets/app_elevated_button.dart';
 import 'package:app_dinix/widgets/app_form_field_dinix.dart';
+import 'package:app_dinix/widgets/app_form_hint_banner.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/reenviar_codigo_botao.dart';
 import 'package:flutter/material.dart';
 import 'package:muller_package/muller_package.dart'
-    hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters;
+    hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters, appTextButton;
 
 class TrocarEmailPage extends StatefulWidget {
   final String emailAtual;
@@ -107,19 +108,15 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
       key: _formKey,
       autovalidateMode: AutovalidateMode.onUserInteraction,
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+        padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
         children: [
-          appText(
-            'Atual: ${widget.emailAtual}',
-            color: DinixColors.textMuted,
-            fontSize: AppFontSizes.verySmall,
+          AppFormHintBanner(
+            icon: Phosphor.envelope,
+            highlight: 'Atual: ${widget.emailAtual}',
+            message:
+                'Enviaremos um código para confirmar o novo endereço. Se o e-mail já estiver cadastrado, não será possível usá-lo.',
           ),
-          appSizedBox(height: AppSpacing.small),
-          appText(
-            'Enviaremos um código para confirmar o novo endereço. Se o e-mail já estiver cadastrado, não será possível usá-lo.',
-            color: DinixColors.textMuted,
-            fontSize: AppFontSizes.verySmall,
-          ),
+          appSizedBox(height: AppSpacing.normal),
           _emailForm.formulario,
           appSizedBox(height: AppSpacing.medium),
           appElevatedButtonDinix(
@@ -136,7 +133,7 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 40),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 40),
           physics: const BouncingScrollPhysics(),
           child: ConstrainedBox(
             constraints: BoxConstraints(minHeight: constraints.maxHeight - 40),

@@ -47,7 +47,12 @@
 		<string>O Dinix usa a Siri para consultar e registrar suas finanças quando você pedir.</string>
 		<key>INAlternativeAppNames</key>
 		<array>
-			<string>Dinix Gastos</string>
+			<dict>
+				<key>INAlternativeAppName</key>
+				<string>Dinix Gastos</string>
+				<key>INAlternativeAppNamePronunciationHint</key>
+				<string>Dinix Gastos</string>
+			</dict>
 		</array>
 		<key>UIApplicationSceneManifest</key>
 		<dict>
