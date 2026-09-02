@@ -65,10 +65,10 @@ struct PesquisarNoDinixIntent: AppIntent {
     static var authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 
     @Parameter(title: "Busca", requestValueDialog: IntentDialog("O que você quer pesquisar no Dinix?"))
-    var busca: String = ""
+    var busca: String
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Pesquisar \(\.$busca) no Dinix")
+        Summary("Pesquisar \(\PesquisarNoDinixIntent.$busca) no Dinix") {}
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {

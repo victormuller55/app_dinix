@@ -50,6 +50,11 @@ enum DinixIntentSupport {
         try await client.contas().first?.id
     }
 
+    static func resolveAccountId(_ explicit: String?, client: DinixAPIClient) async throws -> String? {
+        if let explicit { return explicit }
+        return try await firstAccountId(client)
+    }
+
     static func resolveCategoria(named nome: String?, from client: DinixAPIClient) async throws -> DinixCategoriaRecord? {
         guard let nome, !nome.trimmingCharacters(in: .whitespaces).isEmpty else { return nil }
         let needle = nome.folding(options: [.diacriticInsensitive, .caseInsensitive], locale: Locale(identifier: "pt_BR"))

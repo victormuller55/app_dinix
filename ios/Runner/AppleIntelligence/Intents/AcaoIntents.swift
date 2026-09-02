@@ -55,7 +55,7 @@ struct RegistrarDespesaIntent: AppIntent {
             "Registrar despesa de \(money.formatted()) em \(titulo)\(qtd > 1 ? " em \(qtd) vezes" : "")?"
         )
         let client = DinixIntentSupport.client()
-        let contaId = conta?.id ?? (try await DinixIntentSupport.firstAccountId(client))
+        let contaId = try await DinixIntentSupport.resolveAccountId(conta?.id, client: client)
         let dataISO = DinixDateRange.isoDate(data ?? Date())
         _ = try await client.criarCompra(
             descricao: titulo,
@@ -98,7 +98,12 @@ struct RegistrarReceitaIntent: AppIntent {
     var data: Date?
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Registrar receita de \(\.$valor)")
+        Summary("Registrar receita de \(\.$valor)") {
+            \.$descricao
+            \.$categoria
+            \.$conta
+            \.$data
+        }
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
@@ -112,7 +117,7 @@ struct RegistrarReceitaIntent: AppIntent {
             valor: money,
             data: DinixDateRange.isoDate(data ?? Date()),
             idCategoria: categoria?.id,
-            idConta: conta?.id ?? (try await DinixIntentSupport.firstAccountId(client))
+            idConta: try await DinixIntentSupport.resolveAccountId(conta?.id, client: client)
         )
         let text = "Registrei a receita de \(money.formatted()) em \(titulo)."
         return .result(value: text, dialog: DinixIntentSupport.dialog(text))
@@ -144,7 +149,11 @@ struct RegistrarContaPagarIntent: AppIntent {
     var categoria: CategoriaEntity?
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Registrar conta \(\.$nome) de \(\.$valor)")
+        Summary("Registrar conta \(\.$nome) de \(\.$valor)") {
+            \.$diaVencimento
+            \.$conta
+            \.$categoria
+        }
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
@@ -156,7 +165,7 @@ struct RegistrarContaPagarIntent: AppIntent {
             nome: nome,
             valor: money,
             diaVencimento: dia,
-            idConta: conta?.id ?? (try await DinixIntentSupport.firstAccountId(client)),
+            idConta: try await DinixIntentSupport.resolveAccountId(conta?.id, client: client),
             idCategoria: categoria?.id
         )
         let text = "Cadastrei a conta \(nome) de \(money.formatted())."
@@ -187,7 +196,11 @@ struct RegistrarAssinaturaIntent: AppIntent {
     var categoria: CategoriaEntity?
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Registrar assinatura \(\.$nome) de \(\.$valor)")
+        Summary("Registrar assinatura \(\.$nome) de \(\.$valor)") {
+            \.$diaCobranca
+            \.$conta
+            \.$categoria
+        }
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
@@ -199,7 +212,7 @@ struct RegistrarAssinaturaIntent: AppIntent {
             nome: nome,
             valor: money,
             diaCobranca: dia,
-            idConta: conta?.id ?? (try await DinixIntentSupport.firstAccountId(client)),
+            idConta: try await DinixIntentSupport.resolveAccountId(conta?.id, client: client),
             idCategoria: categoria?.id
         )
         let text = "Cadastrei a assinatura \(nome) de \(money.formatted())."
@@ -248,7 +261,12 @@ struct ExcluirRegistroIntent: AppIntent {
     var assinatura: AssinaturaEntity?
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Excluir \(\.$tipo)")
+        Summary("Excluir \(\.$tipo)") {
+            \.$compra
+            \.$receita
+            \.$gastoMensal
+            \.$assinatura
+        }
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
@@ -310,14 +328,14 @@ struct ExcluirRegistroIntent: AppIntent {
 @available(iOS 16.0, *)
 private extension AppIntent {
     func confirmar(_ mensagem: String) async throws {
-        if #available(iOS 17.0, *) {
+        if #available(iOS 18.0, *) {
             try await requestConfirmation(actionName: .add, dialog: IntentDialog(stringLiteral: mensagem))
         }
     }
 
     func confirmarExclusao(_ mensagem: String) async throws {
-        if #available(iOS 17.0, *) {
-            try await requestConfirmation(actionName: .delete, dialog: IntentDialog(stringLiteral: mensagem))
+        if #available(iOS 18.0, *) {
+            try await requestConfirmation(actionName: .continue, dialog: IntentDialog(stringLiteral: mensagem))
         } else {
             throw DinixAPIError.unsupported("Confirme a exclusão abrindo o Dinix.")
         }
