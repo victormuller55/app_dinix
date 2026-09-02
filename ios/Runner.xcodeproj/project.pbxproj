@@ -13,6 +13,25 @@
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		A7F3E2012F3E4A5B6C7D8E91 /* NativeUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7F3E2012F3E4A5B6C7D8E92 /* NativeUI.swift */; };
+		A11E20000000000000000001 /* DinixMoney.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000001 /* DinixMoney.swift */; };
+		A11E20000000000000000002 /* DinixDateRange.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000002 /* DinixDateRange.swift */; };
+		A11E20000000000000000003 /* DinixAPIError.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000003 /* DinixAPIError.swift */; };
+		A11E20000000000000000004 /* DinixSessionStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000004 /* DinixSessionStore.swift */; };
+		A11E20000000000000000005 /* DinixAPIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000005 /* DinixAPIModels.swift */; };
+		A11E20000000000000000006 /* DinixAPIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000006 /* DinixAPIClient.swift */; };
+		A11E20000000000000000007 /* DinixIntentSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000007 /* DinixIntentSupport.swift */; };
+		A11E20000000000000000008 /* AppleIntelligenceChannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000008 /* AppleIntelligenceChannel.swift */; };
+		A11E20000000000000000009 /* DinixAppEnums.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000009 /* DinixAppEnums.swift */; };
+		A11E2000000000000000000A /* DinixAppEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E1000000000000000000A /* DinixAppEntities.swift */; };
+		A11E2000000000000000000B /* ConsultaIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E1000000000000000000B /* ConsultaIntents.swift */; };
+		A11E2000000000000000000C /* AcaoIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E1000000000000000000C /* AcaoIntents.swift */; };
+		A11E2000000000000000000D /* AbrirEntidadeIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E1000000000000000000D /* AbrirEntidadeIntent.swift */; };
+		A11E2000000000000000000E /* DinixSpotlightIndexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E1000000000000000000E /* DinixSpotlightIndexer.swift */; };
+		A11E2000000000000000000F /* AppShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E1000000000000000000F /* AppShortcuts.swift */; };
+		A11E20000000000000000011 /* DinixMoneyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000011 /* DinixMoneyTests.swift */; };
+		A11E20000000000000000012 /* DinixDateRangeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000012 /* DinixDateRangeTests.swift */; };
+		A11E20000000000000000013 /* DinixAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000013 /* DinixAPIClientTests.swift */; };
+		A11E20000000000000000014 /* DinixConsultaLogicTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A11E10000000000000000014 /* DinixConsultaLogicTests.swift */; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
@@ -51,6 +70,26 @@
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		A7F3E2012F3E4A5B6C7D8E92 /* NativeUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NativeUI.swift; sourceTree = "<group>"; };
+		A11E10000000000000000001 /* DinixMoney.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixMoney.swift; sourceTree = "<group>"; };
+		A11E10000000000000000002 /* DinixDateRange.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixDateRange.swift; sourceTree = "<group>"; };
+		A11E10000000000000000003 /* DinixAPIError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixAPIError.swift; sourceTree = "<group>"; };
+		A11E10000000000000000004 /* DinixSessionStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixSessionStore.swift; sourceTree = "<group>"; };
+		A11E10000000000000000005 /* DinixAPIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixAPIModels.swift; sourceTree = "<group>"; };
+		A11E10000000000000000006 /* DinixAPIClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixAPIClient.swift; sourceTree = "<group>"; };
+		A11E10000000000000000007 /* DinixIntentSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixIntentSupport.swift; sourceTree = "<group>"; };
+		A11E10000000000000000008 /* AppleIntelligenceChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleIntelligenceChannel.swift; sourceTree = "<group>"; };
+		A11E10000000000000000009 /* DinixAppEnums.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixAppEnums.swift; sourceTree = "<group>"; };
+		A11E1000000000000000000A /* DinixAppEntities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixAppEntities.swift; sourceTree = "<group>"; };
+		A11E1000000000000000000B /* ConsultaIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConsultaIntents.swift; sourceTree = "<group>"; };
+		A11E1000000000000000000C /* AcaoIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcaoIntents.swift; sourceTree = "<group>"; };
+		A11E1000000000000000000D /* AbrirEntidadeIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbrirEntidadeIntent.swift; sourceTree = "<group>"; };
+		A11E1000000000000000000E /* DinixSpotlightIndexer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixSpotlightIndexer.swift; sourceTree = "<group>"; };
+		A11E1000000000000000000F /* AppShortcuts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShortcuts.swift; sourceTree = "<group>"; };
+		A11E10000000000000000010 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
+		A11E10000000000000000011 /* DinixMoneyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixMoneyTests.swift; sourceTree = "<group>"; };
+		A11E10000000000000000012 /* DinixDateRangeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixDateRangeTests.swift; sourceTree = "<group>"; };
+		A11E10000000000000000013 /* DinixAPIClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixAPIClientTests.swift; sourceTree = "<group>"; };
+		A11E10000000000000000014 /* DinixConsultaLogicTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DinixConsultaLogicTests.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
@@ -76,8 +115,74 @@
 			isa = PBXGroup;
 			children = (
 				331C807B294A618700263BE5 /* RunnerTests.swift */,
+				A11E30000000000000000004 /* AppleIntelligence */,
 			);
 			path = RunnerTests;
+			sourceTree = "<group>";
+		};
+		A11E30000000000000000001 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				A11E10000000000000000001 /* DinixMoney.swift */,
+				A11E10000000000000000002 /* DinixDateRange.swift */,
+				A11E10000000000000000003 /* DinixAPIError.swift */,
+				A11E10000000000000000004 /* DinixSessionStore.swift */,
+				A11E10000000000000000005 /* DinixAPIModels.swift */,
+				A11E10000000000000000006 /* DinixAPIClient.swift */,
+				A11E10000000000000000007 /* DinixIntentSupport.swift */,
+				A11E10000000000000000008 /* AppleIntelligenceChannel.swift */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		A11E30000000000000000002 /* Entities */ = {
+			isa = PBXGroup;
+			children = (
+				A11E10000000000000000009 /* DinixAppEnums.swift */,
+				A11E1000000000000000000A /* DinixAppEntities.swift */,
+			);
+			path = Entities;
+			sourceTree = "<group>";
+		};
+		A11E30000000000000000003 /* Intents */ = {
+			isa = PBXGroup;
+			children = (
+				A11E1000000000000000000B /* ConsultaIntents.swift */,
+				A11E1000000000000000000C /* AcaoIntents.swift */,
+				A11E1000000000000000000D /* AbrirEntidadeIntent.swift */,
+			);
+			path = Intents;
+			sourceTree = "<group>";
+		};
+		A11E30000000000000000004 /* AppleIntelligence */ = {
+			isa = PBXGroup;
+			children = (
+				A11E10000000000000000011 /* DinixMoneyTests.swift */,
+				A11E10000000000000000012 /* DinixDateRangeTests.swift */,
+				A11E10000000000000000013 /* DinixAPIClientTests.swift */,
+				A11E10000000000000000014 /* DinixConsultaLogicTests.swift */,
+			);
+			path = AppleIntelligence;
+			sourceTree = "<group>";
+		};
+		A11E30000000000000000005 /* Spotlight */ = {
+			isa = PBXGroup;
+			children = (
+				A11E1000000000000000000E /* DinixSpotlightIndexer.swift */,
+			);
+			path = Spotlight;
+			sourceTree = "<group>";
+		};
+		A11E30000000000000000006 /* AppleIntelligence */ = {
+			isa = PBXGroup;
+			children = (
+				A11E30000000000000000001 /* Core */,
+				A11E30000000000000000002 /* Entities */,
+				A11E30000000000000000003 /* Intents */,
+				A11E30000000000000000005 /* Spotlight */,
+				A11E1000000000000000000F /* AppShortcuts.swift */,
+			);
+			path = AppleIntelligence;
 			sourceTree = "<group>";
 		};
 		9740EEB11CF90186004384FC /* Flutter */ = {
@@ -123,6 +228,8 @@
 				A7F3E2012F3E4A5B6C7D8E92 /* NativeUI.swift */,
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
+				A11E10000000000000000010 /* Runner.entitlements */,
+				A11E30000000000000000006 /* AppleIntelligence */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -267,6 +374,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */,
+				A11E20000000000000000011 /* DinixMoneyTests.swift in Sources */,
+				A11E20000000000000000012 /* DinixDateRangeTests.swift in Sources */,
+				A11E20000000000000000013 /* DinixAPIClientTests.swift in Sources */,
+				A11E20000000000000000014 /* DinixConsultaLogicTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -278,6 +389,21 @@
 				A7F3E2012F3E4A5B6C7D8E91 /* NativeUI.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
 				7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */,
+				A11E20000000000000000001 /* DinixMoney.swift in Sources */,
+				A11E20000000000000000002 /* DinixDateRange.swift in Sources */,
+				A11E20000000000000000003 /* DinixAPIError.swift in Sources */,
+				A11E20000000000000000004 /* DinixSessionStore.swift in Sources */,
+				A11E20000000000000000005 /* DinixAPIModels.swift in Sources */,
+				A11E20000000000000000006 /* DinixAPIClient.swift in Sources */,
+				A11E20000000000000000007 /* DinixIntentSupport.swift in Sources */,
+				A11E20000000000000000008 /* AppleIntelligenceChannel.swift in Sources */,
+				A11E20000000000000000009 /* DinixAppEnums.swift in Sources */,
+				A11E2000000000000000000A /* DinixAppEntities.swift in Sources */,
+				A11E2000000000000000000B /* ConsultaIntents.swift in Sources */,
+				A11E2000000000000000000C /* AcaoIntents.swift in Sources */,
+				A11E2000000000000000000D /* AbrirEntidadeIntent.swift in Sources */,
+				A11E2000000000000000000E /* DinixSpotlightIndexer.swift in Sources */,
+				A11E2000000000000000000F /* AppShortcuts.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -369,6 +495,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -549,6 +676,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
@@ -560,6 +688,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				ENABLE_TESTABILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -572,6 +701,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;

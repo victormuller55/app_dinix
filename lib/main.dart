@@ -3,13 +3,16 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:app_dinix/app_config/app_auth.dart';
 import 'package:app_dinix/app_config/app_theme.dart';
 import 'package:app_dinix/app_config/app_widget.dart';
+import 'package:app_dinix/app_config/apple_intelligence_bridge.dart';
 import 'package:app_dinix/app_config/const/dinix_colors.dart';
 import 'package:app_dinix/app_config/theme/theme_controller.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  onSessaoNativaAlterada = syncAppleIntelligenceSession;
   await ThemeController.instance.load();
   DinixColors.applyBrightness(
     ThemeController.instance.resolveBrightness(

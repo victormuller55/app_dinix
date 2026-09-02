@@ -43,6 +43,12 @@
 		<string>O Dinix precisa da câmera para fotografar comprovantes e notas.</string>
 		<key>NSFaceIDUsageDescription</key>
 		<string>O Dinix usa o Face ID para proteger o acesso à sua conta neste aparelho.</string>
+		<key>NSSiriUsageDescription</key>
+		<string>O Dinix usa a Siri para consultar e registrar suas finanças quando você pedir.</string>
+		<key>INAlternativeAppNames</key>
+		<array>
+			<string>Dinix Gastos</string>
+		</array>
 		<key>UIApplicationSceneManifest</key>
 		<dict>
 			<key>UIApplicationSupportsMultipleScenes</key>

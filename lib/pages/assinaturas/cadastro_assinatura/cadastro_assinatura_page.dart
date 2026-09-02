@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/app_enums.dart';
+import 'package:app_dinix/app_config/apple_intelligence_bridge.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/function/categoria_icone.dart';
@@ -71,6 +72,14 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
     _preencher();
     _valorFocus.addListener(_aoFocarValor);
     bloc.add(CadastroAssinaturaLoadEvent());
+    final id = widget.assinatura?.id;
+    if (id != null && id.isNotEmpty) {
+      setAppleIntelligenceOnScreenEntity(
+        type: AppleIntelligenceEntityType.assinatura,
+        id: id,
+        title: widget.assinatura?.nome,
+      );
+    }
   }
 
   void _aoFocarValor() {
@@ -401,6 +410,7 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
 
   @override
   void dispose() {
+    clearAppleIntelligenceOnScreenEntity();
     _valorFocus.removeListener(_aoFocarValor);
     _valorController.dispose();
     _valorFocus.dispose();

@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/app_enums.dart';
+import 'package:app_dinix/app_config/apple_intelligence_bridge.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/function/form_validation.dart';
@@ -73,6 +74,14 @@ class _CadastroGastoMensalPageState extends State<CadastroGastoMensalPage> {
     _preencher();
     _valorFocus.addListener(_aoFocarValor);
     _carregarLookups();
+    final id = widget.gasto?.id;
+    if (id != null && id.isNotEmpty) {
+      setAppleIntelligenceOnScreenEntity(
+        type: AppleIntelligenceEntityType.gastoMensal,
+        id: id,
+        title: widget.gasto?.nome,
+      );
+    }
   }
 
   DateTime? _parseData(String? iso) {
@@ -401,6 +410,7 @@ class _CadastroGastoMensalPageState extends State<CadastroGastoMensalPage> {
 
   @override
   void dispose() {
+    clearAppleIntelligenceOnScreenEntity();
     _valorFocus.removeListener(_aoFocarValor);
     _valorController.dispose();
     _valorFocus.dispose();

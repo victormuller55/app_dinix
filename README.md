@@ -25,3 +25,4 @@ A URL da API está em `lib/app_config/const/app_endpoints.dart`:
 
 - [Arquitetura mobile](docs/ARQUITETURA_FLUTTER_MOBILE.md)
 - [Guia da API](docs/GUIA_API_DINIX.md)
+- [Apple Intelligence / Siri](docs/apple-intelligence.md)

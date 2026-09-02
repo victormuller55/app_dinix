@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/app_enums.dart';
+import 'package:app_dinix/app_config/apple_intelligence_bridge.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/function/categoria_icone.dart';
@@ -68,6 +69,14 @@ class _CadastroCompraPageState extends State<CadastroCompraPage> {
     _preencher();
     _valorFocus.addListener(_aoFocarValor);
     bloc.add(CadastroCompraLoadEvent());
+    final id = widget.compra?.id;
+    if (id != null && id.isNotEmpty) {
+      setAppleIntelligenceOnScreenEntity(
+        type: AppleIntelligenceEntityType.compra,
+        id: id,
+        title: widget.compra?.descricao,
+      );
+    }
   }
 
   void _aoFocarValor() {
@@ -422,6 +431,7 @@ class _CadastroCompraPageState extends State<CadastroCompraPage> {
 
   @override
   void dispose() {
+    clearAppleIntelligenceOnScreenEntity();
     _valorFocus.removeListener(_aoFocarValor);
     _valorController.dispose();
     _valorFocus.dispose();

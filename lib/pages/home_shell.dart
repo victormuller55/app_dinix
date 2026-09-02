@@ -1,14 +1,19 @@
 import 'package:app_dinix/app_config/app_platform.dart';
 import 'package:app_dinix/app_config/app_theme.dart';
+import 'package:app_dinix/app_config/apple_intelligence_bridge.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/app_config/theme/dinix_theme_scope.dart';
 import 'package:app_dinix/cache/reference_data_prefetch.dart';
+import 'package:app_dinix/pages/assinaturas/assinaturas_page.dart';
 import 'package:app_dinix/pages/carteiras/carteiras_page.dart';
 import 'package:app_dinix/pages/compras/compras_page.dart';
+import 'package:app_dinix/pages/gastos_mensais/gastos_mensais_page.dart';
 import 'package:app_dinix/pages/painel/painel_page.dart';
 import 'package:app_dinix/pages/perfil/perfil_page.dart';
 import 'package:app_dinix/pages/receitas/receitas_page.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
+import 'package:muller_package/muller_package.dart'
+    hide AppRadius, AppFontSizes, AppSpacing;
 import 'package:cupertino_native_better/cupertino_native_better.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -103,6 +108,27 @@ class _HomeShellState extends State<HomeShell> {
     super.initState();
     HomeShell._ativo = this;
     ReferenceDataPrefetch.sincronizar(forcar: false, mostrarProgresso: false);
+    _abrirRotaPendenteSiri();
+  }
+
+  Future<void> _abrirRotaPendenteSiri() async {
+    if (!isIOSPlatform) return;
+    final rota = await consumeAppleIntelligencePendingRoute();
+    if (!mounted || rota.isEmpty) return;
+    switch (rota['route']) {
+      case 'compra':
+        _selectTab(1);
+        break;
+      case 'receita':
+        _selectTab(3);
+        break;
+      case 'assinatura':
+        open(screen: const AssinaturasPage());
+        break;
+      case 'gasto_mensal':
+        open(screen: const GastosMensaisPage());
+        break;
+    }
   }
 
   @override

@@ -13,5 +13,6 @@ import UIKit
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
     NativeUI.register(messenger: engineBridge.applicationRegistrar.messenger())
+    AppleIntelligenceChannel.register(messenger: engineBridge.applicationRegistrar.messenger())
   }
 }

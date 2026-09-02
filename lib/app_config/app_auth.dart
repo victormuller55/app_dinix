@@ -18,12 +18,17 @@ const FlutterSecureStorage _secureStorage = FlutterSecureStorage(
   aOptions: AndroidOptions(encryptedSharedPreferences: true),
 );
 
-String _todayKey() {
+/// Preenchido no iOS para espelhar a sessão nos App Intents. Sem efeito no Android.
+Future<void> Function()? onSessaoNativaAlterada;
+
+String todayAuthKey() {
   final now = DateTime.now();
   final month = now.month.toString().padLeft(2, '0');
   final day = now.day.toString().padLeft(2, '0');
   return '${now.year}-$month-$day';
 }
+
+String _todayKey() => todayAuthKey();
 
 String _newDeviceId() {
   final random = Random.secure();
@@ -101,11 +106,13 @@ Future<void> saveToken(String token) async {
   await _secureStorage.write(key: _keyToken, value: token);
   await prefs.remove(_keyToken);
   await prefs.setString(_keyAuthDay, _todayKey());
+  await onSessaoNativaAlterada?.call();
 }
 
 Future<void> clearToken() async {
   final prefs = await SharedPreferences.getInstance();
   await _clearSessao(prefs);
+  await onSessaoNativaAlterada?.call();
 }
 
 /// Headers da API. Token no header `autorizacao` (contrato Dinix).
@@ -130,6 +137,7 @@ Future<void> saveUsuarioLogado(UsuarioModel usuario) async {
   final prefs = await SharedPreferences.getInstance();
   final data = usuario.toMap()..remove('token');
   await prefs.setString(_keyUsuario, jsonEncode(data));
+  await onSessaoNativaAlterada?.call();
 }
 
 Future<UsuarioModel?> getUsuarioLogado() async {

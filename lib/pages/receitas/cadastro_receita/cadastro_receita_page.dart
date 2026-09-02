@@ -1,3 +1,4 @@
+import 'package:app_dinix/app_config/apple_intelligence_bridge.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/function/categoria_icone.dart';
@@ -61,6 +62,14 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
     _preencher();
     _valorFocus.addListener(_aoFocarValor);
     bloc.add(CadastroReceitaLoadEvent());
+    final id = widget.receita?.id;
+    if (id != null && id.isNotEmpty) {
+      setAppleIntelligenceOnScreenEntity(
+        type: AppleIntelligenceEntityType.receita,
+        id: id,
+        title: widget.receita?.descricao,
+      );
+    }
   }
 
   void _aoFocarValor() {
@@ -326,6 +335,7 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
 
   @override
   void dispose() {
+    clearAppleIntelligenceOnScreenEntity();
     _valorFocus.removeListener(_aoFocarValor);
     _valorController.dispose();
     _valorFocus.dispose();
