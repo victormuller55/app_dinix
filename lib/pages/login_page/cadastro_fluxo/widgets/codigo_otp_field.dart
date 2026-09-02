@@ -152,39 +152,45 @@ class _CodigoOtpFieldState extends State<CodigoOtpField> {
                   width: preenchido ? AppBorder.active : AppBorder.thin,
                 ),
               ),
-              child: TextField(
-                controller: _controllers[index],
-                focusNode: _nodes[index],
-                textAlign: TextAlign.center,
-                keyboardType: TextInputType.number,
-                textInputAction: index == _tamanho - 1
-                    ? TextInputAction.done
-                    : TextInputAction.next,
-                style: TextStyle(
-                  fontFamily: AppFonts.family,
-                  color: DinixColors.textPrimary,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+              child: Center(
+                child: TextField(
+                  controller: _controllers[index],
+                  focusNode: _nodes[index],
+                  textAlign: TextAlign.center,
+                  textAlignVertical: TextAlignVertical.center,
+                  keyboardType: TextInputType.number,
+                  textInputAction: index == _tamanho - 1
+                      ? TextInputAction.done
+                      : TextInputAction.next,
+                  style: TextStyle(
+                    fontFamily: AppFonts.family,
+                    color: DinixColors.textPrimary,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    height: 1,
+                  ),
+                  cursorHeight: 22,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.digitsOnly,
+                    LengthLimitingTextInputFormatter(index == 0 ? _tamanho : 1),
+                  ],
+                  decoration: const InputDecoration(
+                    counterText: '',
+                    border: InputBorder.none,
+                    isCollapsed: true,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  onChanged: (v) => _onChanged(index, v),
+                  onTap: () {
+                    final text = _controllers[index].text;
+                    if (text.isEmpty) return;
+                    _controllers[index].selection = TextSelection(
+                      baseOffset: 0,
+                      extentOffset: text.length,
+                    );
+                  },
                 ),
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                  LengthLimitingTextInputFormatter(index == 0 ? _tamanho : 1),
-                ],
-                decoration: const InputDecoration(
-                  counterText: '',
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                onChanged: (v) => _onChanged(index, v),
-                onTap: () {
-                  final text = _controllers[index].text;
-                  if (text.isEmpty) return;
-                  _controllers[index].selection = TextSelection(
-                    baseOffset: 0,
-                    extentOffset: text.length,
-                  );
-                },
               ),
             );
           },

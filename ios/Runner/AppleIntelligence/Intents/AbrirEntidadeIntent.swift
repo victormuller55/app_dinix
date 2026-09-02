@@ -68,7 +68,7 @@ struct PesquisarNoDinixIntent: AppIntent {
     var busca: String
 
     static var parameterSummary: some ParameterSummary {
-        Summary("Pesquisar \(\PesquisarNoDinixIntent.$busca) no Dinix") {}
+        Summary("Pesquisar \(\.$busca) no Dinix")
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
