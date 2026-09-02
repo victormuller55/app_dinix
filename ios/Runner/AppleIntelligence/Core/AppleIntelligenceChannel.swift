@@ -1,3 +1,4 @@
+import AppIntents
 import Flutter
 import UIKit
 
@@ -64,6 +65,9 @@ enum AppleIntelligenceChannel {
             appVersion: args["appVersion"] as? String,
             biometriaHabilitada: args["biometriaHabilitada"] as? Bool
         )
+        if #available(iOS 16.0, *) {
+            DinixShortcuts.updateAppShortcutParameters()
+        }
     }
 
     private static func donateUserActivity(type: String?, id: String?, title: String?) {

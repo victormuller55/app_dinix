@@ -1,3 +1,4 @@
+import AppIntents
 import Flutter
 import UIKit
 
@@ -7,7 +8,11 @@ import UIKit
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    let launched = super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    if #available(iOS 16.0, *) {
+      DinixShortcuts.updateAppShortcutParameters()
+    }
+    return launched
   }
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
