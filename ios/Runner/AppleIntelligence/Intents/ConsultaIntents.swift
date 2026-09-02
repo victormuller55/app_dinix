@@ -19,9 +19,6 @@ struct ConsultarGastosIntent: AppIntent {
     @Parameter(title: "Data final")
     var dataFinal: Date?
 
-    @Parameter(title: "Intervalo")
-    var intervalo: DateInterval?
-
     @Parameter(title: "Categoria")
     var categoria: CategoriaEntity?
 
@@ -44,8 +41,7 @@ struct ConsultarGastosIntent: AppIntent {
         let range = DinixIntentSupport.range(
             periodo: periodo,
             dataInicial: dataInicial,
-            dataFinal: dataFinal,
-            intervalo: intervalo
+            dataFinal: dataFinal
         )
         let consulta = tipo ?? .total
         let text = try await Self.consultar(
@@ -164,9 +160,6 @@ struct ConsultarReceitasIntent: AppIntent {
     @Parameter(title: "Data final")
     var dataFinal: Date?
 
-    @Parameter(title: "Intervalo")
-    var intervalo: DateInterval?
-
     @Parameter(title: "Tipo da consulta")
     var tipo: TipoConsultaGastos?
 
@@ -179,8 +172,7 @@ struct ConsultarReceitasIntent: AppIntent {
         let range = DinixIntentSupport.range(
             periodo: periodo,
             dataInicial: dataInicial,
-            dataFinal: dataFinal,
-            intervalo: intervalo
+            dataFinal: dataFinal
         )
         let consulta = tipo ?? .total
 
@@ -420,9 +412,6 @@ struct ConsultarComprasIntent: AppIntent {
     @Parameter(title: "Data final")
     var dataFinal: Date?
 
-    @Parameter(title: "Intervalo")
-    var intervalo: DateInterval?
-
     @Parameter(title: "Estabelecimento")
     var estabelecimento: LocalEntity?
 
@@ -438,8 +427,7 @@ struct ConsultarComprasIntent: AppIntent {
         let range = DinixIntentSupport.range(
             periodo: periodo,
             dataInicial: dataInicial,
-            dataFinal: dataFinal,
-            intervalo: intervalo
+            dataFinal: dataFinal
         )
         var compras = try await client.compras()
         compras = compras.filter { compra in

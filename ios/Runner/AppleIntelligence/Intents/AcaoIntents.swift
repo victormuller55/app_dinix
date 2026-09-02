@@ -11,7 +11,7 @@ struct RegistrarDespesaIntent: AppIntent {
     static var authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 
     @Parameter(title: "Valor", requestValueDialog: IntentDialog("Qual o valor da despesa?"))
-    var valor: Decimal = 0
+    var valor: Double = 0
 
     @Parameter(title: "Descrição")
     var descricao: String?
@@ -44,7 +44,7 @@ struct RegistrarDespesaIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
-        let money = DinixMoney(decimalString: NSDecimalNumber(decimal: valor).stringValue)
+        let money = DinixMoney(intentValue: valor)
         if money.isZero { throw DinixAPIError.validation("Informe o valor da despesa.") }
         let titulo = descricao
             ?? estabelecimento?.nome
@@ -83,7 +83,7 @@ struct RegistrarReceitaIntent: AppIntent {
     static var authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 
     @Parameter(title: "Valor", requestValueDialog: IntentDialog("Qual o valor da receita?"))
-    var valor: Decimal = 0
+    var valor: Double = 0
 
     @Parameter(title: "Descrição")
     var descricao: String?
@@ -107,7 +107,7 @@ struct RegistrarReceitaIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
-        let money = DinixMoney(decimalString: NSDecimalNumber(decimal: valor).stringValue)
+        let money = DinixMoney(intentValue: valor)
         if money.isZero { throw DinixAPIError.validation("Informe o valor da receita.") }
         let titulo = descricao ?? categoria?.nome ?? "Receita"
         try await confirmar("Registrar receita de \(money.formatted()) em \(titulo)?")
@@ -134,7 +134,7 @@ struct RegistrarContaPagarIntent: AppIntent {
     static var authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 
     @Parameter(title: "Valor", requestValueDialog: IntentDialog("Qual o valor da conta?"))
-    var valor: Decimal
+    var valor: Double
 
     @Parameter(title: "Nome", requestValueDialog: IntentDialog("Qual o nome da conta?"))
     var nome: String
@@ -157,7 +157,7 @@ struct RegistrarContaPagarIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
-        let money = DinixMoney(decimalString: NSDecimalNumber(decimal: valor).stringValue)
+        let money = DinixMoney(intentValue: valor)
         let dia = min(max(diaVencimento ?? Calendar.current.component(.day, from: Date()), 1), 31)
         try await confirmar("Cadastrar a conta \(nome) de \(money.formatted()) com vencimento no dia \(dia)?")
         let client = DinixIntentSupport.client()
@@ -181,7 +181,7 @@ struct RegistrarAssinaturaIntent: AppIntent {
     static var authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 
     @Parameter(title: "Valor", requestValueDialog: IntentDialog("Qual o valor da assinatura?"))
-    var valor: Decimal
+    var valor: Double
 
     @Parameter(title: "Nome", requestValueDialog: IntentDialog("Qual o nome da assinatura?"))
     var nome: String
@@ -204,7 +204,7 @@ struct RegistrarAssinaturaIntent: AppIntent {
     }
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
-        let money = DinixMoney(decimalString: NSDecimalNumber(decimal: valor).stringValue)
+        let money = DinixMoney(intentValue: valor)
         let dia = min(max(diaCobranca ?? Calendar.current.component(.day, from: Date()), 1), 31)
         try await confirmar("Cadastrar a assinatura \(nome) de \(money.formatted())?")
         let client = DinixIntentSupport.client()
@@ -230,7 +230,7 @@ struct RegistrarInvestimentoIntent: AppIntent {
     static var authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 
     @Parameter(title: "Valor")
-    var valor: Decimal?
+    var valor: Double?
 
     func perform() async throws -> some IntentResult & ProvidesDialog & ReturnsValue<String> {
         let text = "O Dinix ainda não cadastra investimentos pelo aplicativo. Consulte o total investido pelo patrimônio."

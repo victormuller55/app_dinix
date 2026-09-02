@@ -10,8 +10,7 @@ enum DinixIntentSupport {
     static func range(
         periodo: PeriodoConsulta?,
         dataInicial: Date?,
-        dataFinal: Date?,
-        intervalo: DateInterval?
+        dataFinal: Date?
     ) -> DinixDateRange {
         if let dataInicial, let dataFinal {
             return DinixDateRange.resolve(
@@ -27,8 +26,12 @@ enum DinixIntentSupport {
                 dataFinal: dataInicial
             )
         }
-        if let intervalo {
-            return DinixDateRange.fromInterval(intervalo)
+        if let dataFinal {
+            return DinixDateRange.resolve(
+                periodo: .personalizado,
+                dataInicial: dataFinal,
+                dataFinal: dataFinal
+            )
         }
         if let periodo {
             return DinixDateRange.resolve(periodo: periodo.dominio)

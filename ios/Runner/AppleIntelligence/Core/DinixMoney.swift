@@ -20,6 +20,11 @@ struct DinixMoney: Equatable, Hashable, Sendable {
         self.cents = Self.parseJSON(jsonValue)
     }
 
+    /// Converte valor vindo de App Intent (`Double` é o tipo numérico estável do framework).
+    init(intentValue: Double) {
+        self.cents = Int((intentValue * 100.0).rounded())
+    }
+
     var decimal: Decimal {
         Decimal(cents) / 100
     }

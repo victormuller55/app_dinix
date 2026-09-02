@@ -2,6 +2,12 @@ import XCTest
 @testable import Runner
 
 final class DinixMoneyTests: XCTestCase {
+    func testIntentDoubleRoundsToCents() {
+        XCTAssertEqual(DinixMoney(intentValue: 187.50).cents, 18750)
+        XCTAssertEqual(DinixMoney(intentValue: 10.1).cents, 1010)
+        XCTAssertEqual(DinixMoney(intentValue: 0).cents, 0)
+    }
+
     func testParseDecimalString() {
         XCTAssertEqual(DinixMoney(decimalString: "187.50").cents, 18750)
         XCTAssertEqual(DinixMoney(decimalString: "187,50").cents, 18750)
