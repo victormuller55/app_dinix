@@ -4,8 +4,6 @@ import 'package:app_dinix/function/abrir_url.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:muller_package/muller_package.dart'
-    hide AppRadius, AppFontSizes, AppSpacing, AppFormFormatters;
 
 class PoliticaPrivacidadeAceite extends StatefulWidget {
   final bool aceito;
@@ -35,11 +33,6 @@ class _PoliticaPrivacidadeAceiteState extends State<PoliticaPrivacidadeAceite> {
     return abrirUrlExterna(AppApiConfig.privacyPolicyUrl);
   }
 
-  void _alternarAceite() {
-    HapticFeedback.selectionClick();
-    widget.onChanged(!widget.aceito);
-  }
-
   @override
   void dispose() {
     _linkRecognizer.dispose();
@@ -48,64 +41,44 @@ class _PoliticaPrivacidadeAceiteState extends State<PoliticaPrivacidadeAceite> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        GestureDetector(
-          onTap: _alternarAceite,
-          behavior: HitTestBehavior.opaque,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Icon(
-                  widget.aceito ? Phosphor.checkSquare : Phosphor.square,
-                  color: widget.aceito
-                      ? DinixColors.primary
-                      : DinixColors.textMuted,
-                  size: 24,
-                ),
-                const SizedBox(width: AppSpacing.normal),
-                Expanded(
-                  child: Text.rich(
-                    TextSpan(
-                      style: TextStyle(
-                        color: DinixColors.textMuted,
-                        fontSize: AppFontSizes.verySmall,
-                        fontFamily: AppFonts.family,
-                        height: 1.35,
-                      ),
-                      children: [
-                        const TextSpan(text: 'Li e aceito a '),
-                        TextSpan(
-                          text: 'Política de Privacidade',
-                          style: TextStyle(
-                            color: DinixColors.primary,
-                            fontWeight: FontWeight.w600,
-                            decoration: TextDecoration.underline,
-                            decorationColor: DinixColors.primary,
-                          ),
-                          recognizer: _linkRecognizer,
-                        ),
-                        const TextSpan(text: ' do Dinix.'),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
+    return CheckboxListTile(
+      value: widget.aceito,
+      onChanged: (value) {
+        HapticFeedback.selectionClick();
+        widget.onChanged(value ?? false);
+      },
+      controlAffinity: ListTileControlAffinity.leading,
+      contentPadding: EdgeInsets.zero,
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      tileColor: Colors.transparent,
+      activeColor: DinixColors.primary,
+      checkColor: DinixColors.onPrimary,
+      side: BorderSide(color: DinixColors.textMuted, width: 1.6),
+      title: Text.rich(
+        TextSpan(
+          style: TextStyle(
+            color: DinixColors.textMuted,
+            fontSize: AppFontSizes.verySmall,
+            fontFamily: AppFonts.family,
+            height: 1.35,
+          ),
+          children: [
+            const TextSpan(text: 'Li e aceito a '),
+            TextSpan(
+              text: 'Política de Privacidade',
+              style: TextStyle(
+                color: DinixColors.primary,
+                fontWeight: FontWeight.w600,
+                decoration: TextDecoration.underline,
+                decorationColor: DinixColors.primary,
+              ),
+              recognizer: _linkRecognizer,
             ),
-          ),
+            const TextSpan(text: ' do Dinix.'),
+          ],
         ),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: appTextButton(
-            text: 'Ler política de privacidade',
-            color: DinixColors.primary,
-            onTap: _abrirPolitica,
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

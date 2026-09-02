@@ -116,7 +116,7 @@ class _LoginPageState extends State<LoginPage> {
             aceito: _aceitouPolitica,
             onChanged: (aceito) => setState(() => _aceitouPolitica = aceito),
           ),
-          appSizedBox(height: AppSpacing.normal),
+          appSizedBox(height: AppSpacing.medium),
           appElevatedButtonDinix(title: AppStrings.entrar, onTap: _salvarLogin, height: 52),
           appSizedBox(height: AppSpacing.normal),
           appElevatedButtonDinix(

@@ -11,7 +11,7 @@ struct RegistrarDespesaIntent: AppIntent {
     static var authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 
     @Parameter(title: "Valor", requestValueDialog: IntentDialog("Qual o valor da despesa?"))
-    var valor: Double = 0
+    var valor: Double
 
     @Parameter(title: "Descrição")
     var descricao: String?
@@ -83,7 +83,7 @@ struct RegistrarReceitaIntent: AppIntent {
     static var authenticationPolicy: IntentAuthenticationPolicy = .requiresAuthentication
 
     @Parameter(title: "Valor", requestValueDialog: IntentDialog("Qual o valor da receita?"))
-    var valor: Double = 0
+    var valor: Double
 
     @Parameter(title: "Descrição")
     var descricao: String?
