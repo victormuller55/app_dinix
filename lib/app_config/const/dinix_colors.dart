@@ -23,6 +23,11 @@ class DinixColors {
   static Color get primary => _palette.primary;
   static Color get primaryDark => _palette.primaryDark;
   static Color get secondary => _palette.secondary;
+  static Color get appBar => _palette.appBar;
+  static Color get drawer => _palette.drawer;
+  static Color get onAppBar => _palette.onAppBar;
+  static Color get appBarIcon => _palette.appBarIcon;
+  static Color get onAppBarMuted => _palette.onAppBarMuted;
   static Color get background => _palette.background;
   static Color get surface => _palette.surface;
   static Color get surfaceElevated => _palette.surfaceElevated;

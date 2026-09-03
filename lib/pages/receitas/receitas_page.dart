@@ -201,9 +201,9 @@ class _ReceitasPageState extends State<ReceitasPage> {
       title: 'Entradas',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       actions: [dinixAddAction(onTap: _abrirCadastro, tooltip: 'Nova entrada')],
       body: body,
     );

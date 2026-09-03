@@ -585,7 +585,7 @@ class _ComprasPageState extends State<ComprasPage> {
           tooltip: 'Gastos mensais',
           icon: Icon(
             Phosphor.calendarBlank,
-            color: DinixColors.primary,
+            color: DinixColors.appBarIcon,
             size: 24,
           ),
         ),

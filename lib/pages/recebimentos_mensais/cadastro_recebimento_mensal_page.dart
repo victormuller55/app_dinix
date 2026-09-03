@@ -214,9 +214,9 @@ class _CadastroRecebimentoMensalPageState
       title: _isEdit ? 'Editar recebimento' : 'Novo recebimento mensal',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       body: _loading || _salvando
           ? appLoadingDinix()
           : Form(

@@ -16,6 +16,7 @@ import 'package:app_dinix/pages/recebimentos_mensais/recebimentos_mensais_page.d
 import 'package:app_dinix/pages/sobra_mensal/sobra_mensal_page.dart';
 import 'package:app_dinix/widgets/app_confirm_dialog.dart';
 import 'package:app_dinix/widgets/app_logo.dart';
+import 'package:app_dinix/widgets/dinix_scaffold.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:muller_package/muller_package.dart'
@@ -166,7 +167,10 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
   Future<void> _abrir(BuildContext context, Widget page) async {
     final nav = Navigator.of(context);
     nav.pop();
-    final rota = CupertinoPageRoute(builder: (_) => page);
+    final rota = CupertinoPageRoute(
+      builder: (_) => page,
+      settings: const RouteSettings(name: kRotaDrawer),
+    );
     if (nav.canPop()) {
       await nav.pushReplacement(rota);
     } else {
@@ -202,12 +206,12 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
 
   Widget _avatarFallback(String iniciais) {
     return ColoredBox(
-      color: DinixColors.primary,
+      color: DinixColors.appBarIcon,
       child: Center(
         child: appText(
           iniciais,
           bold: true,
-          color: DinixColors.onPrimary,
+          color: DinixColors.drawer,
           fontSize: AppFontSizes.normal,
         ),
       ),
@@ -222,7 +226,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
       height: 58,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(color: DinixColors.primary, width: 1.5),
+        border: Border.all(color: DinixColors.appBarIcon, width: 1.5),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.35),
@@ -265,7 +269,11 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
               const Spacer(),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(Phosphor.x, color: DinixColors.textMuted, size: 22),
+                icon: Icon(
+                  Phosphor.x,
+                  color: DinixColors.onAppBarMuted,
+                  size: 22,
+                ),
                 tooltip: 'Fechar',
               ),
             ],
@@ -283,7 +291,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
                     appText(
                       nome,
                       bold: true,
-                      color: DinixColors.textPrimary,
+                      color: DinixColors.onAppBar,
                       fontSize: 17,
                       maxLines: 1,
                       overflow: true,
@@ -292,7 +300,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
                       appSizedBox(height: 4),
                       appText(
                         email,
-                        color: DinixColors.textMuted,
+                        color: DinixColors.onAppBarMuted,
                         fontSize: AppFontSizes.verySmall,
                         maxLines: 1,
                         overflow: true,
@@ -309,7 +317,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
   }
 
   Widget _iconeCaixa(IconData icon, {Color? color, double size = 40}) {
-    final cor = color ?? DinixColors.primary;
+    final cor = color ?? DinixColors.appBarIcon;
     return Container(
       width: size,
       height: size,
@@ -321,10 +329,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
     );
   }
 
-  Widget _item(
-    _DrawerItem item, {
-    bool submenu = false,
-  }) {
+  Widget _item(_DrawerItem item) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -338,32 +343,22 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
         },
         borderRadius: BorderRadius.circular(AppRadius.card),
         child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            submenu ? 28 : 12,
-            submenu ? 10 : 12,
-            12,
-            submenu ? 10 : 12,
-          ),
+          padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
           child: Row(
             children: [
-              _iconeCaixa(
-                item.icon,
-                size: submenu ? 34 : 40,
-              ),
+              _iconeCaixa(item.icon),
               appSizedBox(width: 12),
               Expanded(
                 child: appText(
                   item.title,
                   bold: true,
-                  color: DinixColors.textPrimary,
-                  fontSize: submenu
-                      ? AppFontSizes.verySmall
-                      : AppFontSizes.small,
+                  color: DinixColors.onAppBar,
+                  fontSize: AppFontSizes.small,
                 ),
               ),
               Icon(
                 Phosphor.caretRight,
-                color: DinixColors.textMuted,
+                color: DinixColors.onAppBarMuted,
                 size: 16,
               ),
             ],
@@ -393,7 +388,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
                     child: appText(
                       grupo.title,
                       bold: true,
-                      color: DinixColors.textPrimary,
+                      color: DinixColors.onAppBar,
                       fontSize: AppFontSizes.small,
                     ),
                   ),
@@ -402,7 +397,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
                     duration: const Duration(milliseconds: 180),
                     child: Icon(
                       Phosphor.caretRight,
-                      color: DinixColors.textMuted,
+                      color: DinixColors.onAppBarMuted,
                       size: 16,
                     ),
                   ),
@@ -413,19 +408,28 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
         ),
         AnimatedCrossFade(
           firstChild: const SizedBox(width: double.infinity),
-          secondChild: Column(
-            children: [
-              for (var i = 0; i < grupo.itens.length; i++) ...[
-                if (i > 0)
-                  Divider(
-                    height: 1,
-                    color: AppColors.grey800.withValues(alpha: 0.45),
-                    indent: 74,
-                    endIndent: 12,
-                  ),
-                _item(grupo.itens[i], submenu: true),
-              ],
-            ],
+          secondChild: Padding(
+            padding: const EdgeInsets.fromLTRB(4, 2, 4, 6),
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: DinixColors.onAppBar.withValues(alpha: 0.06),
+                borderRadius: BorderRadius.circular(AppRadius.card),
+                border: Border.all(
+                  color: DinixColors.appBarIcon.withValues(alpha: 0.38),
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadius.card),
+                child: Column(
+                  children: [
+                    for (var i = 0; i < grupo.itens.length; i++) ...[
+                      if (i > 0) _divisor(),
+                      _item(grupo.itens[i]),
+                    ],
+                  ],
+                ),
+              ),
+            ),
           ),
           crossFadeState:
               aberto ? CrossFadeState.showSecond : CrossFadeState.showFirst,
@@ -469,7 +473,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
   Widget _divisor({double indent = 64}) {
     return Divider(
       height: 1,
-      color: AppColors.grey800.withValues(alpha: 0.55),
+      color: DinixColors.onAppBar.withValues(alpha: 0.14),
       indent: indent,
       endIndent: 12,
     );
@@ -479,7 +483,7 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
   Widget build(BuildContext context) {
     DinixThemeScope.depend(context);
     return Drawer(
-      backgroundColor: DinixColors.background,
+      backgroundColor: DinixColors.drawer,
       elevation: 24,
       shadowColor: Colors.black,
       surfaceTintColor: Colors.transparent,
@@ -488,11 +492,13 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
       ),
       child: DecoratedBox(
         decoration: BoxDecoration(
-          color: DinixColors.background,
+          color: DinixColors.drawer,
           borderRadius:
               const BorderRadius.horizontal(right: Radius.circular(20)),
           border: Border(
-            right: BorderSide(color: AppColors.grey800.withValues(alpha: 0.9)),
+            right: BorderSide(
+              color: DinixColors.onAppBar.withValues(alpha: 0.18),
+            ),
           ),
           boxShadow: [
             BoxShadow(
@@ -509,13 +515,16 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
               _cabecalho(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
-                child: Divider(height: 1, color: AppColors.grey800),
+                child: Divider(
+                  height: 1,
+                  color: DinixColors.onAppBar.withValues(alpha: 0.2),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
                 child: appText(
                   'Menu',
-                  color: DinixColors.textMuted,
+                  color: DinixColors.onAppBarMuted,
                   fontSize: AppFontSizes.verySmall,
                 ),
               ),
@@ -534,7 +543,10 @@ class _DinixAppDrawerState extends State<DinixAppDrawer> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
-                child: Divider(height: 1, color: AppColors.grey800),
+                child: Divider(
+                  height: 1,
+                  color: DinixColors.onAppBar.withValues(alpha: 0.2),
+                ),
               ),
               _botaoSair(),
             ],

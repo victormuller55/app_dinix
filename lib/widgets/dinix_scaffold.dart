@@ -9,6 +9,17 @@ import 'package:muller_package/muller_package.dart'
 /// Indica se algum drawer Dinix está aberto (ex.: para esconder a CNTabBar no iOS).
 final ValueNotifier<bool> dinixDrawerAberto = ValueNotifier<bool>(false);
 
+/// Nome das rotas abertas pelo drawer: define se a AppBar mostra a logo (abre o
+/// drawer) ou a seta de voltar (telas abertas por atalho).
+const String kRotaDrawer = 'dinix/drawer';
+
+/// Rota da tela atual veio do drawer (ou é uma aba raiz, sem para onde voltar).
+bool _abertoPeloDrawer(BuildContext context) {
+  final rota = ModalRoute.of(context);
+  if (rota == null) return true;
+  return rota.settings.name == kRotaDrawer || !rota.canPop;
+}
+
 /// Scaffold das abas do menu: menu drawer à esquerda, título centralizado e ações à direita.
 Widget dinixMenuScaffold({
   required String title,
@@ -31,7 +42,7 @@ Widget dinixMenuScaffold({
           IconButton(
             onPressed: onAdd,
             tooltip: addTooltip,
-            icon: Icon(Phosphor.plus, color: DinixColors.primary, size: 26),
+            icon: Icon(Phosphor.plus, color: DinixColors.appBarIcon, size: 26),
           ),
         if ((actions == null || actions.isEmpty) && onAdd == null)
           const SizedBox(width: 72),
@@ -50,8 +61,8 @@ Widget dinixMenuScaffold({
             : null,
         appBar: AppBar(
           elevation: 0,
-          backgroundColor: DinixColors.primaryDark,
-          foregroundColor: DinixColors.textPrimary,
+          backgroundColor: DinixColors.appBar,
+          foregroundColor: DinixColors.onAppBar,
           centerTitle: true,
           automaticallyImplyLeading: false,
           leadingWidth: 72,
@@ -60,17 +71,26 @@ Widget dinixMenuScaffold({
                   builder: (context) {
                     final isLight =
                         Theme.of(context).brightness == Brightness.light;
+                    final peloDrawer = _abertoPeloDrawer(context);
                     return Padding(
                       padding: const EdgeInsets.only(left: 8),
                       child: Align(
                         alignment: Alignment.centerLeft,
                         child: IconButton(
-                          onPressed: () => Scaffold.of(context).openDrawer(),
-                          tooltip: 'Menu',
-                          icon: isLight
+                          onPressed: peloDrawer
+                              ? () => Scaffold.of(context).openDrawer()
+                              : () => Navigator.of(context).maybePop(),
+                          tooltip: peloDrawer ? 'Menu' : 'Voltar',
+                          icon: !peloDrawer
+                              ? Icon(
+                                  Phosphor.caretLeft,
+                                  color: DinixColors.onAppBar,
+                                  size: 26,
+                                )
+                              : isLight
                               ? Icon(
                                   Phosphor.list,
-                                  color: DinixColors.primary,
+                                  color: DinixColors.appBarIcon,
                                   size: 28,
                                 )
                               : Image.asset(
@@ -91,7 +111,7 @@ Widget dinixMenuScaffold({
                     child: Theme.of(context).brightness == Brightness.light
                         ? Icon(
                             Phosphor.list,
-                            color: DinixColors.primary,
+                            color: DinixColors.appBarIcon,
                             size: 26,
                           )
                         : Image.asset(
@@ -104,7 +124,7 @@ Widget dinixMenuScaffold({
                 ),
           title: appText(
             title.toUpperCase(),
-            color: DinixColors.textPrimary,
+            color: DinixColors.onAppBar,
             fontSize: AppFontSizes.verySmall,
             bold: true,
           ),
@@ -123,6 +143,6 @@ Widget dinixAddAction({
   return IconButton(
     onPressed: onTap,
     tooltip: tooltip,
-    icon: Icon(Phosphor.plus, color: DinixColors.primary, size: 26),
+    icon: Icon(Phosphor.plus, color: DinixColors.appBarIcon, size: 26),
   );
 }

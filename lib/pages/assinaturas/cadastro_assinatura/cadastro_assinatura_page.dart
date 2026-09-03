@@ -291,9 +291,9 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
       title: _isEdit ? 'Editar assinatura' : 'Nova assinatura',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       body: BlocConsumer<CadastroAssinaturaBloc, CadastroAssinaturaState>(
         bloc: bloc,
         listener: (_, state) => _onState(state),

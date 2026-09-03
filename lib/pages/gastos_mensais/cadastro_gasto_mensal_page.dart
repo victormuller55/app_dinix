@@ -292,9 +292,9 @@ class _CadastroGastoMensalPageState extends State<CadastroGastoMensalPage> {
       title: _isEdit ? 'Editar gasto mensal' : 'Novo gasto mensal',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       body: _loading || _salvando
           ? appLoadingDinix()
           : Form(

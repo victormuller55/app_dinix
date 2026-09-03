@@ -320,9 +320,9 @@ class _CadastroCompraPageState extends State<CadastroCompraPage> {
       title: _isEdit ? 'Editar compra' : 'Nova compra',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       body: BlocConsumer<CadastroCompraBloc, CadastroCompraState>(
         bloc: bloc,
         listener: (_, state) => _onState(state),

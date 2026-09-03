@@ -228,7 +228,7 @@ class _CarteirasPageState extends State<CarteirasPage> {
       actions: [
         IconButton(
           onPressed: _abrirCartoes,
-          icon: Icon(Phosphor.creditCard, color: DinixColors.primary),
+          icon: Icon(Phosphor.creditCard, color: DinixColors.appBarIcon),
           tooltip: 'Cartões',
         ),
       ],

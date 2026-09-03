@@ -9,15 +9,14 @@ import 'package:muller_package/muller_package.dart'
 SystemUiOverlayStyle systemUiOverlayFor(Brightness brightness) {
   final palette =
       brightness == Brightness.dark ? DinixPalette.dark : DinixPalette.light;
-  final dark = brightness == Brightness.dark;
   return SystemUiOverlayStyle(
-    statusBarColor: palette.primaryDark,
-    statusBarIconBrightness: dark ? Brightness.light : Brightness.dark,
-    statusBarBrightness: dark ? Brightness.dark : Brightness.light,
+    statusBarColor: palette.appBar,
+    // As barras são escuras nos dois temas (preto/laranja queimado).
+    statusBarIconBrightness: Brightness.light,
+    statusBarBrightness: Brightness.dark,
     systemStatusBarContrastEnforced: false,
     systemNavigationBarColor: palette.primaryDark,
-    systemNavigationBarIconBrightness:
-        dark ? Brightness.light : Brightness.dark,
+    systemNavigationBarIconBrightness: Brightness.light,
     systemNavigationBarDividerColor: palette.primaryDark,
     systemNavigationBarContrastEnforced: false,
   );
@@ -66,19 +65,19 @@ ThemeData buildAppTheme({
     textTheme: textTheme,
     primaryTextTheme: textTheme,
     appBarTheme: AppBarTheme(
-      backgroundColor: palette.primaryDark,
-      foregroundColor: textColor,
+      backgroundColor: palette.appBar,
+      foregroundColor: palette.onAppBar,
       elevation: 0,
       centerTitle: true,
       systemOverlayStyle: overlay,
       titleTextStyle: textTheme.titleLarge?.copyWith(
         fontFamily: AppFonts.family,
-        color: textColor,
+        color: palette.onAppBar,
         fontWeight: FontWeight.w600,
       ),
       toolbarTextStyle: textTheme.bodyMedium?.copyWith(
         fontFamily: AppFonts.family,
-        color: textColor,
+        color: palette.onAppBar,
       ),
     ),
     dividerColor: dark ? const Color(0xFF2C2C2C) : const Color(0xFFE0E0E0),
@@ -107,8 +106,9 @@ ThemeData buildAppTheme({
     ),
     progressIndicatorTheme: ProgressIndicatorThemeData(
       color: dark ? Colors.white : palette.primary,
-      circularTrackColor:
-          dark ? const Color(0x33FFFFFF) : const Color(0x330D47A1),
+      circularTrackColor: dark
+          ? const Color(0x33FFFFFF)
+          : palette.primary.withValues(alpha: 0.2),
       refreshBackgroundColor: palette.surfaceElevated,
     ),
     dialogTheme: DialogThemeData(

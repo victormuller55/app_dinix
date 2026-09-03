@@ -2,8 +2,26 @@ import 'package:flutter/material.dart';
 
 class DinixPalette {
   final Color primary;
-  final Color primaryDark;
   final Color secondary;
+
+  /// Fundo da barra inferior (e da navigation bar do sistema).
+  final Color primaryDark;
+
+  /// Fundo da AppBar e da status bar.
+  final Color appBar;
+
+  /// Fundo do drawer: um tom abaixo das barras.
+  final Color drawer;
+
+  /// Título e ícone de voltar sobre as barras.
+  final Color onAppBar;
+
+  /// Ícones de ação da AppBar e item ativo da barra inferior.
+  final Color appBarIcon;
+
+  /// Item inativo da barra inferior.
+  final Color onAppBarMuted;
+
   final Color background;
   final Color surface;
   final Color surfaceElevated;
@@ -15,6 +33,11 @@ class DinixPalette {
     required this.primary,
     required this.primaryDark,
     required this.secondary,
+    required this.appBar,
+    required this.drawer,
+    required this.onAppBar,
+    required this.appBarIcon,
+    required this.onAppBarMuted,
     required this.background,
     required this.surface,
     required this.surfaceElevated,
@@ -27,6 +50,11 @@ class DinixPalette {
     primary: Color(0xFFFF9800),
     primaryDark: Color(0xFF000000),
     secondary: Color(0xFFFF9800),
+    appBar: Color(0xFF000000),
+    drawer: Color(0xFF000000),
+    onAppBar: Color(0xFFF5F5F5),
+    appBarIcon: Color(0xFFFF9800),
+    onAppBarMuted: Color(0xFFBDBDBD),
     background: Color(0xFF121212),
     surface: Color(0xFF121212),
     surfaceElevated: Color(0xFF1C1C1C),
@@ -36,10 +64,16 @@ class DinixPalette {
   );
 
   static const light = DinixPalette(
-    primary: Color(0xFF0D47A1),
-    // Barras (topo/baixo) = mesmo cinza dos cards, para destacar do fundo.
-    primaryDark: Color(0xFFF0F0F0),
-    secondary: Color(0xFF0D47A1),
+    // Grafite azulado no lugar do laranja: acentos e barras na mesma cor.
+    primary: Color(0xFF1F2937),
+    secondary: Color(0xFF1F2937),
+    primaryDark: Color(0xFF1F2937),
+    appBar: Color(0xFF1F2937),
+    drawer: Color(0xFF111827),
+    onAppBar: Color(0xFFFFFFFF),
+    // Sobre as barras a cor de acento sumiria: o conteúdo delas é branco.
+    appBarIcon: Color(0xFFFFFFFF),
+    onAppBarMuted: Color(0x99FFFFFF),
     background: Color(0xFFFAFAFA),
     surface: Color(0xFFFFFFFF),
     surfaceElevated: Color(0xFFF0F0F0),

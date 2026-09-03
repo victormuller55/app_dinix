@@ -341,13 +341,13 @@ class _DetalheCartaoPageState extends State<DetalheCartaoPage> {
       title: 'Cartão',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       actions: [
         IconButton(
           onPressed: _abrirEditarCartao,
-          icon: Icon(Phosphor.pencilSimple, color: DinixColors.primary),
+          icon: Icon(Phosphor.pencilSimple, color: DinixColors.appBarIcon),
           tooltip: 'Editar cartão',
         ),
       ],

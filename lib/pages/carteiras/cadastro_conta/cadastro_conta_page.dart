@@ -210,9 +210,9 @@ class _CadastroContaPageState extends State<CadastroContaPage> {
       title: _isEdit ? 'Editar conta' : 'Nova conta',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       body: BlocConsumer<CadastroContaBloc, CadastroContaState>(
         bloc: bloc,
         listener: (_, state) => _onState(state),

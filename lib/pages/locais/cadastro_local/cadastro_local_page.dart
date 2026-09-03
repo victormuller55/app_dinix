@@ -151,9 +151,9 @@ class _CadastroLocalPageState extends State<CadastroLocalPage> {
       title: _isEdit ? 'Editar local' : 'Novo estabelecimento',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       body: BlocConsumer<CadastroLocalBloc, CadastroLocalState>(
         bloc: bloc,
         listener: (_, state) => _onState(state),

@@ -1,4 +1,4 @@
-package br.net.convertix.app_dinix
+package br.net.convertix.dinix
 
 import io.flutter.embedding.android.FlutterFragmentActivity
 

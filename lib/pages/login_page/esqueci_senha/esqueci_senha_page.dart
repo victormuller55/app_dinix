@@ -211,15 +211,15 @@ class _EsqueciSenhaPageState extends State<EsqueciSenhaPage> {
       child: Scaffold(
         backgroundColor: DinixColors.background,
         appBar: AppBar(
-          backgroundColor: DinixColors.primaryDark,
+          backgroundColor: DinixColors.appBar,
           elevation: 0,
           leading: IconButton(
             onPressed: _voltar,
-            icon: Icon(Phosphor.arrowLeft, color: DinixColors.textPrimary),
+            icon: Icon(Phosphor.arrowLeft, color: DinixColors.onAppBar),
           ),
           title: appText(
             'Recuperar senha',
-            color: DinixColors.textPrimary,
+            color: DinixColors.onAppBar,
             fontSize: AppFontSizes.small,
             bold: true,
           ),

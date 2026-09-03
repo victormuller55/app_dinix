@@ -35,17 +35,17 @@ class CadastroFluxoShell extends StatelessWidget {
       child: Scaffold(
         backgroundColor: DinixColors.background,
         appBar: AppBar(
-          backgroundColor: DinixColors.primaryDark,
+          backgroundColor: DinixColors.appBar,
           elevation: 0,
           leading: onVoltar == null
               ? null
               : IconButton(
                   onPressed: onVoltar,
-                  icon: Icon(Phosphor.arrowLeft, color: DinixColors.textPrimary),
+                  icon: Icon(Phosphor.arrowLeft, color: DinixColors.onAppBar),
                 ),
           title: appText(
             'Cadastro',
-            color: DinixColors.textPrimary,
+            color: DinixColors.onAppBar,
             fontSize: AppFontSizes.small,
             bold: true,
           ),

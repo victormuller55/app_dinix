@@ -280,9 +280,9 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
       title: _isEdit ? 'Editar cartão' : 'Novo cartão',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       body: BlocConsumer<CadastroCartaoBloc, CadastroCartaoState>(
         bloc: bloc,
         listener: (_, state) => _onState(state),

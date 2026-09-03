@@ -233,9 +233,9 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
       title: _isEdit ? 'Editar ganho' : 'Novo ganho',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       body: BlocConsumer<CadastroReceitaBloc, CadastroReceitaState>(
         bloc: bloc,
         listener: (_, state) => _onState(state),

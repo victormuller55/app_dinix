@@ -70,9 +70,9 @@ class _ApagarContaPageState extends State<ApagarContaPage> {
       title: 'Apagar conta',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       body: _carregando
           ? appLoadingDinix()
           : Form(

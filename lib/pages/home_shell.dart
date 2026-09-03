@@ -153,7 +153,7 @@ class _HomeShellState extends State<HomeShell> {
       child: Center(
         child: Icon(
           selected ? item.iconSelected : item.iconOutlined,
-          color: selected ? DinixColors.primary : DinixColors.textMuted,
+          color: selected ? DinixColors.appBarIcon : DinixColors.onAppBarMuted,
           size: 26,
         ),
       ),

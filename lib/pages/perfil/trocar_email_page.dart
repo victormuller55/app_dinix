@@ -187,9 +187,9 @@ class _TrocarEmailPageState extends State<TrocarEmailPage> {
       title: 'Trocar e-mail',
       centerTitle: true,
       background: DinixColors.background,
-      appBarColor: DinixColors.primaryDark,
-      titleColor: DinixColors.textPrimary,
-      drawerColor: DinixColors.textPrimary,
+      appBarColor: DinixColors.appBar,
+      titleColor: DinixColors.onAppBar,
+      drawerColor: DinixColors.onAppBar,
       body: _carregando
           ? appLoadingDinix()
           : (_aguardandoCodigo ? _passoCodigo() : _passoEmail()),
