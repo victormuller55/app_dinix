@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/function/await_bloc_refresh.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/models/cartao_credito_model.dart';
 import 'package:app_dinix/pages/carteiras/cartoes/cadastro_cartao/cadastro_cartao_page.dart';
@@ -150,9 +151,12 @@ class _CartoesPageState extends State<CartoesPage> {
           );
         }
         if (state is CartoesSuccessState) {
-          Future<void> atualizar() async {
-            bloc.add(CartoesLoadEvent(forceRefresh: true));
-          }
+          Future<void> atualizar() => awaitBlocRefresh(
+            bloc,
+            isDone: (state) =>
+                state is CartoesSuccessState || state is CartoesErrorState,
+            dispatch: () => bloc.add(CartoesLoadEvent(forceRefresh: true)),
+          );
 
           if (state.cartoes.isEmpty) {
             return listaRefreshVazia(

@@ -5,6 +5,7 @@ import 'package:app_dinix/pages/sobra_mensal/sobra_mensal_service.dart';
 import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
+import 'package:app_dinix/widgets/fade_slide_in.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:muller_package/muller_package.dart'
@@ -248,7 +249,7 @@ class _SobraMensalPageState extends State<SobraMensalPage> {
             fontSize: AppFontSizes.verySmall,
           ),
           appSizedBox(height: 14),
-          _cardResumo(resumo),
+          FadeSlideIn(index: 0, child: _cardResumo(resumo)),
           appSizedBox(height: 20),
           appText(
             'Mês a mês',
@@ -257,7 +258,12 @@ class _SobraMensalPageState extends State<SobraMensalPage> {
             fontSize: AppFontSizes.small,
           ),
           appSizedBox(height: 10),
-          ...resumo.meses.map(_cardMes),
+          ...resumo.meses.asMap().entries.map(
+            (entry) => FadeSlideIn(
+              index: entry.key + 1,
+              child: _cardMes(entry.value),
+            ),
+          ),
         ],
       ),
     );

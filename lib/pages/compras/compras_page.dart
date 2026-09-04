@@ -1,5 +1,6 @@
 import 'package:app_dinix/app_config/app_enums.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/function/await_bloc_refresh.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/function/categoria_icone.dart';
 import 'package:app_dinix/function/service/api_error.dart';
@@ -125,7 +126,7 @@ class _ComprasPageState extends State<ComprasPage> {
         title: 'Conta',
         items: contas,
         labelOf: (c) => c.nome ?? '',
-        subtitleOf: (c) => c.nomeBanco,
+        subtitleOf: (c) => TipoConta.rotulo(c.tipoConta),
         selected: contas.where((c) => c.id == idContaPadrao).firstOrNull,
         leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
       );
@@ -231,7 +232,7 @@ class _ComprasPageState extends State<ComprasPage> {
         title: 'Conta de destino',
         items: contas,
         labelOf: (c) => c.nome ?? 'Conta',
-        subtitleOf: (c) => c.nomeBanco,
+        subtitleOf: (c) => TipoConta.rotulo(c.tipoConta),
         selected: null,
         leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
       );
@@ -619,9 +620,12 @@ class _ComprasPageState extends State<ComprasPage> {
             );
           }
           if (state is ComprasSuccessState) {
-            Future<void> atualizar() async {
-              bloc.add(ComprasLoadEvent(forceRefresh: true));
-            }
+            Future<void> atualizar() => awaitBlocRefresh(
+              bloc,
+              isDone: (state) =>
+                  state is ComprasSuccessState || state is ComprasErrorState,
+              dispatch: () => bloc.add(ComprasLoadEvent(forceRefresh: true)),
+            );
             final vazio = state.compras.isEmpty &&
                 state.pendentesMensais.isEmpty &&
                 state.pendentesAssinaturas.isEmpty &&

@@ -313,28 +313,74 @@ Widget cadastroCampoQuando({
   final ontem = hoje.subtract(const Duration(days: 1));
   final amanha = hoje.add(const Duration(days: 1));
   final selecionada = DateTime(data.year, data.month, data.day);
+  final dataIso =
+      '${selecionada.year}-${selecionada.month.toString().padLeft(2, '0')}-${selecionada.day.toString().padLeft(2, '0')}';
 
   return cadastroSecao(
     titulo,
-    cadastroGradeChips(
-      [
-        cadastroChip(
-          label: 'Ontem',
-          selecionado: selecionada == ontem,
-          onTap: () => onChanged(ontem),
-        ),
-        cadastroChip(
-          label: 'Hoje',
-          selecionado: selecionada == hoje,
-          onTap: () => onChanged(hoje),
-        ),
-        cadastroChip(
-          label: 'Amanhã',
-          selecionado: selecionada == amanha,
-          onTap: () => onChanged(amanha),
-        ),
-      ],
-      colunas: 3,
+    Builder(
+      builder: (context) {
+        return Column(
+          children: [
+            cadastroGradeChips(
+              [
+                cadastroChip(
+                  label: 'Ontem',
+                  selecionado: selecionada == ontem,
+                  onTap: () => onChanged(ontem),
+                ),
+                cadastroChip(
+                  label: 'Hoje',
+                  selecionado: selecionada == hoje,
+                  onTap: () => onChanged(hoje),
+                ),
+                cadastroChip(
+                  label: 'Amanhã',
+                  selecionado: selecionada == amanha,
+                  onTap: () => onChanged(amanha),
+                ),
+              ],
+              colunas: 3,
+            ),
+            appSizedBox(height: 8),
+            cadastroBotaoSeletor(
+              tituloVazio: 'Escolher data',
+              valor: isoParaBr(dataIso),
+              leading: Icon(
+                Phosphor.calendarBlank,
+                color: DinixColors.primary,
+              ),
+              onTap: () async {
+                final escolhido = await showDatePicker(
+                  context: context,
+                  initialDate: selecionada,
+                  firstDate: DateTime(2020),
+                  lastDate: DateTime(agora.year + 5),
+                  helpText: 'Escolher dia',
+                  builder: (context, child) {
+                    final scheme = Theme.of(context).colorScheme;
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: scheme.copyWith(
+                          primary: DinixColors.primary,
+                          onPrimary: DinixColors.onPrimary,
+                          surface: DinixColors.surfaceElevated,
+                          onSurface: DinixColors.textPrimary,
+                        ),
+                      ),
+                      child: child!,
+                    );
+                  },
+                );
+                if (escolhido == null) return;
+                onChanged(
+                  DateTime(escolhido.year, escolhido.month, escolhido.day),
+                );
+              },
+            ),
+          ],
+        );
+      },
     ),
   );
 }

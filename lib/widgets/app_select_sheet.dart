@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:muller_package/muller_package.dart' hide AppRadius, AppFontSizes, AppSpacing;
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/widgets/empty.dart';
+import 'package:flutter/material.dart';
+import 'package:muller_package/muller_package.dart'
+    hide AppRadius, AppFontSizes, AppSpacing;
 
 Future<T?> showAppSelectSheet<T>({
   required BuildContext context,
@@ -10,6 +12,8 @@ Future<T?> showAppSelectSheet<T>({
   T? selected,
   Widget Function(T)? leadingOf,
   String? Function(T)? subtitleOf,
+  String? emptyTitle,
+  IconData emptyIcon = Phosphor.tray,
 }) {
   return showModalBottomSheet<T>(
     context: context,
@@ -49,36 +53,46 @@ Future<T?> showAppSelectSheet<T>({
                   ),
                 ),
               ),
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: items.length,
-                  itemBuilder: (_, index) {
-                    final item = items[index];
-                    final selectedItem = selected != null && selected == item;
-                    final subtitle = subtitleOf?.call(item);
-                    return ListTile(
-                      leading: leadingOf?.call(item),
-                      title: appText(
-                        labelOf(item),
-                        color: DinixColors.textPrimary,
-                        bold: selectedItem,
-                      ),
-                      subtitle: subtitle == null || subtitle.isEmpty
-                          ? null
-                          : appText(
-                              subtitle,
-                              color: DinixColors.textMuted,
-                              fontSize: AppFontSizes.verySmall,
-                            ),
-                      trailing: selectedItem
-                          ? Icon(Phosphor.check, color: DinixColors.primary)
-                          : null,
-                      onTap: () => Navigator.pop(ctx, item),
-                    );
-                  },
+              if (items.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 32, 24, 48),
+                  child: emptyMessage(
+                    title: emptyTitle ?? 'Nenhum item cadastrado',
+                    icon: emptyIcon,
+                  ),
+                )
+              else
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: items.length,
+                    itemBuilder: (_, index) {
+                      final item = items[index];
+                      final selectedItem =
+                          selected != null && selected == item;
+                      final subtitle = subtitleOf?.call(item);
+                      return ListTile(
+                        leading: leadingOf?.call(item),
+                        title: appText(
+                          labelOf(item),
+                          color: DinixColors.textPrimary,
+                          bold: selectedItem,
+                        ),
+                        subtitle: subtitle == null || subtitle.isEmpty
+                            ? null
+                            : appText(
+                                subtitle,
+                                color: DinixColors.textMuted,
+                                fontSize: AppFontSizes.verySmall,
+                              ),
+                        trailing: selectedItem
+                            ? Icon(Phosphor.check, color: DinixColors.primary)
+                            : null,
+                        onTap: () => Navigator.pop(ctx, item),
+                      );
+                    },
+                  ),
                 ),
-              ),
             ],
           ),
         ),

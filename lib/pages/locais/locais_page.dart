@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/function/await_bloc_refresh.dart';
 import 'package:app_dinix/function/categoria_icone.dart';
 import 'package:app_dinix/models/local_model.dart';
 import 'package:app_dinix/pages/locais/cadastro_local/cadastro_local_page.dart';
@@ -102,9 +103,12 @@ class _LocaisPageState extends State<LocaisPage> {
             );
           }
           if (state is LocaisSuccessState) {
-            Future<void> atualizar() async {
-              bloc.add(LocaisLoadEvent(forceRefresh: true));
-            }
+            Future<void> atualizar() => awaitBlocRefresh(
+              bloc,
+              isDone: (state) =>
+                  state is LocaisSuccessState || state is LocaisErrorState,
+              dispatch: () => bloc.add(LocaisLoadEvent(forceRefresh: true)),
+            );
 
             if (state.locais.isEmpty) {
               return listaRefreshVazia(

@@ -1,6 +1,7 @@
 import 'package:app_dinix/app_config/app_enums.dart';
 import 'package:app_dinix/app_config/bancos_catalogo.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/function/await_bloc_refresh.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/models/conta_model.dart';
 import 'package:app_dinix/pages/carteiras/cadastro_conta/cadastro_conta_page.dart';
@@ -162,9 +163,12 @@ class _CarteirasPageState extends State<CarteirasPage> {
   }
 
   Widget _lista(CarteirasSuccessState state) {
-    Future<void> atualizar() async {
-      bloc.add(CarteirasLoadEvent(forceRefresh: true));
-    }
+    Future<void> atualizar() => awaitBlocRefresh(
+      bloc,
+      isDone: (state) =>
+          state is CarteirasSuccessState || state is CarteirasErrorState,
+      dispatch: () => bloc.add(CarteirasLoadEvent(forceRefresh: true)),
+    );
 
     if (state.contas.isEmpty) {
       return listaRefreshVazia(

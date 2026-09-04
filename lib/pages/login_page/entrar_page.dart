@@ -140,7 +140,7 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             appLogoDinix(height: 56),
             appSizedBox(height: AppSpacing.big),
-            appLoadingDinix(),
+            appLoadingDinix(size: 28),
           ],
         ),
       ),

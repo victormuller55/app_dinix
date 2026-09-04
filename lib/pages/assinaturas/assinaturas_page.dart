@@ -1,6 +1,7 @@
 import 'package:app_dinix/app_config/app_enums.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
+import 'package:app_dinix/function/await_bloc_refresh.dart';
 import 'package:app_dinix/function/categoria_icone.dart';
 import 'package:app_dinix/models/assinatura_model.dart';
 import 'package:app_dinix/models/categoria_model.dart';
@@ -274,9 +275,14 @@ class _AssinaturasPageState extends State<AssinaturasPage> {
             );
           }
           if (state is AssinaturasSuccessState) {
-            Future<void> atualizar() async {
-              bloc.add(AssinaturasLoadEvent(forceRefresh: true));
-            }
+            Future<void> atualizar() => awaitBlocRefresh(
+              bloc,
+              isDone: (state) =>
+                  state is AssinaturasSuccessState ||
+                  state is AssinaturasErrorState,
+              dispatch: () =>
+                  bloc.add(AssinaturasLoadEvent(forceRefresh: true)),
+            );
 
             if (state.assinaturas.isEmpty) {
               return listaRefreshVazia(

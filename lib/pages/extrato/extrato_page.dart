@@ -88,14 +88,16 @@ class _ExtratoPageState extends State<ExtratoPage> {
     _carregarMais();
   }
 
-  Future<void> _carregar({bool forceRefresh = false}) async {
+  Future<void> _carregar({bool forceRefresh = false, bool limpar = false}) async {
     setState(() {
-      _loading = true;
+      _loading = _itens.isEmpty || limpar;
       _erro = null;
-      if (forceRefresh) {
-        _itens.clear();
+      if (forceRefresh || limpar) {
         _numPag = 1;
         _maxPag = 1;
+      }
+      if (limpar) {
+        _itens.clear();
       }
     });
     try {
@@ -149,7 +151,7 @@ class _ExtratoPageState extends State<ExtratoPage> {
       return;
     }
     setState(() => _filtro = filtro);
-    _carregar(forceRefresh: true);
+    _carregar(forceRefresh: true, limpar: true);
   }
 
   String _rotuloPeriodo() {

@@ -171,7 +171,7 @@ class _CadastroGastoMensalPageState extends State<CadastroGastoMensalPage> {
       title: 'Conta',
       items: _contas,
       labelOf: (c) => c.nome ?? '',
-      subtitleOf: (c) => c.nomeBanco,
+      subtitleOf: (c) => TipoConta.rotulo(c.tipoConta),
       selected: _contas.where((c) => c.id == _idConta).firstOrNull,
       leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
     );

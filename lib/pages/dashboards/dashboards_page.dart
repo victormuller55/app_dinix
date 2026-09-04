@@ -9,6 +9,7 @@ import 'package:app_dinix/pages/dashboards/widgets/dashboard_widgets.dart';
 import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
+import 'package:app_dinix/widgets/fade_slide_in.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
 import 'package:flutter/material.dart';
 import 'package:muller_package/muller_package.dart'
@@ -520,29 +521,35 @@ class _DashboardsPageState extends State<DashboardsPage> {
     return dinixRefresh(
       onRefresh: () => _carregar(forceRefresh: true),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 28),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _secaoResumo(data.painel),
-          appSizedBox(height: 22),
-          _secaoCartoes(data.painel.cartoes),
-          appSizedBox(height: 22),
-          _secaoMetricaPeriodo(
-            titulo: 'Ganhos',
-            icon: Phosphor.trendUp,
-            metrica: data.painel.receitas,
-            valorColor: _corReceita,
-            receita: true,
-          ),
-          appSizedBox(height: 22),
-          _secaoGastos(data.painel),
-          appSizedBox(height: 22),
-          _secaoAssinaturas(data),
-          appSizedBox(height: 22),
-          _secaoPatrimonio(data),
-          appSizedBox(height: 22),
-          _secaoPrevisao(data),
-        ],
+      child: KeyedSubtree(
+        key: ObjectKey(data),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            FadeSlideIn(index: 0, child: _secaoResumo(data.painel)),
+            appSizedBox(height: 22),
+            FadeSlideIn(index: 1, child: _secaoCartoes(data.painel.cartoes)),
+            appSizedBox(height: 22),
+            FadeSlideIn(
+              index: 2,
+              child: _secaoMetricaPeriodo(
+                titulo: 'Ganhos',
+                icon: Phosphor.trendUp,
+                metrica: data.painel.receitas,
+                valorColor: _corReceita,
+                receita: true,
+              ),
+            ),
+            appSizedBox(height: 22),
+            FadeSlideIn(index: 3, child: _secaoGastos(data.painel)),
+            appSizedBox(height: 22),
+            FadeSlideIn(index: 4, child: _secaoAssinaturas(data)),
+            appSizedBox(height: 22),
+            FadeSlideIn(index: 5, child: _secaoPatrimonio(data)),
+            appSizedBox(height: 22),
+            FadeSlideIn(index: 6, child: _secaoPrevisao(data)),
+          ],
+        ),
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/function/await_bloc_refresh.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/models/cartao_credito_model.dart';
 import 'package:app_dinix/models/painel_model.dart';
@@ -13,6 +14,7 @@ import 'package:app_dinix/widgets/app_error_state.dart';
 import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
 import 'package:app_dinix/widgets/dinix_scaffold.dart';
+import 'package:app_dinix/widgets/fade_slide_in.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -45,6 +47,7 @@ class PainelPage extends StatefulWidget {
 
 class _PainelPageState extends State<PainelPage> {
   final PainelBloc bloc = PainelBloc();
+  int _cardAnimIndex = 0;
 
   @override
   void initState() {
@@ -62,15 +65,19 @@ class _PainelPageState extends State<PainelPage> {
     EdgeInsetsGeometry? padding,
     VoidCallback? onTap,
   }) {
-    return Material(
-      color: DinixColors.surfaceElevated,
-      borderRadius: BorderRadius.circular(AppRadius.card),
-      child: InkWell(
-        onTap: onTap,
+    final index = _cardAnimIndex++;
+    return FadeSlideIn(
+      index: index,
+      child: Material(
+        color: DinixColors.surfaceElevated,
         borderRadius: BorderRadius.circular(AppRadius.card),
-        child: Padding(
-          padding: padding ?? const EdgeInsets.all(16),
-          child: child,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(AppRadius.card),
+          child: Padding(
+            padding: padding ?? const EdgeInsets.all(16),
+            child: child,
+          ),
         ),
       ),
     );
@@ -305,6 +312,12 @@ class _PainelPageState extends State<PainelPage> {
     if (cartoes.isEmpty) return const SizedBox.shrink();
 
     final totais = _totaisLimite(cartoes);
+    final limiteCard = _limiteSobrandoCard(
+      sobrando: totais.sobrando,
+      usado: totais.usado,
+      total: totais.total,
+    );
+
     final linhas = <Widget>[];
     for (var i = 0; i < cartoes.length; i += 2) {
       final esquerda = cartoes[i];
@@ -332,11 +345,7 @@ class _PainelPageState extends State<PainelPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _secaoTitulo('Cartões de crédito'),
-        _limiteSobrandoCard(
-          sobrando: totais.sobrando,
-          usado: totais.usado,
-          total: totais.total,
-        ),
+        limiteCard,
         appSizedBox(height: 10),
         ...linhas,
       ],
@@ -507,6 +516,7 @@ class _PainelPageState extends State<PainelPage> {
   }
 
   Widget _conteudo(PainelResumoModel resumo) {
+    _cardAnimIndex = 0;
     final painel = resumo.painel;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -537,6 +547,13 @@ class _PainelPageState extends State<PainelPage> {
     );
   }
 
+  Future<void> _atualizar() => awaitBlocRefresh(
+        bloc,
+        isDone: (state) =>
+            state is PainelSuccessState || state is PainelErrorState,
+        dispatch: () => bloc.add(PainelLoadEvent(forceRefresh: true)),
+      );
+
   Widget _error(ErrorModel errorModel) {
     return appErrorState(
       errorModel: errorModel,
@@ -558,10 +575,12 @@ class _PainelPageState extends State<PainelPage> {
           if (state is PainelErrorState) return _error(state.errorModel);
           if (state is PainelSuccessState) {
             return dinixRefresh(
-              onRefresh: () async =>
-                  bloc.add(PainelLoadEvent(forceRefresh: true)),
+              onRefresh: _atualizar,
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-              child: _conteudo(state.resumo),
+              child: KeyedSubtree(
+                key: ObjectKey(state.resumo),
+                child: _conteudo(state.resumo),
+              ),
             );
           }
           return appLoadingDinix();

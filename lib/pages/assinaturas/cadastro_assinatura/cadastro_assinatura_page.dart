@@ -171,7 +171,7 @@ class _CadastroAssinaturaPageState extends State<CadastroAssinaturaPage> {
       title: 'Conta',
       items: items,
       labelOf: (c) => c.nome ?? '',
-      subtitleOf: (c) => c.nomeBanco,
+      subtitleOf: (c) => TipoConta.rotulo(c.tipoConta),
       selected: items.where((c) => c.id == _idConta).firstOrNull,
       leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
     );

@@ -1,3 +1,4 @@
+import 'package:app_dinix/app_config/app_enums.dart';
 import 'package:app_dinix/app_config/bancos_catalogo.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
@@ -117,7 +118,7 @@ class _CadastroCartaoPageState extends State<CadastroCartaoPage> {
       title: 'Conta de pagamento',
       items: _contas,
       labelOf: (c) => c.nome ?? '',
-      subtitleOf: (c) => c.nomeBanco,
+      subtitleOf: (c) => TipoConta.rotulo(c.tipoConta),
       selected: _contas.where((c) => c.id == _idConta).firstOrNull,
       leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
     );

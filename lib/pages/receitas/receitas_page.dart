@@ -1,4 +1,5 @@
 import 'package:app_dinix/app_config/const/app_consts.dart';
+import 'package:app_dinix/function/await_bloc_refresh.dart';
 import 'package:app_dinix/function/app_formatters.dart';
 import 'package:app_dinix/models/categoria_model.dart';
 import 'package:app_dinix/models/conta_model.dart';
@@ -127,9 +128,12 @@ class _ReceitasPageState extends State<ReceitasPage> {
   }
 
   Widget _lista(ReceitasSuccessState state) {
-    Future<void> atualizar() async {
-      bloc.add(ReceitasLoadEvent(forceRefresh: true));
-    }
+    Future<void> atualizar() => awaitBlocRefresh(
+      bloc,
+      isDone: (state) =>
+          state is ReceitasSuccessState || state is ReceitasErrorState,
+      dispatch: () => bloc.add(ReceitasLoadEvent(forceRefresh: true)),
+    );
 
     if (state.receitas.isEmpty) {
       return listaRefreshVazia(

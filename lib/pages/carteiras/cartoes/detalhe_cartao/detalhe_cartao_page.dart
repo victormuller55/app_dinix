@@ -18,6 +18,7 @@ import 'package:app_dinix/widgets/app_loading.dart';
 import 'package:app_dinix/widgets/app_select_sheet.dart';
 import 'package:app_dinix/widgets/banco_icon.dart';
 import 'package:app_dinix/widgets/empty.dart';
+import 'package:app_dinix/widgets/fade_slide_in.dart';
 import 'package:app_dinix/widgets/lista_refresh.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -37,6 +38,7 @@ class _DetalheCartaoPageState extends State<DetalheCartaoPage> {
   late CartaoCreditoModel _cartao;
   List<FaturaCartaoModel> _faturas = [];
   bool _carregando = true;
+  bool _jaCarregou = false;
   String? _erro;
 
   @override
@@ -49,8 +51,9 @@ class _DetalheCartaoPageState extends State<DetalheCartaoPage> {
   Future<void> _carregar() async {
     final id = _cartao.id;
     if (id == null || id.isEmpty) return;
+    final primeiraCarga = !_jaCarregou;
     setState(() {
-      _carregando = true;
+      if (primeiraCarga) _carregando = true;
       _erro = null;
     });
     try {
@@ -64,6 +67,7 @@ class _DetalheCartaoPageState extends State<DetalheCartaoPage> {
         _cartao = cartao;
         _faturas = faturas;
         _carregando = false;
+        _jaCarregou = true;
       });
     } catch (e) {
       if (!mounted) return;
@@ -364,7 +368,7 @@ class _DetalheCartaoPageState extends State<DetalheCartaoPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _resumo(),
+                      FadeSlideIn(index: 0, child: _resumo()),
                       appSizedBox(height: AppSpacing.medium),
                       Row(
                         children: [
@@ -396,7 +400,12 @@ class _DetalheCartaoPageState extends State<DetalheCartaoPage> {
                           icon: Phosphor.receipt,
                         )
                       else
-                        ..._faturas.map(_itemFatura),
+                        ..._faturas.asMap().entries.map(
+                          (entry) => FadeSlideIn(
+                            index: entry.key + 1,
+                            child: _itemFatura(entry.value),
+                          ),
+                        ),
                       if (_faturas.any((f) => f.isAtual)) ...[
                         appSizedBox(height: AppSpacing.normal),
                         appElevatedButtonDinix(

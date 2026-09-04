@@ -144,7 +144,7 @@ class _CadastroCompraPageState extends State<CadastroCompraPage> {
       title: 'Conta',
       items: items,
       labelOf: (c) => c.nome ?? 'Conta',
-      subtitleOf: (c) => c.nomeBanco,
+      subtitleOf: (c) => TipoConta.rotulo(c.tipoConta),
       selected: items.where((c) => c.id == _idConta).firstOrNull,
       leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
     );
@@ -196,6 +196,8 @@ class _CadastroCompraPageState extends State<CadastroCompraPage> {
       labelOf: (c) => c.nome ?? '',
       selected: items.where((c) => c.id == _idLocal).firstOrNull,
       leadingOf: (_) => Icon(Phosphor.storefront, color: DinixColors.primary),
+      emptyTitle: 'Não há estabelecimentos cadastrados',
+      emptyIcon: Phosphor.storefront,
     );
     if (selecionado == null) return;
     setState(() => _idLocal = selecionado.id);

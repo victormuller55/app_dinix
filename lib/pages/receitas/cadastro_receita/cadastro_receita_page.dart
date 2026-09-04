@@ -1,3 +1,4 @@
+import 'package:app_dinix/app_config/app_enums.dart';
 import 'package:app_dinix/app_config/apple_intelligence_bridge.dart';
 import 'package:app_dinix/app_config/const/app_consts.dart';
 import 'package:app_dinix/function/app_formatters.dart';
@@ -139,7 +140,7 @@ class _CadastroReceitaPageState extends State<CadastroReceitaPage> {
       title: 'Conta de destino',
       items: items,
       labelOf: (c) => c.nome ?? 'Conta',
-      subtitleOf: (c) => c.nomeBanco,
+      subtitleOf: (c) => TipoConta.rotulo(c.tipoConta),
       selected: items.where((c) => c.id == _idConta).firstOrNull,
       leadingOf: (c) => bancoIcon(banco: c.nomeBanco ?? c.nome, size: 32),
     );
